@@ -1,0 +1,10 @@
+*~
+*.dat
+*.root
+*.log
+*.pdf
+*.png
+*.csv
+*.h5
+*.npy
+*.ipynb_checkpoints
