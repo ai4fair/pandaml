@@ -2,13 +2,13 @@ int generatePatternDB() {
 
   Int_t nEvents = 0;
 
-  TString inputFolder = "";
+  TString prefix = "evtcomplete";
 
   // Set input and output files
-  TString simFile = inputFolder+"sim.root";
-  TString parFile = inputFolder+"par.root";
-  TString digiFile = inputFolder+"digi.root"; 				// provides STThit
-  //TString recoFile = inputFolder+"recoideal.root"; 		// provides SttMvdGemIdealTrackCand
+  TString simFile = prefix+"_sim.root";
+  TString parFile = prefix+"_par.root";
+  TString digiFile = prefix+"_digi.root"; 				// provides STThit
+  //TString recoFile = prefix+"_recoideal.root"; 		// provides SttMvdGemIdealTrackCand
   TString outFile = "patterns.root";
   TString digiParFile = "all.par";
 

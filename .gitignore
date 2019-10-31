@@ -7,4 +7,7 @@
 *.csv
 *.h5
 *.npy
+*.pyc
+*.pickle
 *.ipynb_checkpoints
+__pycache__

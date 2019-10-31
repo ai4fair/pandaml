@@ -1,20 +1,19 @@
 // Macro for running Panda digitization tasks
 // to run the macro:
 // root  digi_complete.C  or in root session root>.x  digi_complete.C
-int digi_complete(Int_t nEvents = 0)
+int pid_complete(Int_t nEvents = 0)
 {
   //-----User Settings:------------------------------------------------------
-  TString  parAsciiFile  = "all.par";
-  TString  prefix        = "evtcomplete";
-  //TString  input       = "llbar_fwp.dec";
-  //TString  input       = "box:type(13,10):p(1,2):tht(22,140):phi(0,360)";
-  TString  input         = "box:type(13,10):p(.2,.5):tht(22,140):phi(0,360)";
-  TString  output        = "digi";
-  TString  friend1       = "sim";
-  TString  friend2       = "";
-  TString  friend3       = "";
-  TString  friend4       = "";
-  
+  TString  parAsciiFile   = "all.par";
+  TString  prefix         = "evtcomplete";
+  TString  input          = "llbar_fwp.dec";
+  TString  output         = "pid";
+  TString  friend1        = "sim";
+  TString  friend2        = "digi";
+  TString  friend3        = "reco";
+  TString  friend4        = "";
+  TString  fOptions       = "";
+
   // -----   Initial Settings   --------------------------------------------
   PndMasterRunAna *fRun= new PndMasterRunAna();
   fRun->SetInput(input);
@@ -26,10 +25,12 @@ int digi_complete(Int_t nEvents = 0)
   fRun->SetParamAsciiFile(parAsciiFile);
   fRun->Setup(prefix);
 
+  
   // -----   Add tasks   ----------------------------------------------------
-  fRun->AddDigiTasks();
-
+  fRun->AddPidTasks();
+  
   // -----   Intialise and run   --------------------------------------------
+  PndEmcMapper::Init(1);
   fRun->Init();
   fRun->Run(0, nEvents);
   fRun->Finish();
