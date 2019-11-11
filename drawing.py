@@ -87,11 +87,11 @@ def draw_pickled_history(history, draw_val=True, figsize=(12, 5)):
     return fig
    
 # Draw Event
-def draw_single_event(event=None, event_id=9999, name="event"):
+def plot_single_event(event=None, event_id=9999, name="event"):
     p_ids = np.unique(event.particle_id.values)
     det = pd.read_csv("stt.csv")
     # plt.style.use('seaborn')
-    fig = plt.gcf()
+    # fig = plt.gcf()
     plt.figure(figsize=(10,10))
     skw = det.query('skewed==0')
     nkw = det.query('skewed==1')
@@ -99,8 +99,8 @@ def draw_single_event(event=None, event_id=9999, name="event"):
     plt.scatter(nkw.x.values, nkw.y.values, s=30, facecolors='none', edgecolors='coral')
     for i in p_ids:
         df_ = event.loc[event.particle_id==i]
-        plt.scatter(df_.x.values, df_.y.values, s=30, label='track_id: %d'%i)
-    plt.title('Reconstructed Event # %d'%event_id)
+        plt.scatter(df_.x.values, df_.y.values, s=30, label='particle_id: %d'%i)
+    plt.title('Event # %d'%event_id)
     plt.xlabel('x [cm]', fontsize=10)
     plt.ylabel('y [cm]', fontsize=10)
     plt.xticks(fontsize=10)
@@ -110,9 +110,9 @@ def draw_single_event(event=None, event_id=9999, name="event"):
     #plt.axis('scaled')
     plt.grid(False)
     plt.legend(fontsize=10, loc='best')
-    plt.savefig(name+'_%d.png'%event_id)
-    # plt.show()
-    # return fig
+    # plt.savefig(name+'_%d.png'%event_id)
+    plt.show()
+    #return fig
 
 # Draw Reco Event
 def draw_reco_event(event=None, reco_event=None, event_id=9999, name="reco_event"):
