@@ -5,24 +5,22 @@
 // to run with different options:(e.g more events, different momentum, Geant4)
 // root  sim_complete.C"(100, "TGeant4",2)"
 
-int sim_complete_vis(Int_t nEvents=10000, TString  SimEngine="TGeant4", Double_t BeamMomentum=1.642)
+int sim_complete(Int_t nEvents=10000, TString  SimEngine="TGeant4", Double_t BeamMomentum=4.0)
 {
-	/* ************************************************************************
-	* TString inputGenerator = 
-	* EvtGen -> "xxxxxxxx.dec" (parses dec-file for initial particle) OR
-	* 			"xxxxxxx.dec:initial_particle"
-	* DPM    -> "dpm_xxxxx"
-	* FTF    -> "ftf_xxxxx"
-	* BOX    -> "box:type(pdgcode,mult):p(min,max):tht(min,max):phi(min,max)"
-	************************************************************************ */
+	//User Settings
+	TString parAsciiFile= "all.par";
+	TString prefix      = "evtcomplete";		// prefix string for output files
+
+	//TString inputGenerator = 
+	//EvtGen -> "xxxxxxxx.dec" (parses dec-file for initial particle) or "xxxxxxx.dec:initial_particle"
+	//DPM    -> "dpm_xxxxx"
+	//FTF    -> "ftf_xxxxx"
+	//BOX    -> "box:type(pdgcode,mult):p(min,max):tht(min,max):phi(min,max)"
 	
-	TString parAsciiFile     = "all.par";
-	TString prefix           = "evtcomplete";		// prefix for output files
 	//TString inputGenerator = "dpm";
 	//TString inputGenerator = "ftf";
+	TString inputGenerator = "box:type(13,10):p(1,2):tht(10,120):phi(0,360)";
 	//TString inputGenerator = "llbar_fwp.dec";
-	//TString inputGenerator = "box:type(13,10):p(1,2):tht(22,140):phi(0,360)";
-	TString inputGenerator   = "box:type(13,10):p(3,7):tht(22,140):phi(0,360)";
 	
 	//Create the Simulation Run Manager
 	PndMasterRunSim *fRun = new PndMasterRunSim();
@@ -55,21 +53,6 @@ int sim_complete_vis(Int_t nEvents=10000, TString  SimEngine="TGeant4", Double_t
 	
 	// Add tasks
 	fRun->AddSimTasks();
-	
-	
-	// Event Display (Store Trajectories)
-	fRun->SetStoreTraj(kTRUE);
-	
-	//Trajectory Filter with Cuts (check? gives errors.):
-	/*
-	FairTrajFilter* trajFilter = FairTrajFilter::Instance();
-	trajFilter->SetStepSizeCut(1); 									// 1 cm ???
-	trajFilter->SetVertexCut(-2000.,-2000.,4.,2000.,2000.,100.);	// 
-	trajFilter->SetMomentumCutP(10e-3); 							// p_lab > 10 MeV
-	trajFilter->SetEnergyCut(0.0,1.02); 							// 0 < Etot < 1.04 GeV
-	trajFilter->SetStorePrimaries(kTRUE);
-	trajFilter->SetStoreSecondaries(kTRUE);
-	*/
 	
 	// Intialise and run
 	fRun->Init();

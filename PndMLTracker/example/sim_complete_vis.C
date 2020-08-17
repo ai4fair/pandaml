@@ -7,22 +7,20 @@
 
 int sim_complete_vis(Int_t nEvents=10000, TString  SimEngine="TGeant4", Double_t BeamMomentum=1.642)
 {
-	/* ************************************************************************
-	* TString inputGenerator = 
-	* EvtGen -> "xxxxxxxx.dec" (parses dec-file for initial particle) OR
-	* 			"xxxxxxx.dec:initial_particle"
-	* DPM    -> "dpm_xxxxx"
-	* FTF    -> "ftf_xxxxx"
-	* BOX    -> "box:type(pdgcode,mult):p(min,max):tht(min,max):phi(min,max)"
-	************************************************************************ */
+	//User Settings
+	TString parAsciiFile= "all.par";
+	TString prefix      = "evtcomplete";		// prefix string for output files
+
+	//TString inputGenerator = 
+	//EvtGen -> "xxxxxxxx.dec" (parses dec-file for initial particle) or "xxxxxxx.dec:initial_particle"
+	//DPM    -> "dpm_xxxxx"
+	//FTF    -> "ftf_xxxxx"
+	//BOX    -> "box:type(pdgcode,mult):p(min,max):tht(min,max):phi(min,max)"
 	
-	TString parAsciiFile     = "all.par";
-	TString prefix           = "evtcomplete";		// prefix for output files
 	//TString inputGenerator = "dpm";
 	//TString inputGenerator = "ftf";
+	TString inputGenerator = "box:type(13,10):p(1,2):tht(22,140):phi(0,360)";
 	//TString inputGenerator = "llbar_fwp.dec";
-	//TString inputGenerator = "box:type(13,10):p(1,2):tht(22,140):phi(0,360)";
-	TString inputGenerator   = "box:type(13,10):p(3,7):tht(22,140):phi(0,360)";
 	
 	//Create the Simulation Run Manager
 	PndMasterRunSim *fRun = new PndMasterRunSim();

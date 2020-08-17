@@ -1,0 +1,14 @@
+*~
+*.root
+*.log
+*.pdf
+*.png
+*.csv
+*.dat
+*.h5
+*.npy
+*.ipynb_checkpoints
+.vscode/
+data/
+data_3_7_GeV/
+docs/
