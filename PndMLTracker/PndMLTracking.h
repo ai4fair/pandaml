@@ -35,6 +35,7 @@ private:
 	//Generate Data (CSVs)
 	void GenerateCSV();
 	void GenerateData();
+	void GenerateData_V2();
 	
 	//SttParameters
 	PndGeoSttPar *fSttParameters;
