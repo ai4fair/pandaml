@@ -70,4 +70,5 @@ int pzfinder (Int_t nEvents = 10000) {
     fRun->Run(0, nEvents);
     fRun->Finish();
     return 0;
-    }
+}
+

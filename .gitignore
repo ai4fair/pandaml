@@ -10,4 +10,6 @@
 *.pyc
 *.pickle
 *.ipynb_checkpoints
+core*
 __pycache__
+data*

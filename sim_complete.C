@@ -5,7 +5,7 @@
 // to run with different options:(e.g more events, different momentum, Geant4)
 // root  sim_complete.C"(100, "TGeant4",2)"
 
-int sim_complete(Int_t nEvents=10000, TString  SimEngine="TGeant4", Double_t BeamMomentum=4.0)
+int sim_complete(Int_t nEvents=10, TString  SimEngine="TGeant4", Double_t BeamMomentum=7.0)
 {
 	/* ************************************************************************
 	* TString inputGenerator = 
@@ -21,40 +21,65 @@ int sim_complete(Int_t nEvents=10000, TString  SimEngine="TGeant4", Double_t Bea
 	//TString inputGenerator = "dpm";
 	//TString inputGenerator = "ftf";
 	//TString inputGenerator = "llbar_fwp.dec";
-	//TString inputGenerator = "box:type(13,10):p(1,2):tht(22,140):phi(0,360)";
-	TString inputGenerator   = "box:type(13,10):p(.3,.7):tht(22,140):phi(0,360)";
+	TString inputGenerator   = "box:type(13,10):p(1.0,3.0):tht(22,140):phi(0,360)";
 	
+	Bool_t UseDoubleBox      = kFALSE;
+
+	    
 	//Create the Simulation Run Manager
 	PndMasterRunSim *fRun = new PndMasterRunSim();
-	fRun->SetInput(inputGenerator);
+	
+	if(!UseDoubleBox)
+	    fRun->SetInput(inputGenerator);                               // (UseBoxGenerator = kTRUE)
+	    
 	fRun->SetName(SimEngine);
 	fRun->SetParamAsciiFile(parAsciiFile);
 	fRun->SetNumberOfEvents(nEvents);
 	fRun->SetBeamMom(BeamMomentum);
 	
+	
 	//Initialization
 	fRun->Setup(prefix);
+	
 	
 	//Geometry
 	fRun->CreateGeometry();
 	
-	//Event Generator
-	fRun->SetGenerator();
-
-	//Event Filter Setup
-	FairFilteredPrimaryGenerator *primGen = fRun->GetFilteredPrimaryGenerator();
-	primGen->SetVerbose(1);
-
-	//Example configuration for the event filter
-	/*
-	FairEvtFilterOnSingleParticleCounts* chrgFilter = 
-	new FairEvtFilterOnSingleParticleCounts("chrgFilter");
-	chrgFilter->AndMinCharge(4, FairEvtFilter::kCharged);
-	primGen->AndFilter(chrgFilter);  
-	*/
 	
+	//Event Generator
+	fRun->SetGenerator();                                           // (UseBoxGenerator = kTRUE)
+	
+	
+	//--------------------------------------------------------------
+    //                     BOX Generator mu+ mu-
+    //--------------------------------------------------------------
+	// Box Generator
+    if (UseDoubleBox) 
+    {
+        std::cout << "Using BoxGenerator..." << std::endl;
+        
+        // 1st BoxGenerator
+        FairBoxGenerator* boxGen1 = new FairBoxGenerator(13, 5);    // 13 = muon; 5 = multiplicity
+        boxGen1->SetPRange(1.0, 3.0);                               // GeV/c (1.0 to 3.0)
+        boxGen1->SetPhiRange(0., 360.);                             // Azimuth angle range [degree]
+        boxGen1->SetThetaRange(22., 140.);                          // Polar angle in lab system range [degree]
+        boxGen1->SetXYZ(0., 0., 0.);                                // mm or cm ??
+        fRun->AddGenerator(boxGen1);
+
+        // 2nd BoxGenerator
+        FairBoxGenerator* boxGen2 = new FairBoxGenerator(-13, 5);   // -13 = antimuon; 5 = multiplicity
+        boxGen2->SetPRange(1.0, 3.0);                               // GeV/c (1.0 to 3.0)
+        boxGen2->SetPhiRange(0., 360.);                             // Azimuth angle range [degree]
+        boxGen2->SetThetaRange(22., 140.);                          // Polar angle in lab system range [degree]
+        boxGen2->SetXYZ(0., 0., 0.);                                // mm or cm ??
+        fRun->AddGenerator(boxGen2);
+     
+    }//end
+
+
 	// Add tasks
 	fRun->AddSimTasks();
+	
 	
 	// Intialise and run
 	fRun->Init();
