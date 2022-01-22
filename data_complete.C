@@ -1,4 +1,4 @@
-int trackml_data (Int_t nEvents = 0) {
+int data_complete(Int_t nEvents = 0) {
 
     /* A FairTask (PndMLTracking) to generate data from MCTracks */
     

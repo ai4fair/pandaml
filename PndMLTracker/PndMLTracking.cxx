@@ -303,7 +303,7 @@ void PndMLTracking::GenerateData_V2() {
             << "energyloss"<< ","
             << "volume_id" << ","       // e.g. STT (sub-detectors)
             << "layer_id"  << ","       // e.g. layer_id in STT
-            << "module_id"   << ","       // e.g. tube_id -> layer_id -> STT
+            << "module_id"   << ","     // e.g. tube_id -> layer_id -> STT
             << "skewed"    << ","       // if tube_id is skewed.
             << "sector_id"              // in which sector tube exists.
             <<std::endl;
@@ -476,22 +476,23 @@ void PndMLTracking::GenerateData_V2() {
 		    // std::cout << "mcTrack->GetNPoints(kSTT): " <<  mcTrack->GetNPoints(kSTT) << std::endl;
 		    
 			int q =0;
-			if (mcTrack->GetPdgCode()==13)           //mu+
+			
+			if (mcTrack->GetPdgCode() > 0)           //mu+
 			    q = 1;
 			    
-			else if (mcTrack->GetPdgCode()==-13)     //mu-
+			else if (mcTrack->GetPdgCode() < 0)     //mu-
 			    q = -1;
 		
 			// CSV:: Writting Info to CSV File. 		   
 			fParticles 	<< (mc + 1) << ","                          // track_id > 0
-			            << (mcTrack->GetStartVertex()).X() << ","   // vx = start x
-						<< (mcTrack->GetStartVertex()).Y() << ","   // vy = start y
-						<< (mcTrack->GetStartVertex()).Z() << ","   // vz = start z
+			            << (mcTrack->GetStartVertex()).X() << ","   // vx = start x [cm, ns]
+						<< (mcTrack->GetStartVertex()).Y() << ","   // vy = start y [cm, ns]
+						<< (mcTrack->GetStartVertex()).Z() << ","   // vz = start z [cm, ns]
 						<< (mcTrack->GetMomentum()).X()    << ","   // px = x-component of track momentum
 						<< (mcTrack->GetMomentum()).Y()    << ","   // py = y-component of track momentum
 						<< (mcTrack->GetMomentum()).Z()    << ","   // pz = z-component of track momentum
 						<< q                               << ","   // q = charge of mu-/mu+
-						<< (1.0)                           << ","   // nhits =  number of hits in a track
+						<< (26)                            << ","   // nhits =  number of hits in a track, mctrack.size()??
 						<< mcTrack->GetPdgCode()           << ","   // pdgcode = PDG ID e.g. mu- has pdgcode=-13
 						<< mcTrack->GetStartTime()                  // start_time = starting time of particle track
 						<< std::endl;
