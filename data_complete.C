@@ -1,10 +1,10 @@
 int data_complete(Int_t nEvents=10, TString prefix="evtcomplete") {
     
-    // Files
+    // ROOT Files
     TString parFile     = prefix+"_par.root";
     TString simFile     = prefix+"_sim.root";
     TString digiFile    = prefix+"_digi.root";
-    TString outFile     = "out.root";
+    TString outFile     = prefix+"_out.root";
     
     // Initialization
 	FairLogger::GetLogger()->SetLogToFile(kFALSE);
@@ -21,12 +21,10 @@ int data_complete(Int_t nEvents=10, TString prefix="evtcomplete") {
     FairRootFileSink *fSink = new FairRootFileSink(outFile);
     fRun->SetSink(fSink);
     
-    
 	// FairRuntimeDb
 	FairRuntimeDb *rtdb = fRun->GetRuntimeDb();
 	FairParRootFileIo *parInput1 = new FairParRootFileIo();
 	parInput1->open(parFile.Data());
-	
 	
 	// FairParAsciiFileIo
 	FairParAsciiFileIo* parIo1 = new FairParAsciiFileIo();
@@ -39,11 +37,9 @@ int data_complete(Int_t nEvents=10, TString prefix="evtcomplete") {
 	rtdb->setFirstInput(parInput1);
 	rtdb->setSecondInput(parIo1);
 	
-	
 	// HERE OUR TASK GOES!
     PndMLTracking *genDB = new PndMLTracking();
     fRun->AddTask(genDB);
-
 
     // FairRunAna::Init()
     PndEmcMapper::Init(1);

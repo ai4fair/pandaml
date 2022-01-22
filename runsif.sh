@@ -27,7 +27,7 @@ CONTAINER=$HOME/fair/stable/dev210810.sif    # FairSoft(nov20p1), FairRoot(18.6.
 # Input Flags
 nevt=100
 prefix=evtcomplete
-dec=llbar_fwp.dec
+dec=llbar_fwp.DEC
 mom=1.642
 seed=42
 
@@ -68,10 +68,10 @@ echo ""
 echo "Script has Started..."
 
 echo "Started Simulation..."
-#singularity exec $CONTAINER root -l -b -q sim_complete_vis.C\($nevt,\"$outprefix\",\"$dec\"\) > $outprefix"_sim.log" 2>&1
+singularity exec $CONTAINER root -l -b -q sim_complete_vis.C\($nevt,\"$outprefix\",\"$dec\"\) > $outprefix"_sim.log" 2>&1
 
 echo "Started Digitization..."
-#singularity exec $CONTAINER root -l -b -q digi_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_digi.log" 2>&1
+singularity exec $CONTAINER root -l -b -q digi_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_digi.log" 2>&1
 
 echo "Started CSV Generator..."
 singularity exec $CONTAINER root -l -b -q data_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_data.log" 2>&1
