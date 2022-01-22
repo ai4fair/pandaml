@@ -4,7 +4,7 @@
 # The script is based on runideal.sh script with the only exeption 
 # of running the PandaRoot from a special Singularity container.
 
-if((1)); then
+if((0)); then
   rm *.root
   rm *.log
   rm *.pdf
@@ -18,6 +18,7 @@ if [[ ! -e $path ]]; then
     mkdir $path
 elif [[ ! -d $path ]]; then
     echo "$path already exists but is not a directory" 1>&2
+fi
 
 #CONTAINER=$HOME/fair/stable/v12.0.3.sif     # FairSoft(nov20p1), FairRoot(18.6.3), PandaRoot(v12.0.3)
 CONTAINER=$HOME/fair/stable/dev210810.sif    # FairSoft(nov20p1), FairRoot(18.6.3), PandaRoot(dev210810)
@@ -26,9 +27,7 @@ CONTAINER=$HOME/fair/stable/dev210810.sif    # FairSoft(nov20p1), FairRoot(18.6.
 # Input Flags
 nevt=100
 prefix=evtcomplete
-inputGen=llbar_fwp.DEC
-inputGen=box:type(13,10):p(1.0,3.0):tht(22,140):phi(0,360)
-UseDoubleBox=kFALSE
+dec=llbar_fwp.dec
 mom=1.642
 seed=42
 
@@ -41,18 +40,41 @@ if test "$2" != ""; then
   prefix=$2
 fi
 
+if test "$3" != ""; then
+  dec=$3
+fi
+
+
+outprefix=$path"/"$prefix
+
+# ---------------------------------------------------------------
+#                              Print Flags
+# ---------------------------------------------------------------
+
+echo -e "Events    : $nevt"
+echo -e "Prefix    : $outprefix"
+echo -e "Decay     : $dec"
+echo -e "pBeam     : $mom"
+echo -e "Seed      : $seed"
+
+# Terminate Script for Testing.
+#exit 0;
+
+# ---------------------------------------------------------------
+#                            Initiate Simulaton
+# ---------------------------------------------------------------
 
 echo ""
 echo "Script has Started..."
 
 echo "Started Simulation..."
-singularity exec $CONTAINER root -l -b -q sim_complete.C\($nevt,\"$prefix\",\"$inputGen\",$UseDoubleBox\) > sim.log 2>&1
+#singularity exec $CONTAINER root -l -b -q sim_complete_vis.C\($nevt,\"$outprefix\",\"$dec\"\) > $outprefix"_sim.log" 2>&1
 
 echo "Started Digitization..."
-singularity exec $CONTAINER root -l -b -q digi_complete.C\($nevt,\"$prefix\"\) > digi.log 2>&1
+#singularity exec $CONTAINER root -l -b -q digi_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_digi.log" 2>&1
 
 echo "Started CSV Generator..."
-singularity exec $CONTAINER root -l -b -q data_complete.C\($nevt,\"$prefix\"\) > data.log 2>&1
+singularity exec $CONTAINER root -l -b -q data_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_data.log" 2>&1
 
 echo "Script has Finished..."
 echo ""

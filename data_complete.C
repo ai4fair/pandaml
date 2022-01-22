@@ -1,51 +1,52 @@
-int data_complete(Int_t nEvents = 0) {
-
-    /* A FairTask (PndMLTracking) to generate data from MCTracks */
+int data_complete(Int_t nEvents=10, TString prefix="evtcomplete") {
     
-    TString prefix = "evtcomplete";
-
-    // Set input and output files
-    TString simFile     = prefix+"_sim.root";
+    // Files
     TString parFile     = prefix+"_par.root";
-    TString digiFile    = prefix+"_digi.root"; 				// provides STThit
-    //TString recoFile  = prefix+"_recoideal.root"; 		// provides SttMvdGemIdealTrackCand
-    TString outFile     = "patterns.root";
-    TString digiParFile = "all.par";
+    TString simFile     = prefix+"_sim.root";
+    TString digiFile    = prefix+"_digi.root";
+    TString outFile     = "out.root";
+    
+    // Initialization
+	FairLogger::GetLogger()->SetLogToFile(kFALSE);
+	FairRunAna *fRun = new FairRunAna();
+    
+    // Add Input File to FairFileSource
+    FairFileSource *fSrc = new FairFileSource(simFile);
+	fRun->SetSource(fSrc);
+	
+	// Add Friend File to FairFileSource
+	fSrc->AddFriend(digiFile);
 
-    // Set up run
-    FairRunAna *fRun = new FairRunAna();
-    fRun->SetInputFile(simFile);
-    fRun->AddFriend(digiFile);
-    //fRun->AddFriend(recoFile);
-    fRun->SetOutputFile(outFile);
-    fRun->SetUseFairLinks(kTRUE);
-    fRun->SetGenerateRunInfo(kFALSE);
-
-    // -----  Parameter database   --------------------------------------------
-    TString emcDigiFile = gSystem->Getenv("VMCWORKDIR");
-    emcDigiFile += "/macro/params/";
-    emcDigiFile += digiParFile;
-
-    FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
-    FairParRootFileIo* parInput1 = new FairParRootFileIo();
-    parInput1->open(parFile.Data());
-
-    FairParAsciiFileIo* parIo1 = new FairParAsciiFileIo();
-    parIo1->open(emcDigiFile.Data(),"in");
-
-    rtdb->setFirstInput(parInput1);
-    rtdb->setSecondInput(parIo1);
-
-    // starts the pattern counter, no specific options at the moment
+    // Add Output File to FairRootFileSink
+    FairRootFileSink *fSink = new FairRootFileSink(outFile);
+    fRun->SetSink(fSink);
+    
+    
+	// FairRuntimeDb
+	FairRuntimeDb *rtdb = fRun->GetRuntimeDb();
+	FairParRootFileIo *parInput1 = new FairParRootFileIo();
+	parInput1->open(parFile.Data());
+	
+	
+	// FairParAsciiFileIo
+	FairParAsciiFileIo* parIo1 = new FairParAsciiFileIo();
+	
+	//TString allDigiFile = TString(gSystem->Getenv("VMCWORKDIR"))+"/macro/params/all.par";	 // OR
+	TString allDigiFile = gSystem->Getenv("VMCWORKDIR"); 
+	allDigiFile += "/macro/params/all.par";
+	
+	parIo1->open(allDigiFile.Data(), "in");
+	rtdb->setFirstInput(parInput1);
+	rtdb->setSecondInput(parIo1);
+	
+	
+	// HERE OUR TASK GOES!
     PndMLTracking *genDB = new PndMLTracking();
-    //PndPatternDBGenerator *genDB = new PndPatternDBGenerator();
     fRun->AddTask(genDB);
 
 
-
-    // -----   Intialise and run   --------------------------------------------
+    // FairRunAna::Init()
     PndEmcMapper::Init(1);
-    cout << "fRun->Init()" << endl;
     fRun->Init();
     fRun->Run(0,nEvents);
     return 0;

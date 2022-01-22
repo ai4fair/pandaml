@@ -85,7 +85,7 @@ int sim_complete_vis(Int_t nEvents=100, TString prefix="evtcomplete", TString in
      
     }
     else
-        std::cout << "Using Box or EvtGen Generator..." << << std::endl;
+        std::cout << "Using Box or EvtGen Generator..." << std::endl;
 
 	//----- Add Sim Tasks
     fRun->AddSimTasks();
