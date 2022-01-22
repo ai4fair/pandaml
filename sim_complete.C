@@ -5,7 +5,7 @@
 // to run with different options:(e.g more events, different momentum, Geant4)
 // root  sim_complete.C"(100, "TGeant4", 2)"
 
-int sim_complete(Int_t nEvents=100, TString prefix="evtcomplete", TString inputGen="llbar_fwp.DEC", Bool_t UseDoubleBox=kFALSE, Double_t pBeam=1.642, Int_t seed=42) {
+int sim_complete(Int_t nEvents=100, TString prefix="evtcomplete", TString inputGen="", Double_t pBeam=1.642, Int_t seed=42) {
 
     std::cout << "FLAGS: " << nEvents << "," << prefix << "," << inputGen << "," << pBeam << std::endl;
     std::cout << "SEED : " << seed << std::endl;
@@ -15,7 +15,6 @@ int sim_complete(Int_t nEvents=100, TString prefix="evtcomplete", TString inputG
     
     // OR from a specific seed.
     gRandom->SetSeed(seed);
-    
     
     /* ************************************************************************
     * TString inputGen =
@@ -40,8 +39,10 @@ int sim_complete(Int_t nEvents=100, TString prefix="evtcomplete", TString inputG
     //----- Create the Simulation Run Manager
     PndMasterRunSim *fRun = new PndMasterRunSim();
     
-    if(!UseDoubleBox)
-	    fRun->SetInput(inputGen);                               // (UseBoxGenerator = !UseDoubleBox)
+    if (inputGen.Contains("DEC")) {
+        std::cout << "Using EvtGen Generator..." << std::endl;
+	    fRun->SetInput(inputGen);
+	}
 	    
     fRun->SetName("TGeant4");
     fRun->SetParamAsciiFile(parAsciiFile);
@@ -55,15 +56,28 @@ int sim_complete(Int_t nEvents=100, TString prefix="evtcomplete", TString inputG
     fRun->CreateGeometry();
 
     //----- Event Generator
-    fRun->SetGenerator();                                       // (UseBoxGenerator = !UseDoubleBox)
+    fRun->SetGenerator();
 	
 	
 	//--------------------------------------------------------------
     //                     Box Generator mu+ mu-
     //--------------------------------------------------------------
     
+    // Single Box Generator
+    if (inputGen.Contains("BoxGEN"))
+    {
+        std::cout << "Using Single BoxGenerator..." << std::endl;
+        
+        FairBoxGenerator* boxGen = new FairBoxGenerator(13, 5);    // 13 = muon; 5 = multiplicity
+        boxGen->SetPRange(1.0, 3.0);                               // GeV/c (1.0 to 3.0)
+        boxGen->SetPhiRange(0., 360.);                             // Azimuth angle range [degree]
+        boxGen->SetThetaRange(22., 140.);                          // Polar angle in lab system range [degree]
+        boxGen->SetXYZ(0., 0., 0.);                                // mm or cm ??
+        fRun->AddGenerator(boxGen);
+    }
+    
 	// Double Box Generator
-    if (UseDoubleBox) 
+    if (inputGen.Contains("DBoxGEN"))
     {
         std::cout << "Using Double BoxGenerator..." << std::endl;
         
@@ -84,12 +98,35 @@ int sim_complete(Int_t nEvents=100, TString prefix="evtcomplete", TString inputG
         fRun->AddGenerator(boxGen2);
      
     }
-    else
-        std::cout << "Using Box or EvtGen Generator..." << std::endl;
-
+    
+    // EvtGen Generator
+    if (inputGen.Contains("EvtGenFWP")) {
+    
+        std::cout << "Using EvtGen (FWP) Generator..." << std::endl;
+        
+        inputGen = "llbar_fwp.DEC"
+        PndEvtGenDirect* evtGenDirect = new PndEvtGenDirect("pbarpSystem", inputGen.Data(), pBeam);
+        evtGenDirect->SetStoreTree(kFALSE);
+        fRun->AddGenerator(evtGenDirect);
+    }
+    
+    // EvtGen Generator
+    if (inputGen.Contains("EvtGenBKG")) {
+                
+        std::cout << "Using EvtGen (BKG) Generator..." << std::endl;
+        
+        inputGen = "llbar_bkg.DEC"
+        PndEvtGenDirect* evtGenDirect = new PndEvtGenDirect("pbarpSystem", inputGen.Data(), pBeam);
+        evtGenDirect->SetStoreTree(kFALSE);
+        fRun->AddGenerator(evtGenDirect);
+    }
+    
 	//----- Add Sim Tasks
     fRun->AddSimTasks();
-
+    
+    //----- Event Display (Store Trajectories)
+	//fRun->SetStoreTraj(kTRUE);
+	
     //----- Intialise & Run
     fRun->Init();
     fRun->Run(nEvents); 

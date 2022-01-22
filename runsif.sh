@@ -27,8 +27,14 @@ CONTAINER=$HOME/fair/stable/dev210810.sif    # FairSoft(nov20p1), FairRoot(18.6.
 # Input Flags
 nevt=100
 prefix=evtcomplete
-dec=llbar_fwp.DEC
-mom=1.642
+
+# gen=BGEN                    # Double Box Gen
+# gen=DBGEN                   # Double Box Gen
+# gen=EvtGenFWP               # EvtGen (DEC for FWP)
+# gen=EvtGenBKG               # EvtGen (DEC for BKG)
+gen=llbar_fwp.DEC             # EvtGen (DEC)
+
+pBeam=1.642
 seed=42
 
 
@@ -41,10 +47,10 @@ if test "$2" != ""; then
 fi
 
 if test "$3" != ""; then
-  dec=$3
+  gen=$3
 fi
 
-
+# outprefix
 outprefix=$path"/"$prefix
 
 # ---------------------------------------------------------------
@@ -53,8 +59,8 @@ outprefix=$path"/"$prefix
 
 echo -e "Events    : $nevt"
 echo -e "Prefix    : $outprefix"
-echo -e "Decay     : $dec"
-echo -e "pBeam     : $mom"
+echo -e "Decay     : $gen"
+echo -e "pBeam     : $pBeam"
 echo -e "Seed      : $seed"
 
 # Terminate Script for Testing.
@@ -68,7 +74,7 @@ echo ""
 echo "Script has Started..."
 
 echo "Started Simulation..."
-singularity exec $CONTAINER root -l -b -q sim_complete_vis.C\($nevt,\"$outprefix\",\"$dec\"\) > $outprefix"_sim.log" 2>&1
+singularity exec $CONTAINER root -l -b -q sim_complete_vis.C\($nevt,\"$outprefix\",\"$gen\"\) > $outprefix"_sim.log" 2>&1
 
 echo "Started Digitization..."
 singularity exec $CONTAINER root -l -b -q digi_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_digi.log" 2>&1

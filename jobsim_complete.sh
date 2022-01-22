@@ -1,24 +1,32 @@
 #!/bin/bash
 
+# *** Cluster USAGE ***
+# sbatch [options] -- jobsim_complete.sh <prefix> <events> <dec> <pbeam> [opt] [mode]
+
 # *** Local USAGE ***
-# Same as jobsim_aod.sh script except it will use storage 
-# on local Laptop/PC rather than using LUSTRE STORAGE etc.
+# ./jobsim_complete.sh <prefix> <events> <dec>
+# ./jobsim_complete.sh llbar 100 llbar_fwp.DEC
 
 
 if [ $# -lt 3 ]; then
-  echo -e "\nUSAGE: ./runall.sh <prefix> <nEvents> <dec> <pbeam>\n"
+  echo -e "\nMinimum Three Arguments Are Required\n"
+  echo -e "USAGE: sbatch -a<min>-<max> -- jobsim_complete.sh <prefix> <nEvents> <dec>\n"
+  echo -e " <min>     : Minimum job number"
+  echo -e " <max>     : Maximum job number"
   echo -e " <prefix>  : Prefix of output files"
   echo -e " <nevts>   : Number of events to be simulated"
   echo -e " <dec>     : Decay File or Keywords: fwp (signal), bkg (non-resonant bkg), dpm (generic bkg)"
   echo -e " <pbeam>   : Momentum of pbar-beam (GeV/c)."
-  echo -e "\nMinimum Three Arguments Are Required."
-  echo -e "Example: ./runall.sh fwp 100 llbar_fwp.DEC\n"
+  echo -e " [opt]     : Optional options: if contains 'savesim', 'saveall' or 'ana'\n";
+  echo -e "Example 1 : sbatch -a1-20 [options] jobsim_complete.sh fwp 1000 llbar_fwp.DEC"
+  echo -e "Example 2 : ./jobsim_complete.sh fwp 100 llbar_fwp.DEC\n"
   exit 1
 fi
 
 
 # Lustre Storage
-LUSTRE_HOME=$HOME"/current/2_deepana"
+# LUSTRE_HOME=/lustre/$(id -g -n)/$USER
+LUSTRE_HOME="/lustre/panda/"$USER
 
 
 # Working Directory
@@ -26,12 +34,14 @@ nyx=$LUSTRE_HOME"/hpc"
 
 
 # Data Storage
+tmpdir="/tmp/"$USER
 _target=$nyx"/data"
 
 
 # Init PandaRoot
-. "/home/adeel/fair/pandaroot_dev/build-April2021/config.sh"
-
+#. $LUSTRE_HOME"/pandaroot/build-dev/config.sh"
+#. $LUSTRE_HOME"/pandaroot/install-dev/bin/config.sh" -p
+. $LUSTRE_HOME"/CENTOS/dev-install/bin/config.sh" -p
 
 echo -e "\n";
 
@@ -65,6 +75,33 @@ if test "$4" != ""; then
   mom=$4
 fi
 
+if test "$5" != ""; then
+  opt=$5
+fi
+
+if test "$6" != ""; then
+  mode=$6
+fi
+
+
+# Get .DEC if Only Keywords [fwp,bkg,dpm] Are Given.
+# e.g. ./jobsim_complete.sh llbar 100 fwp 1.642
+
+if [[ $dec == "fwp" ]]; then
+    _target=$nyx"/data/"$dec
+    dec="llbar_fwp.DEC"
+fi
+
+if [[ $dec == "bkg" ]]; then
+    _target=$nyx"/data/"$dec
+    dec="llbar_bkg.DEC"
+fi 
+
+if [[ $dec == "dpm" ]]; then
+    _target=$nyx"/data/"$dec
+    dec="dpm"
+fi
+
 
 # Deduce Signal/Bkg from .DEC & Create Storage Accordingly.
 # e.g. ./jobsim_complete.sh llbar 100 llbar_fwp.DEC 1.642
@@ -84,17 +121,16 @@ if [[ $dec == *"dpm"* ]]; then
     #_target=$nyx"/data/dpm"
 fi
 
-
 # Prepend Absolute Path to .DEC File
 if [[ $dec == *".dec"* ]]; then
   if [[ $dec != \/* ]] ; then
-	dec=$nyx"/"$dec
+    dec=$nyx"/"$dec
   fi
 fi
 
 if [[ $dec == *".DEC"* ]]; then
   if [[ $dec != \/* ]] ; then
-	dec=$nyx"/"$dec
+    dec=$nyx"/"$dec
   fi
 fi
 
@@ -111,14 +147,14 @@ fi
 # IF ARRAY_TASK Used
 if test "$run" == ""; then
     tmpdir="/tmp/"$USER
-	outprefix=$tmpdir"/"$prefix
-	seed=4200
-	pidfile=$outprefix"_pid.root"
+    outprefix=$tmpdir"/"$prefix
+    seed=4200
+    pidfile=$outprefix"_pid.root"
 else
     tmpdir="/tmp/"$USER"_"$SLURM_JOB_ID
-	outprefix=$tmpdir"/"$prefix"_"$run
-	seed=$SLURM_ARRAY_TASK_ID
-	pidfile=$outprefix"_pid.root"
+    outprefix=$tmpdir"/"$prefix"_"$run
+    seed=$SLURM_ARRAY_TASK_ID
+    pidfile=$outprefix"_pid.root"
 fi
 
 
@@ -151,8 +187,10 @@ echo -e "IsSignal  : $IsSignal"
 echo -e "TargetMode: $TargetMode"
 echo -e "PID File  : $pidfile"
 
+
 # Terminate Script for Testing.
 # exit 0;
+
 
 # ---------------------------------------------------------------
 #                            Initiate Simulaton
@@ -163,13 +201,13 @@ echo "Started Simulating..."
 root -l -b -q $nyx"/"prod_sim.C\($nevt,\"$outprefix\",\"$dec\",$mom,$seed,$TargetMode\) > $outprefix"_sim.log" 2>&1
 
 echo "Started Digitization..."
-root -l -b -q $nyx"/"prod_digi.C\($nevt,\"$outprefix\"\) > $outprefix"_digi.log" 2>&1
+root -l -b -q $nyx"/"prod_digi.C\($nevt,\"$outprefix\"\) > $outprefix"_digi.log" 2>&1 
 
 echo "Started Ideal Reconstruction..."
 root -l -b -q $nyx"/"prod_rec.C\($nevt,\"$outprefix\"\) > $outprefix"_reco.log" 2>&1
 
 echo "Started Ideal PID..."
-root -l -b -q $nyx"/"prod_pid.C\($nevt,\"$outprefix\"\) > $outprefix"_pid.log" 2>&1
+root -l -b -q $nyx"/"prod_pid.C\($nevt,\"$outprefix\"\) > $outprefix"_pid.log" 2>&1 
 
 echo "Finished Simulating..."
 echo ""
@@ -206,13 +244,12 @@ echo "Moving Files from '$tmpdir' to '$_target'"
 # move root files to target dir
 mv $outprefix"_par.root" $_target
 mv $outprefix"_sim.root" $_target
-mv $outprefix"_digi.root" $_target
-mv $outprefix"_reco.root" $_target
-mv $outprefix"_pid.root" $_target
-
 mv $outprefix"_sim.log" $_target
+mv $outprefix"_digi.root" $_target
 mv $outprefix"_digi.log" $_target
+mv $outprefix"_reco.root" $_target
 mv $outprefix"_reco.log" $_target
+mv $outprefix"_pid.root" $_target
 mv $outprefix"_pid.log" $_target
 
 
