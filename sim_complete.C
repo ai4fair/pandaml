@@ -5,10 +5,10 @@
 // to run with different options:(e.g more events, different momentum, Geant4)
 // root  sim_complete.C"(100, "TGeant4", 2)"
 
-int sim_complete(Int_t nEvents=100, TString prefix="evtcomplete", TString inputGen="", Double_t pBeam=1.642, Int_t seed=42) {
+int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Double_t pBeam=1.642, Int_t seed=42) {
 
-    std::cout << "FLAGS: " << nEvents << "," << prefix << "," << inputGen << "," << pBeam << std::endl;
-    std::cout << "SEED : " << seed << std::endl;
+    std::cout << "\nFLAGS: " << nEvents << "," << prefix << "," << inputGen << "," << pBeam << std::endl;
+    std::cout << "SEED : " << seed << std::endl << std::endl;
     
     // Set Seed for Random Generator
     // gRandom->SetSeed();
@@ -40,7 +40,7 @@ int sim_complete(Int_t nEvents=100, TString prefix="evtcomplete", TString inputG
     PndMasterRunSim *fRun = new PndMasterRunSim();
     
     if (inputGen.Contains("DEC")) {
-        std::cout << "Using EvtGen Generator..." << std::endl;
+        std::cout << "-I- Using EvtGen Generator..." << std::endl;
 	    fRun->SetInput(inputGen);
 	}
 	    
@@ -66,7 +66,7 @@ int sim_complete(Int_t nEvents=100, TString prefix="evtcomplete", TString inputG
     // Single Box Generator
     if (inputGen.Contains("BoxGEN"))
     {
-        std::cout << "Using Single BoxGenerator..." << std::endl;
+        std::cout << "-I- Using Single BoxGenerator..." << std::endl;
         
         FairBoxGenerator* boxGen = new FairBoxGenerator(13, 5);    // 13 = muon; 5 = multiplicity
         boxGen->SetPRange(1.0, 3.0);                               // GeV/c (1.0 to 3.0)
@@ -79,7 +79,7 @@ int sim_complete(Int_t nEvents=100, TString prefix="evtcomplete", TString inputG
 	// Double Box Generator
     if (inputGen.Contains("DBoxGEN"))
     {
-        std::cout << "Using Double BoxGenerator..." << std::endl;
+        std::cout << "-I- Using Double BoxGenerator..." << std::endl;
         
         // 1st BoxGenerator
         FairBoxGenerator* boxGen1 = new FairBoxGenerator(13, 5);    // 13 = muon; 5 = multiplicity
@@ -102,9 +102,9 @@ int sim_complete(Int_t nEvents=100, TString prefix="evtcomplete", TString inputG
     // EvtGen Generator
     if (inputGen.Contains("EvtGenFWP")) {
     
-        std::cout << "Using EvtGen (FWP) Generator..." << std::endl;
+        std::cout << "-I- Using EvtGen (FWP) Generator..." << std::endl;
         
-        inputGen = "llbar_fwp.DEC"
+        inputGen = "llbar_fwp.DEC";
         PndEvtGenDirect* evtGenDirect = new PndEvtGenDirect("pbarpSystem", inputGen.Data(), pBeam);
         evtGenDirect->SetStoreTree(kFALSE);
         fRun->AddGenerator(evtGenDirect);
@@ -113,9 +113,9 @@ int sim_complete(Int_t nEvents=100, TString prefix="evtcomplete", TString inputG
     // EvtGen Generator
     if (inputGen.Contains("EvtGenBKG")) {
                 
-        std::cout << "Using EvtGen (BKG) Generator..." << std::endl;
+        std::cout << "-I- Using EvtGen (BKG) Generator..." << std::endl;
         
-        inputGen = "llbar_bkg.DEC"
+        inputGen = "llbar_bkg.DEC";
         PndEvtGenDirect* evtGenDirect = new PndEvtGenDirect("pbarpSystem", inputGen.Data(), pBeam);
         evtGenDirect->SetStoreTree(kFALSE);
         fRun->AddGenerator(evtGenDirect);
@@ -125,7 +125,7 @@ int sim_complete(Int_t nEvents=100, TString prefix="evtcomplete", TString inputG
     fRun->AddSimTasks();
     
     //----- Event Display (Store Trajectories)
-	//fRun->SetStoreTraj(kTRUE);
+	fRun->SetStoreTraj(kTRUE);
 	
     //----- Intialise & Run
     fRun->Init();

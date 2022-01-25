@@ -1,7 +1,7 @@
 // Macro for running Panda digitization tasks
 // to run the macro:
 // root  digi_complete.C  or in root session root>.x  digi_complete.C
-int digi_complete(Int_t nEvents=10, TString prefix="ll") {
+int digi_complete(Int_t nEvents=10, TString prefix="") {
 
     //***
     //----- User Settings

@@ -1,4 +1,4 @@
-int data_complete(Int_t nEvents=10, TString prefix="evtcomplete") {
+int data_complete(Int_t nEvents=10, TString prefix="") {
     
     // ROOT Files
     TString parFile     = prefix+"_par.root";

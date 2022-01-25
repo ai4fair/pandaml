@@ -30,9 +30,10 @@ prefix=evtcomplete
 
 # gen=BGEN                    # Double Box Gen
 # gen=DBGEN                   # Double Box Gen
+gen=llbar_bkg.DEC             # EvtGen (DEC)
 # gen=EvtGenFWP               # EvtGen (DEC for FWP)
 # gen=EvtGenBKG               # EvtGen (DEC for BKG)
-gen=llbar_fwp.DEC             # EvtGen (DEC)
+
 
 pBeam=1.642
 seed=42
@@ -74,7 +75,7 @@ echo ""
 echo "Script has Started..."
 
 echo "Started Simulation..."
-singularity exec $CONTAINER root -l -b -q sim_complete_vis.C\($nevt,\"$outprefix\",\"$gen\"\) > $outprefix"_sim.log" 2>&1
+singularity exec $CONTAINER root -l -b -q sim_complete.C\($nevt,\"$outprefix\",\"$gen\"\) > $outprefix"_sim.log" 2>&1
 
 echo "Started Digitization..."
 singularity exec $CONTAINER root -l -b -q digi_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_digi.log" 2>&1
