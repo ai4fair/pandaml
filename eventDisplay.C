@@ -10,7 +10,7 @@ void eventDisplay(TString prefix="./data/evtcomplete") {
     TString recoFile     = prefix+"_reco.root";
     TString outFile      = "display.root";
     
-    /*
+    
     // Initialization
 	FairLogger::GetLogger()->SetLogToFile(kFALSE);
 	FairRunAna *fRun = new FairRunAna();
@@ -18,7 +18,7 @@ void eventDisplay(TString prefix="./data/evtcomplete") {
     // Add I/O Files
     FairFileSource *fSrc = new FairFileSource(simFile);
 	fRun->SetSource(fSrc);
-	fSrc->AddFriend(digiFile);
+	//fSrc->AddFriend(digiFile);
     //fSrc->AddFriend(recoFile);
     
     FairRootFileSink *fSink = new FairRootFileSink(outFile);
@@ -35,9 +35,10 @@ void eventDisplay(TString prefix="./data/evtcomplete") {
 	parAsciiFile = TString(gSystem->Getenv("VMCWORKDIR"))+"/macro/params/all.par";
 	parIo1->open(parAsciiFile.Data(), "in");
 	rtdb->setSecondInput(parIo1);
-	*/
+	
 	
 	// OR, Using MasterRunAna
+	/*
 	PndMasterRunAna *fRun= new PndMasterRunAna();
 	fRun->SetInput(input);
 	fRun->AddFriend(simFile);
@@ -46,6 +47,7 @@ void eventDisplay(TString prefix="./data/evtcomplete") {
 	fRun->SetParamAsciiFile(parAsciiFile);
 	fRun->Setup(prefix);
 	fRun->SetUseFairLinks(kTRUE);
+	*/
 	
 	// FairEventManager
 	FairEventManager *fMan= new FairEventManager();
