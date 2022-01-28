@@ -98,6 +98,10 @@ InitStatus PndMLTracking::Init() {
 	fGemHitArray = (TClonesArray*) ioman->GetObject("GEMHit");
 	gemHitBranchID = ioman->GetBranchId("GEMHit");
 	
+	// Access STTPoint (MC) branch and determine its branch ID
+	fSttPointArray = (TClonesArray*) ioman->GetObject("STTPoint");
+	sttPointBranchID = ioman->GetBranchId("STTPoint");
+	
 	// Access STTHit branch and determine its branch ID
 	fSttHitArray = (TClonesArray*) ioman->GetObject("STTHit");
 	sttHitBranchID = ioman->GetBranchId("STTHit");
@@ -283,10 +287,10 @@ void PndMLTracking::Exec(Option_t* /*opt*/) {
 
 
 // GenerateMvdData()
-void PndMLTracking::GenerateSttData() { /* Under Construction */ }
+void PndMLTracking::GenerateMvdData() { /* Under Construction */ }
 
 // GenerateGemData()
-void PndMLTracking::GenerateSttData() { /* Under Construction */ }
+void PndMLTracking::GenerateGemData() { /* Under Construction */ }
 
 
 // GenerateSttData()

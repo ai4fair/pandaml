@@ -67,14 +67,20 @@ private:
 	int mcTrackBranchID;               // BranchID for MC Points
 	TClonesArray *fMCTrackArray;       // Storage for MC Points
 	
+	// MVD
 	int mvdHitsPixelBranchID;          // BranchID for MVD Pixel Hits
 	TClonesArray *fMvdHitsPixelArray;  // Storage for MVD Pixel Hits
 	
 	int mvdHitsStripBranchID;          // BranchID for MVD Strip Hits
 	TClonesArray *fMvdHitsStripArray;  // Storage for MVD Strip Hits
 	
+	// GEM
 	int gemHitBranchID;                // BranchID for GEM Hits
 	TClonesArray *fGemHitArray;        // Storage for GEM Hits
+	
+	// STT
+	int sttPointBranchID;              // BranchID for STT Hits
+	TClonesArray *fSttPointArray;      // Storage for STT Hits
 	
 	int sttHitBranchID;                // BranchID for STT Hits
 	TClonesArray *fSttHitArray;        // Storage for STT Hits
