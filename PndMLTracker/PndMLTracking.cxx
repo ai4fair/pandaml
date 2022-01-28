@@ -460,7 +460,7 @@ void PndMLTracking::GenerateSttData() {
 		
 		    // Print MCTrack
 		    // mcTrack->Print(mc);
-		    std::cout << "mcTrack->GetNPoints(kSTT): " << mcTrack->GetNPoints(kSTT) << std::endl;
+		    // std::cout << "mcTrack->GetNPoints(kSTT): " << mcTrack->GetNPoints(kSTT) << std::endl;
 		    
 			int q =0;
 			if (mcTrack->GetPdgCode() > 0)           //mu+
@@ -477,7 +477,7 @@ void PndMLTracking::GenerateSttData() {
 						<< (mcTrack->GetMomentum()).Y()    << ","   // py = y-component of track momentum
 						<< (mcTrack->GetMomentum()).Z()    << ","   // pz = z-component of track momentum
 						<< q                               << ","   // q = charge of mu-/mu+
-						<< mcTrack->GetNPoints(9)          << ","   // FIXME: Maybe mcTrack->GetNPoints(kSTT) where kSTT=9 (DetectorID)
+						<< 26                              << ","   // FIXME: Maybe mcTrack->GetNPoints(kSTT) where kSTT=??? (DetectorID)
 						<< mcTrack->GetPdgCode()           << ","   // pdgcode e.g. mu- has pdgcode=-13
 						<< mcTrack->GetStartTime()                  // start_time = starting time of particle track
 						<< std::endl;
