@@ -507,7 +507,7 @@ void PndMLTracking::GenerateSttData() {
 					// If the number of STT hits greater than 0, write MC track to file!!
 		
 			        // CSV:: Writting Info to CSV File. 		   
-			        fParticles 	<< (std::to_string(links.GetLink(i) + 1)) << "," // FIXME: track_id > 0
+			        fParticles 	<< (std::to_string(links.GetLink(i).GetIndex() + 1)) << "," // FIXME: track_id > 0
 			                    << (mcTrack->GetStartVertex()).X() << ","   // vx = start x [cm, ns]
 						        << (mcTrack->GetStartVertex()).Y() << ","   // vy = start y [cm, ns]
 						        << (mcTrack->GetStartVertex()).Z() << ","   // vz = start z [cm, ns]
