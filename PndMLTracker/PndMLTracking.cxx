@@ -491,7 +491,7 @@ void PndMLTracking::GenerateSttData() {
 	FairMultiLinkedData linksSTT;
 	PndMCTrack *mcTrack;
 	
-	std::cout << "Starting fParticle: " << mcTrackLinks_sorted.size() << std::endl;
+	std::cout << "Starting fParticle... " << std::endl;
 	
 	FairRootManager *ioman = FairRootManager::Instance();
 	
