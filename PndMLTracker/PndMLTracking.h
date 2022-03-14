@@ -85,6 +85,10 @@ private:
 	int sttHitBranchID;                // BranchID for STT Hits
 	TClonesArray *fSttHitArray;        // Storage for STT Hits
 	
+	// SttMvdGemTrack
+	int sttMvdGemTrackBranchID;        // BranchID for STT Hits
+	TClonesArray *fSttMvdGemTrackArray;     // Storage for STT Hits
+	
 	//Global Counters
 	unsigned int fHitId;               // Hit ID
 	unsigned int fEventId;             // Event ID

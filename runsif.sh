@@ -22,7 +22,7 @@ fi
 
 # PandaRoot
 #CONTAINER=$HOME/fair/stable/v12.0.3.sif     # FairSoft(nov20p1), FairRoot(18.6.3), PandaRoot(v12.0.3)
-CONTAINER=$HOME/fair/stable/dev210810.sif    # FairSoft(nov20p1), FairRoot(18.6.3), PandaRoot(dev210810)
+CONTAINER=$HOME/fair/containers/dev220310    # FairSoft(nov20p1), FairRoot(18.6.3), PandaRoot(dev210810)
 
 
 # Input Flags
@@ -30,8 +30,8 @@ nevt=100
 prefix=evtcomplete
 
 # gen=BGEN                    # Single Box Gen
-# gen=DBGEN                   # Double Box Gen
-gen=llbar_bkg.DEC             # EvtGen (DEC)
+gen=DBGEN                   # Double Box Gen
+# gen=llbar_bkg.DEC             # EvtGen (DEC)
 pBeam=1.642
 seed=42
 
@@ -76,6 +76,9 @@ singularity exec $CONTAINER root -l -b -q sim_complete.C\($nevt,\"$outprefix\",\
 
 echo "Started Digitization..."
 singularity exec $CONTAINER root -l -b -q digi_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_digi.log" 2>&1
+
+echo "Started Ideal Reconstruction..."
+singularity exec $CONTAINER root -l -b -q recoideal_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_reco.log" 2>&1
 
 echo "Started CSV Generator..."
 singularity exec $CONTAINER root -l -b -q data_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_data.log" 2>&1

@@ -3,7 +3,7 @@
 // root  recoideal_complete.C  or in root session root>.x  recoideal_complete.C
 int recoideal_complete(Int_t nEvents=10, TString prefix="") {
     
-    std::cout << "FLAGS: " << nEvents << "," << prefix << "," << options << std::endl;
+    std::cout << "FLAGS: " << nEvents << "," << prefix << std::endl;
     std::cout << std::endl;
     
     //----- User Settings    

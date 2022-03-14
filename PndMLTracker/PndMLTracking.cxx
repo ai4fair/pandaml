@@ -105,6 +105,10 @@ InitStatus PndMLTracking::Init() {
 	// Access STTHit branch and determine its branch ID
 	fSttHitArray = (TClonesArray*) ioman->GetObject("STTHit");
 	sttHitBranchID = ioman->GetBranchId("STTHit");
+	
+	// Access SttMvdGemGenTrack branch and determine its branch ID
+	TClonesArray* fSttMvdGemTrackArray = (TClonesArray*) ioman->GetObject("SttMvdGemTrack");
+	sttMvdGemTrackBranchID = ioman->GetBranchId("SttMvdGemTrack");
 	      
 	std::cout << "-I- PndMLTracking: Initialisation successful" << std::endl;
 	return kSUCCESS;
@@ -368,7 +372,7 @@ void PndMLTracking::GenerateSttData() {
         
         // Get MCTrack ID associated with each hit_idx (fSttHitArray)
         std::vector<FairLink> mcTrackLinks_sorted = sttHitsLinks->GetSortedMCTracks();
-        std::cout << "No. of MCTracks Linked to STTHit: " << mcTrackLinks_sorted.size() << std::endl;
+        //std::cout << "No. of MCTracks Linked to STTHit: " << mcTrackLinks_sorted.size() << std::endl;
         
 		for (unsigned int trackIndex = 0; trackIndex < mcTrackLinks_sorted.size(); trackIndex++) {
 		
@@ -487,45 +491,48 @@ void PndMLTracking::GenerateSttData() {
 	FairMultiLinkedData linksSTT;
 	PndMCTrack *mcTrack;
 	
-	for (Int_t i_Array = 0; i_Array < SttMvdGemGenTrackArray ->GetEntries(); i_Array++) { //loop over trackarray
+	std::cout << "Starting fParticle: " << mcTrackLinks_sorted.size() << std::endl;
 	
-	sttMvdGemGenTrack = (PndTrack *) SttMvdGemGenTrackArray ->At(i_Array);
-
-	mcTrack = NULL;
-	links = sttMvdGemGenTrack->GetLinksWithType(ioman->GetBranchId("MCTrack")); // create the links between the track and the MCTrack
-	if (links.GetNLinks()>0){
-		for (Int_t i=0; i<links.GetNLinks(); i++){
-
-			if(links.GetLink(i).GetIndex()==sttMvdGemGenTrack->GetTrackCand().getMcTrackId()) {
-
-				mcTrack= (PndMCTrack *) ioman->GetCloneOfLinkData(links.GetLink(i));
-				//if (mcTrack->IsGeneratorLast()) {
-
-					// Check the number of STT hits
-					linksSTT = sttMvdGemGenTrack->GetLinksWithType(ioman->GetBranchId("STTHit"));
-					
-					// If the number of STT hits greater than 0, write MC track to file!!
-		
-			        // CSV:: Writting Info to CSV File. 		   
-			        fParticles 	<< (std::to_string(links.GetLink(i).GetIndex() + 1)) << "," // FIXME: track_id > 0
-			                    << (mcTrack->GetStartVertex()).X() << ","   // vx = start x [cm, ns]
-						        << (mcTrack->GetStartVertex()).Y() << ","   // vy = start y [cm, ns]
-						        << (mcTrack->GetStartVertex()).Z() << ","   // vz = start z [cm, ns]
-						        << (mcTrack->GetMomentum()).X()    << ","   // px = x-component of track momentum
-						        << (mcTrack->GetMomentum()).Y()    << ","   // py = y-component of track momentum
-						        << (mcTrack->GetMomentum()).Z()    << ","   // pz = z-component of track momentum
-						        << ((mcTrack->GetPdgCode()>0)?1:-1)<< ","   // FIXME: q = charge of mu-/mu+
-						        << (linksSTT.GetNLinks())          << ","   // FIXME: nhits
-						        << mcTrack->GetPdgCode()           << ","   // pdgcode e.g. mu- has pdgcode=-13
-						        << mcTrack->GetStartTime()                  // start_time = starting time of particle track
-						        << std::endl;
-						        
-					//}//end-IsGeneratorLast()
-				}//end-if
-				
-			}//end-for(GetNLinks)
-		}//end-if(GetNLinks)
+	FairRootManager *ioman = FairRootManager::Instance();
 	
+	for (Int_t i_Array = 0; i_Array < fSttMvdGemTrackArray->GetEntries(); i_Array++) { //loop over trackarray
+	    std::cout << "IdealTrack # : " << i_Array << std::endl;
+	    PndTrack *sttMvdGemTrack = (PndTrack *)fSttMvdGemTrackArray->At(i_Array);
+
+	    mcTrack = NULL;
+	    links = sttMvdGemTrack->GetLinksWithType(ioman->GetBranchId("MCTrack")); // create the links between the track and the MCTrack
+	    if (links.GetNLinks()>0){
+		    for (Int_t i=0; i<links.GetNLinks(); i++){
+
+			    if(links.GetLink(i).GetIndex()==sttMvdGemTrack->GetTrackCand().getMcTrackId()) {
+
+				    mcTrack= (PndMCTrack *) ioman->GetCloneOfLinkData(links.GetLink(i));
+				    //if (mcTrack->IsGeneratorLast()) {
+
+					    // Check the number of STT hits
+					    linksSTT = sttMvdGemTrack->GetLinksWithType(ioman->GetBranchId("STTHit"));
+					    
+					    // If the number of STT hits greater than 0, write MC track to file!!
+		    
+			            // CSV:: Writting Info to CSV File. 		   
+			            fParticles 	<< (std::to_string(links.GetLink(i).GetIndex() + 1)) << "," // FIXME: track_id > 0
+			                        << (mcTrack->GetStartVertex()).X() << ","   // vx = start x [cm, ns]
+						            << (mcTrack->GetStartVertex()).Y() << ","   // vy = start y [cm, ns]
+						            << (mcTrack->GetStartVertex()).Z() << ","   // vz = start z [cm, ns]
+						            << (mcTrack->GetMomentum()).X()    << ","   // px = x-component of track momentum
+						            << (mcTrack->GetMomentum()).Y()    << ","   // py = y-component of track momentum
+						            << (mcTrack->GetMomentum()).Z()    << ","   // pz = z-component of track momentum
+						            << ((mcTrack->GetPdgCode()>0)?1:-1)<< ","   // FIXME: q = charge of mu-/mu+
+						            << (linksSTT.GetNLinks())          << ","   // FIXME: nhits
+						            << mcTrack->GetPdgCode()           << ","   // pdgcode e.g. mu- has pdgcode=-13
+						            << mcTrack->GetStartTime()                  // start_time = starting time of particle track
+						            << std::endl;
+						            
+					    //}//end-IsGeneratorLast()
+				    }//end-if
+				 
+			    }//end-for(GetNLinks)
+		    }//end-if(GetNLinks)
 	} //SttMvdGemTrack Array
 	
 

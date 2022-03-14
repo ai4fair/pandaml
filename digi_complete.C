@@ -31,6 +31,7 @@ int digi_complete(Int_t nEvents=10, TString prefix="") {
     fRun->AddDigiTasks();
 
     //----- Intialise & Run
+    PndEmcMapper::Init(1);
     fRun->Init();
     fRun->Run(0, nEvents);
     fRun->Finish();

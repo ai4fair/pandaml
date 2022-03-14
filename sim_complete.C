@@ -64,7 +64,7 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
     //--------------------------------------------------------------
     
     // Single Box Generator
-    if (inputGen.Contains("BoxGEN"))
+    if (inputGen.Contains("BGEN"))
     {
         std::cout << "-I- Using Single BoxGenerator..." << std::endl;
         
@@ -77,7 +77,7 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
     }
     
 	// Double Box Generator
-    if (inputGen.Contains("DBoxGEN"))
+    if (inputGen.Contains("DBGEN"))
     {
         std::cout << "-I- Using Double BoxGenerator..." << std::endl;
         
@@ -125,9 +125,10 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
     fRun->AddSimTasks();
     
     //----- Event Display (Store Trajectories)
-	fRun->SetStoreTraj(kTRUE);
+	// fRun->SetStoreTraj(kTRUE);
 	
     //----- Intialise & Run
+    PndEmcMapper::Init(1);
     fRun->Init();
     fRun->Run(nEvents); 
     fRun->Finish();
