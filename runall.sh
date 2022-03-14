@@ -27,8 +27,8 @@ fi
 nevt=100
 prefix=evtcomplete
 
-# gen=BGEN                    # Single Box Gen
-gen=DBGEN                     # Double Box Gen
+# gen=SBoxGEN                    # Single Box Gen
+gen=DBoxGEN                     # Double Box Gen
 # gen=llbar_bkg.DEC           # EvtGen (DEC)
 pBeam=1.642
 seed=42

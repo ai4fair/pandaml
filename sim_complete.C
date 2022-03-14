@@ -64,7 +64,7 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
     //--------------------------------------------------------------
     
     // Single Box Generator
-    if (inputGen.Contains("BGEN"))
+    if (inputGen.Contains("SBoxGEN"))
     {
         std::cout << "-I- Using Single BoxGenerator..." << std::endl;
         
@@ -77,7 +77,7 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
     }
     
 	// Double Box Generator
-    if (inputGen.Contains("DBGEN"))
+    if (inputGen.Contains("DBoxGEN"))
     {
         std::cout << "-I- Using Double BoxGenerator..." << std::endl;
         
