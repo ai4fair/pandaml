@@ -20,6 +20,7 @@ elif [[ ! -d $path ]]; then
     echo "$path already exists but is not a directory" 1>&2
 fi
 
+# PandaRoot
 #CONTAINER=$HOME/fair/stable/v12.0.3.sif     # FairSoft(nov20p1), FairRoot(18.6.3), PandaRoot(v12.0.3)
 CONTAINER=$HOME/fair/stable/dev210810.sif    # FairSoft(nov20p1), FairRoot(18.6.3), PandaRoot(dev210810)
 
@@ -28,13 +29,9 @@ CONTAINER=$HOME/fair/stable/dev210810.sif    # FairSoft(nov20p1), FairRoot(18.6.
 nevt=100
 prefix=evtcomplete
 
-# gen=BGEN                    # Double Box Gen
+# gen=BGEN                    # Single Box Gen
 # gen=DBGEN                   # Double Box Gen
 gen=llbar_bkg.DEC             # EvtGen (DEC)
-# gen=EvtGenFWP               # EvtGen (DEC for FWP)
-# gen=EvtGenBKG               # EvtGen (DEC for BKG)
-
-
 pBeam=1.642
 seed=42
 

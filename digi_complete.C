@@ -3,10 +3,9 @@
 // root  digi_complete.C  or in root session root>.x  digi_complete.C
 int digi_complete(Int_t nEvents=10, TString prefix="") {
 
-    //***
-    //----- User Settings
-    //***
+    std::cout << "FLAGS: " << nEvents << "," << prefix << std::endl;
     
+    //----- User Settings
     TString parAsciiFile = "all.par";
     //TString prefix     = "llbar_fwp";        // "llbar_fwp", "evtcomplete";
     TString input        = "";                 // "dpm", "llbar_fwp.DEC";
@@ -16,12 +15,8 @@ int digi_complete(Int_t nEvents=10, TString prefix="") {
     TString friend4      = "";
     TString output       = "digi";
 
-    //***
     //----- Init Settings
-    //***
-    
     PndMasterRunAna *fRun= new PndMasterRunAna();
-    
     fRun->SetInput(input);
     fRun->SetOutput(output);
     fRun->AddFriend(friend1);
@@ -31,16 +26,10 @@ int digi_complete(Int_t nEvents=10, TString prefix="") {
     fRun->SetParamAsciiFile(parAsciiFile);
     fRun->Setup(prefix);
 
-    //***
     //----- AddDigiTasks
-    //***
-    
     fRun->AddDigiTasks();
 
-    //***
     //----- Intialise & Run
-    //***
-    
     fRun->Init();
     fRun->Run(0, nEvents);
     fRun->Finish();

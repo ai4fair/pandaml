@@ -83,7 +83,7 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
         
         // 1st BoxGenerator
         FairBoxGenerator* boxGen1 = new FairBoxGenerator(13, 5);    // 13 = muon; 5 = multiplicity
-        boxGen1->SetPRange(1.0, 3.0);                               // GeV/c (1.0 to 3.0)
+        boxGen1->SetPRange(0.1, 1.5);                               // GeV/c (1.0 to 3.0), 100 MeV to 1.5 GeV
         boxGen1->SetPhiRange(0., 360.);                             // Azimuth angle range [degree]
         boxGen1->SetThetaRange(22., 140.);                          // Polar angle in lab system range [degree]
         boxGen1->SetXYZ(0., 0., 0.);                                // mm or cm ??
@@ -91,7 +91,7 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
 
         // 2nd BoxGenerator
         FairBoxGenerator* boxGen2 = new FairBoxGenerator(-13, 5);   // -13 = antimuon; 5 = multiplicity
-        boxGen2->SetPRange(1.0, 3.0);                               // GeV/c (1.0 to 3.0)
+        boxGen2->SetPRange(0.1, 1.5);                               // GeV/c (1.0 to 3.0), 100 MeV to 1.5 GeV
         boxGen2->SetPhiRange(0., 360.);                             // Azimuth angle range [degree]
         boxGen2->SetThetaRange(22., 140.);                          // Polar angle in lab system range [degree]
         boxGen2->SetXYZ(0., 0., 0.);                                // mm or cm ??
@@ -99,7 +99,7 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
      
     }
     
-    // EvtGen Generator
+    // EvtGen Generator (Redundant)
     if (inputGen.Contains("EvtGenFWP")) {
     
         std::cout << "-I- Using EvtGen (FWP) Generator..." << std::endl;
@@ -110,7 +110,7 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
         fRun->AddGenerator(evtGenDirect);
     }
     
-    // EvtGen Generator
+    // EvtGen Generator (Redundant)
     if (inputGen.Contains("EvtGenBKG")) {
                 
         std::cout << "-I- Using EvtGen (BKG) Generator..." << std::endl;
