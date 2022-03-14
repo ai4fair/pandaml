@@ -1,14 +1,5 @@
 #!/bin/bash
 
-# *** Cluster USAGE ***
-# sbatch [options] -- jobsim_complete.sh <prefix> <events> <dec> <pbeam> [opt] [mode]
-
-# *** Local USAGE ***
-# ./jobsim_complete.sh <prefix> <events> <dec>
-# ./jobsim_complete.sh llbar 100 llbar_fwp.DEC
-
-
-
 LUSTRE_HOME="/lustre/panda/"$USER
 nyx=$LUSTRE_HOME"/pandaml"
 
@@ -107,7 +98,7 @@ echo -e "Seed      : $seed"
 
 
 # Terminate Script for Testing.
-# exit 0;
+exit 0;
 
 
 # ---------------------------------------------------------------
@@ -121,6 +112,8 @@ root -l -b -q $nyx"/"sim_complete.C\($nevt,\"$outprefix\",\"$gen\"\) > $outprefi
 echo "Started Digitization..."
 root -l -b -q $nyx"/"digi_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_digi.log" 2>&1
 
+echo "Started Ideal Reconstruction..."
+root -l -b -q $nyx"/"recoideal_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_reco.log" 2>&1
 
 echo "Finished Simulating..."
 echo ""
@@ -149,8 +142,8 @@ mv $outprefix"_sim.root" $_target
 mv $outprefix"_sim.log" $_target
 mv $outprefix"_digi.root" $_target
 mv $outprefix"_digi.log" $_target
-mv $outprefix"_data.root" $_target
-mv $outprefix"_data.log" $_target
+mv $outprefix"_reco.root" $_target
+mv $outprefix"_reco.log" $_target
 
 
 #*** Tidy Up ***

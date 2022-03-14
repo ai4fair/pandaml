@@ -75,6 +75,9 @@ root -l -b -q sim_complete.C\($nevt,\"$outprefix\",\"$gen\"\) > $outprefix"_sim.
 echo "Started Digitization..."
 root -l -b -q digi_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_digi.log" 2>&1
 
+echo "Started Ideal Reconstruction..."
+root -l -b -q recoideal_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_reco.log" 2>&1
+
 echo "Started CSV Generator..."
 root -l -b -q data_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_data.log" 2>&1
 

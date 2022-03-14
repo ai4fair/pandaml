@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# ***
+# ----- Export Variables
+# ***
+
+export LUSTRE_HOME="/lustre/panda/"$USER
+export SLURM_SUBMIT_DIR=$LUSTRE_HOME"/pandaml"
+export SLURM_WORKING_DIR=$LUSTRE_HOME"/pandaml/logs"
+mkdir -p $SLURM_WORKING_DIR;
+export SLURM_JOB_NAME="mumu"
+
+sbatch -a1-5 --get-user-env -t 8:00:00 -o '%x-%j.out' -e '%x-%j.err' -J mumu --mail-type=END --mail-user=a.akram@gsi.de -D $SLURM_WORKING_DIR -- $SLURM_SUBMIT_DIR/jobsim_complete.sh mumu 2000 llbar_fwp.DEC 1.642
