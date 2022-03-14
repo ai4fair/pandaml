@@ -417,36 +417,29 @@ void PndMLTracking::GenerateSttData() {
 		//std::vector<FairLink> mcTrackLinks_sorted = sttHitsLinks->GetSortedMCTracks();
 		
 		// Write to xxx-particles.csv
-		/*
 		for (unsigned int trackIndex=0; trackIndex < mcTrackLinks_sorted.size(); trackIndex++) {
 		
 		    std::cout << "Number of MCTracks (fParticles): " << trackIndex << std::endl;
 			PndMCTrack *mcTrack = (PndMCTrack*)ioman->GetCloneOfLinkData(mcTrackLinks_sorted[trackIndex]);
 			
-			int q =0;
-			if (mcTrack->GetPdgCode()>0)           //e.g. mu+
-			    q = 1;
-			if (mcTrack->GetPdgCode()<0)           //e.g. mu-
-			    q = -1;
-			
 			// CSV:: Writting Info to CSV File. 		   
 			fParticles 	<< std::to_string(mcTrackLinks_sorted[trackIndex].GetIndex() + 1)   
-			                                                     << ","   // track_id > 0
-						<< (mcTrack->GetStartVertex()).X()       << ","   // vx = start x
-						<< (mcTrack->GetStartVertex()).Y()       << ","   // vy = start y
-						<< (mcTrack->GetStartVertex()).Z()       << ","   // vz = start z
-						<< (mcTrack->GetMomentum()).X()          << ","   // px = x-component of track momentum
-						<< (mcTrack->GetMomentum()).Y()          << ","   // py = y-component of track momentum
-						<< (mcTrack->GetMomentum()).Z()          << ","   // pz = z-component of track momentum
-						<< q                                     << ","   // q = charge of +ve or -ve particle
-						<< mcTrack->GetNPoints(DetectorID::kSTT) << ","   // FIXME: nhits. How ???
-						<< mcTrack->GetPdgCode()                 << ","   // pdgcode e.g. mu- has pdgcode=-13
-						<< mcTrack->GetStartTime()                        // start_time = starting time of particle track
+			                                                      << ","   // track_id > 0
+						<< (mcTrack->GetStartVertex()).X()        << ","   // vx = start x
+						<< (mcTrack->GetStartVertex()).Y()        << ","   // vy = start y
+						<< (mcTrack->GetStartVertex()).Z()        << ","   // vz = start z
+						<< (mcTrack->GetMomentum()).X()           << ","   // px = x-component of track momentum
+						<< (mcTrack->GetMomentum()).Y()           << ","   // py = y-component of track momentum
+						<< (mcTrack->GetMomentum()).Z()           << ","   // pz = z-component of track momentum
+						<< ((mcTrack->GetPdgCode()>0)?1:-1)       << ","   // q = charge of mu-/mu+
+						//<< mcTrack->GetNPoints(DetectorID::kSTT)<< ","   // FIXME: nhits (Not tested yet).
+						<< 1                                      << ","   // FIXME: nhits==1
+						<< mcTrack->GetPdgCode()                  << ","   // pdgcode e.g. mu- has pdgcode=-13
+						<< mcTrack->GetStartTime()                         // start_time = starting time of particle track
 						<< std::endl;
 					              
 			delete (mcTrack);
 		}
-		*/
 		
 	}//end-fSttHitArray
     
@@ -454,7 +447,6 @@ void PndMLTracking::GenerateSttData() {
     /* ------------------------------------------------------------------------
     *                          (4) Event Particles
     *  --------------------------------------------------------------------- */
-	
 	/*
 	// Write to xxx-particles.csv
 	for (Int_t mc=0; mc < fMCTrackArray->GetEntries(); mc++) {
@@ -475,7 +467,8 @@ void PndMLTracking::GenerateSttData() {
 						<< (mcTrack->GetMomentum()).Y()          << ","   // py = y-component of track momentum
 						<< (mcTrack->GetMomentum()).Z()          << ","   // pz = z-component of track momentum
 						<< ((mcTrack->GetPdgCode()>0)?1:-1)      << ","   // q = charge of mu-/mu+
-						<< mcTrack->GetNPoints(DetectorID::kSTT) << ","   // FIXME: Not tested yet.
+						//<< mcTrack->GetNPoints(DetectorID::kSTT) << ","   // FIXME: nhits (Not tested yet).
+						<< 1 << ","   // FIXME: nhits==1
 						<< mcTrack->GetPdgCode()                 << ","   // pdgcode e.g. mu- has pdgcode=-13
 						<< mcTrack->GetStartTime()                        // start_time = starting time of particle track
 						<< std::endl;
@@ -487,11 +480,12 @@ void PndMLTracking::GenerateSttData() {
 	// TODO: For MCTrack only in STT. I use IdealTrackFinder to access MCTracks
 	// in STT using FairLinks, one can also get nhits == linksSTT.GetNLinks()
 	
+	/*
 	FairMultiLinkedData links;
 	FairMultiLinkedData linksSTT;
 	PndMCTrack *mcTrack;
 	
-	std::cout << "Starting fParticle... " << std::endl;
+	std::cout << "Starting fParticle with number of tracks: " << fSttMvdGemTrackArray->GetEntries() << std::endl;
 	
 	FairRootManager *ioman = FairRootManager::Instance();
 	
@@ -534,7 +528,7 @@ void PndMLTracking::GenerateSttData() {
 			    }//end-for(GetNLinks)
 		    }//end-if(GetNLinks)
 	} //SttMvdGemTrack Array
-	
+	*/
 
 	
 	
