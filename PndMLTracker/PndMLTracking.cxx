@@ -107,7 +107,7 @@ InitStatus PndMLTracking::Init() {
 	sttHitBranchID = ioman->GetBranchId("STTHit");
 	
 	// Access SttMvdGemGenTrack branch and determine its branch ID
-	TClonesArray* fSttMvdGemTrackArray = (TClonesArray*) ioman->GetObject("SttMvdGemTrack");
+	fSttMvdGemTrackArray = (TClonesArray*) ioman->GetObject("SttMvdGemTrack");
 	sttMvdGemTrackBranchID = ioman->GetBranchId("SttMvdGemTrack");
 	      
 	std::cout << "-I- PndMLTracking: Initialisation successful" << std::endl;
