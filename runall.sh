@@ -1,39 +1,27 @@
 #!/bin/sh
 
-# Script to run whole analysis chain using Singularity container.
-# The script is based on runideal.sh script with the only exeption 
-# of running the PandaRoot from a special Singularity container.
+# Lustre Home
+LUSTRE_HOME="/lustre/panda/"$USER
+nyx=$LUSTRE_HOME"/pandaml"
 
-if((0)); then
-  rm *.root
-  rm *.log
-  rm *.pdf
-  rm core*
-  rm *.dat
-fi
+tmpdir="/tmp/"$USER
+_target=$nyx"/data"
 
-# For CSV a directory named `data` is needed
-path=data
-if [[ ! -e $path ]]; then
-    mkdir $path
-elif [[ ! -d $path ]]; then
-    echo "$path already exists but is not a directory" 1>&2
-fi
 
-# PandaRoot (Virgo)
-. "/lustre/panda/CENTOS/dev-install/bin/config.sh" -p
+# Init PandaRoot
+. $LUSTRE_HOME"/CENTOS/dev-install/bin/config.sh" -p
 
-# Input Flags
+echo -e "\n";
+
+
+# Default Inputs
 nevt=1000
 prefix=mumu
-
-# gen=SBoxGEN                    # Single Box Gen
-gen=DBoxGEN                     # Double Box Gen
-# gen=llbar_bkg.DEC           # EvtGen (DEC)
+gen=DBoxGEN             # SBoxGEN, DBoxGEN or .DEC
 pBeam=1.642
 seed=42
 
-
+# Get Inputs from User
 if test "$1" != ""; then
   nevt=$1
 fi
@@ -46,8 +34,28 @@ if test "$3" != ""; then
   gen=$3
 fi
 
+
+# Make Sure $_target Exists
+if [ ! -d $_target ]; then
+    mkdir -p $_target;
+    echo -e "\nThe data dir. at '$_target' created."
+else
+    echo -e "\nThe data dir. at '$_target' exists."
+fi
+
+
+# Make Sure $tempdir Exists
+if [ ! -d $tmpdir ]; then
+    mkdir $tmpdir;
+    echo -e "The temporary dir. at '$tmpdir' created."
+else
+    echo -e "The temporary dir. at '$tmpdir' exists."
+fi
+
+
 # outprefix
-outprefix=$path"/"$prefix
+outprefix=$_target"/"$prefix
+
 
 # ---------------------------------------------------------------
 #                              Print Flags
@@ -70,16 +78,16 @@ echo ""
 echo "Script has Started..."
 
 echo "Started Simulation..."
-root -l -b -q sim_complete.C\($nevt,\"$outprefix\",\"$gen\"\) > $outprefix"_sim.log" 2>&1
+root -l -b -q $nyx"/"sim_complete.C\($nevt,\"$outprefix\",\"$gen\"\) > $outprefix"_sim.log" 2>&1
 
 echo "Started Digitization..."
-root -l -b -q digi_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_digi.log" 2>&1
+root -l -b -q $nyx"/"digi_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_digi.log" 2>&1
 
 echo "Started Ideal Reconstruction..."
-root -l -b -q recoideal_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_reco.log" 2>&1
+root -l -b -q $nyx"/"recoideal_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_reco.log" 2>&1
 
 echo "Started CSV Generator..."
-root -l -b -q data_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_data.log" 2>&1
+root -l -b -q $nyx"/"data_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_data.log" 2>&1
 
 echo "Script has Finished..."
 echo ""
