@@ -413,7 +413,7 @@ void PndMLTracking::GenerateSttData() {
         
         //std::cout << "Number of MCTracks (fParticles): " << mcTrackLinks_sorted.size() << std::endl;
         //std::vector<FairLink> mcTrackLinks_sorted = sttHitsLinks->GetSortedMCTracks();
-        
+        /*
         // Write to xxx-particles.csv
         for (unsigned int trackIndex=0; trackIndex < mcTrackLinks_sorted.size(); trackIndex++) {
         
@@ -438,7 +438,7 @@ void PndMLTracking::GenerateSttData() {
                         
             delete (mcTrack);
         }
-        
+        */
     }//end-fSttHitArray
     
     
@@ -449,7 +449,7 @@ void PndMLTracking::GenerateSttData() {
     // TODO: For MCTrack only in STT. I use IdealTrackFinder to access MCTracks
     // in STT using FairLinks, one can also get nhits == linksSTT.GetNLinks()
     
-    /*
+    
     FairMultiLinkedData links;
     FairMultiLinkedData linksSTT;
     PndMCTrack *mcTrack;
@@ -475,7 +475,7 @@ void PndMLTracking::GenerateSttData() {
                 
                 if (links.GetLink(i).GetIndex()==sttMvdGemTrack->GetTrackCand().getMcTrackId()) {
                     
-                    mcTrack = (PndMCTrack *) ioman->GetCloneOfLinkData(links.GetLink(i));
+                    mcTrack = (PndMCTrack *)ioman->GetCloneOfLinkData(links.GetLink(i));
                     //if (mcTrack->IsGeneratorLast()) {
                     
                         // Check the number of STT hits
@@ -503,8 +503,8 @@ void PndMLTracking::GenerateSttData() {
                     
                 }//end-for(GetNLinks)
             }//end-if(GetNLinks)
-    } //SttMvdGemTrack Array
-    */
+    }//end-for (SttMvdGemTrack)
+    
     
     /*
     // Old Solution (Adeel)

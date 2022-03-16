@@ -61,7 +61,7 @@ outprefix=$_target"/"$prefix
 #                              Print Flags
 # ---------------------------------------------------------------
 
-echo -e "Events    : $nevt"
+echo -e "\nEvents  : $nevt"
 echo -e "Prefix    : $outprefix"
 echo -e "Decay     : $gen"
 echo -e "pBeam     : $pBeam"
@@ -75,7 +75,7 @@ echo -e "Seed      : $seed"
 # ---------------------------------------------------------------
 
 echo ""
-echo "Script has Started..."
+echo -e "\nScript has Started..."
 
 echo "Started Simulation..."
 root -l -b -q $nyx"/"sim_complete.C\($nevt,\"$outprefix\",\"$gen\"\) > $outprefix"_sim.log" 2>&1
