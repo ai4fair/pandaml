@@ -21,11 +21,11 @@ elif [[ ! -d $path ]]; then
 fi
 
 # PandaRoot (Virgo)
-# . "/lustre/panda/CENTOS/dev-install/bin/config.sh" -p
+. "/lustre/panda/CENTOS/dev-install/bin/config.sh" -p
 
 # Input Flags
-nevt=100
-prefix=evtcomplete
+nevt=1000
+prefix=mumu
 
 # gen=SBoxGEN                    # Single Box Gen
 gen=DBoxGEN                     # Double Box Gen
