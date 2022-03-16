@@ -8,24 +8,22 @@ _target=$nyx"/data"
 
 
 # Init PandaRoot
+# . $LUSTRE_HOME"/CENTOS/v12.0.3-install/bin/config.sh" -p
 . $LUSTRE_HOME"/CENTOS/dev-install/bin/config.sh" -p
 
 echo -e "\n";
 
 
-# Defaults
-prefix=llbar                # output file naming
-nevt=1000                   # number of events
-# dec=BGEN                  # Single Box Gen
-dec=DBGEN                   # Double Box Gen
-# dec=llbar_bkg.DEC         # EvtGen (DEC)
-mom=1.642                   # pbarp with 1.642 GeV/c
-opt="ana"                   # use opt to do specific tasks e.g. ana for analysis etc.
-seed=$RANDOM                # random seed for simulation
-run=$SLURM_ARRAY_TASK_ID    # Slurm Array ID
+# Default Inputs
+nevt=1000
+prefix=mumu
+gen=DBoxGEN                 # SBoxGEN, DBoxGEN or .DEC
+pBeam=1.642
+opt=""
+seed=$RANDOM
+run=$SLURM_ARRAY_TASK_ID
 
-
-# User Input
+# User Inputs
 if test "$1" != ""; then
   prefix=$1
 fi
@@ -36,14 +34,6 @@ fi
 
 if test "$3" != ""; then
   dec=$3
-fi
-
-if test "$4" != ""; then
-  mom=$4
-fi
-
-if test "$5" != ""; then
-  opt=$5
 fi
 
 
@@ -61,12 +51,10 @@ if test "$run" == ""; then
     tmpdir="/tmp/"$USER
     outprefix=$tmpdir"/"$prefix
     seed=4200
-    pidfile=$outprefix"_pid.root"
 else
     tmpdir="/tmp/"$USER"_"$SLURM_JOB_ID
     outprefix=$tmpdir"/"$prefix"_"$run
     seed=$SLURM_ARRAY_TASK_ID
-    pidfile=$outprefix"_pid.root"
 fi
 
 
@@ -84,10 +72,10 @@ fi
 # ---------------------------------------------------------------
 
 echo ""
-echo "Lustre Home  : $LUSTRE_HOME"
-echo "Working Dir. : $nyx"
-echo "Temp Dir.    : $tmpdir"
-echo "Target Dir.  : $_target"
+echo -e "\nLustre Home  : $LUSTRE_HOME"
+echo -e "Working Dir. : $nyx"
+echo -e "Temp Dir.    : $tmpdir"
+echo -e "Target Dir.  : $_target"
 echo ""
 echo -e "--Macro--"
 echo -e "Events    : $nevt"
@@ -95,6 +83,7 @@ echo -e "Prefix    : $outprefix"
 echo -e "Decay     : $dec"
 echo -e "pBeam     : $mom"
 echo -e "Seed      : $seed"
+echo ""
 
 
 # Terminate Script for Testing.
@@ -118,15 +107,12 @@ root -l -b -q $nyx"/"recoideal_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_
 echo "Finished Simulating..."
 echo ""
 
-# ---------------------------------------------------------------
-#                            Initiate Analysis
-# ---------------------------------------------------------------
 
 if [[ $opt == *"ana"* ]]; then
     
     echo "Started CSV Generator..."
     root -l -b -q $nyx"/"data_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_data.log" 2>&1
-
+    
     mv $outprefix"_data.root" $_target
     mv $outprefix"_data.log" $_target
     echo "Finished CSV Generator..."

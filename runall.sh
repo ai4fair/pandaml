@@ -9,6 +9,7 @@ _target=$nyx"/data"
 
 
 # Init PandaRoot
+# . $LUSTRE_HOME"/CENTOS/v12.0.3-install/bin/config.sh" -p
 . $LUSTRE_HOME"/CENTOS/dev-install/bin/config.sh" -p
 
 echo -e "\n";
@@ -21,7 +22,7 @@ gen=DBoxGEN             # SBoxGEN, DBoxGEN or .DEC
 pBeam=1.642
 seed=42
 
-# Get Inputs from User
+# User Inputs
 if test "$1" != ""; then
   nevt=$1
 fi
@@ -61,14 +62,23 @@ outprefix=$_target"/"$prefix
 #                              Print Flags
 # ---------------------------------------------------------------
 
+echo ""
+echo -e "\nLustre Home  : $LUSTRE_HOME"
+echo -e "Working Dir. : $nyx"
+echo -e "Temp Dir.    : $tmpdir"
+echo -e "Target Dir.  : $_target"
+echo ""
 echo -e "\nEvents  : $nevt"
 echo -e "Prefix    : $outprefix"
 echo -e "Decay     : $gen"
 echo -e "pBeam     : $pBeam"
 echo -e "Seed      : $seed"
+echo ""
+
 
 # Terminate Script for Testing.
 # exit 0;
+
 
 # ---------------------------------------------------------------
 #                            Initiate Simulaton
