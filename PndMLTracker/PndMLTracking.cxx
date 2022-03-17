@@ -282,7 +282,7 @@ void PndMLTracking::Exec(Option_t* /*opt*/) {
     fParticles.close();
     fTubes.close();
     
-    std::cout << "-I- PndMLTracking: Exec Successful with Event: " << (fEventId - 1) << " with Prefix: " << "event"+fidx << std::endl;
+    std::cout << "-I- PndMLTracking: Exec Successful with Event: " << (fEventId) << " with Prefix: " << "event"+fidx << std::endl;
     fEventId++;
     
 }//end-Exec()
@@ -476,7 +476,9 @@ void PndMLTracking::GenerateSttData() {
                 if (links.GetLink(i).GetIndex()==sttMvdGemTrack->GetTrackCand().getMcTrackId()) {
                     
                     mcTrack = (PndMCTrack *)ioman->GetCloneOfLinkData(links.GetLink(i));
-                    //if (mcTrack->IsGeneratorLast()) {
+                    
+                    // Get Only Primary Tracks (Skip Secondaries e.g. e+/e-)
+                    if (mcTrack->IsGeneratorCreated()) {
                     
                         // Check the number of STT hits
                         linksSTT = sttMvdGemTrack->GetLinksWithType(ioman->GetBranchId("STTHit"));
@@ -497,9 +499,9 @@ void PndMLTracking::GenerateSttData() {
                                     << mcTrack->GetStartTime()                  // start_time = starting time of particle track
                                     << std::endl;
                                     
-                        //}//end-IsGeneratorLast()
+                        }//end-IsGeneratorCreated()
                         
-                    }//end-if
+                    }//end-if(GetLink(i))
                     
                 }//end-for(GetNLinks)
             }//end-if(GetNLinks)
