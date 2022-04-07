@@ -19,39 +19,102 @@
 
 ClassImp(PndMLTracking)
 
-// PndMLTracking()
-PndMLTracking::PndMLTracking() {
+/*
+* Initialization by assignment, avoid this method as its two step process.
+* First default constructor is called (step one) and then assignment operation
+* is performed (2nd step).
+*
+* One needs to initialize members right at instantiation of a class object in one go.
+* There are two ways to achiever this: (1) inline initialization (initialize in .h) only
+* available in C++11 and beyond standard, (2) initializer list (is considered best practice)
+*
+*/
 
+/** Constructor (1) **/
+PndMLTracking::PndMLTracking()
+/*
+    : fEventId(0)
+    , fCsvFilesPath("./data/")
+    , fSttParameters(nullptr)
+    , fEventHeader(nullptr)
+    , fTubeArray(nullptr)
+    , mcTrackBranchID(-1)
+    , fMCTrackArray(nullptr)
+    , mvdHitsPixelBranchID(-1)
+    , fMvdHitsPixelArray(nullptr)
+    , mvdHitsStripBranchID(-1)
+    , fMvdHitsStripArray(nullptr)
+    , gemHitBranchID(-1)
+    , fGemHitArray(nullptr)
+    , sttPointBranchID(-1)
+    , fSttPointArray(nullptr)
+    , sttHitBranchID(-1)
+    , fSttHitArray(nullptr)
+    , sttMvdGemTrackBranchID(-1)
+    , fSttMvdGemTrackArray(nullptr)
+*/
+{   
+    //TODO: Move initialization to either inline or initializer
+    // list and leave the body of default constructor empyt. So
+    // comment everything inside constructor and uncomment above.
+    
+    /** Default Values (Order of Declaration) **/
+    fEventId = 0;
+    fCsvFilesPath = "./data/";
+    
     fSttParameters = nullptr;
     fEventHeader = nullptr;
     fTubeArray = nullptr;
-
-    fMCTrackArray = nullptr;
+    
     mcTrackBranchID = -1;
-
-    fMvdHitsPixelArray = nullptr;
+    fMCTrackArray = nullptr;
+    
     mvdHitsPixelBranchID = -1;
-
-    fMvdHitsStripArray = nullptr;
+    fMvdHitsPixelArray = nullptr;
     mvdHitsStripBranchID = -1;
-
-    fGemHitArray = nullptr;
+    fMvdHitsStripArray = nullptr;
+    
     gemHitBranchID = -1;
-
-    fSttHitArray = nullptr;
+    fGemHitArray = nullptr;
+    
+    sttPointBranchID = -1;
+    fSttPointArray = nullptr;
     sttHitBranchID = -1;
-
-    fHitId = 0;
-    fEventId = 0;
-    fCsvFilesPath = "./data/";
-
+    fSttHitArray = nullptr;
+    
+    sttMvdGemTrackBranchID = -1;
+    fSttMvdGemTrackArray = nullptr;
 }
 
-// ~PndMLTracking()
+/** Constructor (2) **/
+PndMLTracking::PndMLTracking(int start_counter)
+    : fEventId(start_counter)
+    , fCsvFilesPath("./data/")
+    , fSttParameters(nullptr)
+    , fEventHeader(nullptr)
+    , fTubeArray(nullptr)
+    , mcTrackBranchID(-1)
+    , fMCTrackArray(nullptr)
+    , mvdHitsPixelBranchID(-1)
+    , fMvdHitsPixelArray(nullptr)
+    , mvdHitsStripBranchID(-1)
+    , fMvdHitsStripArray(nullptr)
+    , gemHitBranchID(-1)
+    , fGemHitArray(nullptr)
+    , sttPointBranchID(-1)
+    , fSttPointArray(nullptr)
+    , sttHitBranchID(-1)
+    , fSttHitArray(nullptr)
+    , sttMvdGemTrackBranchID(-1)
+    , fSttMvdGemTrackArray(nullptr) {
+}
+    
+
+/** Destructor **/
 PndMLTracking::~PndMLTracking() {
 }
 
-// SetParContainers()
+/** SetParContainers() **/
 void PndMLTracking::SetParContainers() {
 
     FairRuntimeDb *rtdb = FairRunAna::Instance()->GetRuntimeDb();
@@ -59,7 +122,7 @@ void PndMLTracking::SetParContainers() {
 
 }
 
-// Init()
+/** Init() **/
 InitStatus PndMLTracking::Init() {
 
     // Get instance of the FairRootManager to access tree branches
@@ -113,7 +176,7 @@ InitStatus PndMLTracking::Init() {
 
 }
 
-// Exec()
+/** Exec() **/
 void PndMLTracking::Exec(Option_t* /*opt*/) {
     
     // Debugging Tasks    
@@ -288,14 +351,14 @@ void PndMLTracking::Exec(Option_t* /*opt*/) {
 }//end-Exec()
 
 
-// GenerateMvdData()
+/**  GenerateMvdData() **/
 void PndMLTracking::GenerateMvdData() { /* Under Construction */ }
 
-// GenerateGemData()
+/**  GenerateGemData() **/
 void PndMLTracking::GenerateGemData() { /* Under Construction */ }
 
 
-// GenerateSttData()
+/**  GenerateSttData() **/
 void PndMLTracking::GenerateSttData() {
 
     // ------------------------------------------------------------------------
@@ -486,15 +549,15 @@ void PndMLTracking::GenerateSttData() {
                         // If the number of STT hits greater than 0, write MC track to file!!
 
                         // CSV:: Writting Info to CSV File.
-                        fParticles  << (std::to_string(links.GetLink(i).GetIndex() + 1)) << "," // FIXME: track_id > 0
+                        fParticles  << (std::to_string(links.GetLink(i).GetIndex() + 1)) << "," // track_id > 0
                                     << (mcTrack->GetStartVertex()).X() << ","   // vx = start x [cm, ns]
                                     << (mcTrack->GetStartVertex()).Y() << ","   // vy = start y [cm, ns]
                                     << (mcTrack->GetStartVertex()).Z() << ","   // vz = start z [cm, ns]
                                     << (mcTrack->GetMomentum()).X()    << ","   // px = x-component of track momentum
                                     << (mcTrack->GetMomentum()).Y()    << ","   // py = y-component of track momentum
                                     << (mcTrack->GetMomentum()).Z()    << ","   // pz = z-component of track momentum
-                                    << ((mcTrack->GetPdgCode()>0)?1:-1)<< ","   // FIXME: q = charge of mu-/mu+
-                                    << (linksSTT.GetNLinks())          << ","   // FIXME: nhits
+                                    << ((mcTrack->GetPdgCode()>0)?1:-1)<< ","   // q = charge of mu-/mu+
+                                    << (linksSTT.GetNLinks())          << ","   // nhits
                                     << mcTrack->GetPdgCode()           << ","   // pdgcode e.g. mu- has pdgcode=-13
                                     << mcTrack->GetStartTime()                  // start_time = starting time of particle track
                                     << std::endl;
@@ -542,7 +605,7 @@ void PndMLTracking::GenerateSttData() {
 }//end-GenerateSttData()
 
 
-// FinishTask()
+/**  FinishTask() **/
 void PndMLTracking::FinishTask() {
     
     // Close all files
@@ -555,7 +618,7 @@ void PndMLTracking::FinishTask() {
 }
 
 
-// GetFairMCPoint()
+/**  GetFairMCPoint() **/
 FairMCPoint* PndMLTracking::GetFairMCPoint(TString fBranchName, FairMultiLinkedData_Interface* links, FairMultiLinkedData& array) {
     
     // get the mc point(s) from each reco hit
@@ -568,55 +631,8 @@ FairMCPoint* PndMLTracking::GetFairMCPoint(TString fBranchName, FairMultiLinkedD
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// Following code is kept for record, will be deleted soon.
-
-
+/** OLD Code (Kept for Reference) **/
+/*
 // GenerateData()
 void PndMLTracking::GenerateData() {
     
@@ -894,4 +910,5 @@ void PndMLTracking::GenerateCSV() {
     InFile3.close();
     fEventId++;
 }//end-GenerateCSV()
+*/
 

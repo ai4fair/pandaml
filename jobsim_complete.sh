@@ -111,7 +111,7 @@ echo ""
 if [[ $opt == *"ana"* ]]; then
     
     echo "Started CSV Generator..."
-    root -l -b -q $nyx"/"data_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_data.log" 2>&1
+    root -l -b -q $nyx"/"data_complete.C\($nevt,\"$outprefix\",$run\) > $outprefix"_data.log" 2>&1
     
     mv $outprefix"_data.root" $_target
     mv $outprefix"_data.log" $_target
