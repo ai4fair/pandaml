@@ -5,7 +5,7 @@ int data_complete(Int_t nEvents=10, TString prefix="", Int_t Job_Id=0) {
     TString simFile     = prefix+"_sim.root";
     TString digiFile    = prefix+"_digi.root";
     TString recoFile    = prefix+"_reco.root";
-    TString outFile     = prefix+"_out.root";
+    TString outFile     = prefix+"_data.root"; // its dummy file, usually out.root
     
     // Initialization
 	FairLogger::GetLogger()->SetLogToFile(kFALSE);
@@ -42,7 +42,7 @@ int data_complete(Int_t nEvents=10, TString prefix="", Int_t Job_Id=0) {
 	rtdb->setSecondInput(parIo1);
 	
 	// HERE OUR TASK GOES!
-    PndMLTracking *genDB = new PndMLTracking((nEvents*Job_Id));
+    PndMLTracking *genDB = new PndMLTracking((nEvents*Job_Id), prefix);
     fRun->AddTask(genDB);
 
     // FairRunAna::Init()

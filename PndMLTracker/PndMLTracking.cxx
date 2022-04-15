@@ -64,9 +64,9 @@ PndMLTracking::PndMLTracking()
 }
 
 /* PndMLTracking(int) */
-PndMLTracking::PndMLTracking(int start_counter)
+PndMLTracking::PndMLTracking(int start_counter, TString csv_path)
     : fEventId(start_counter)
-    , fCsvFilesPath("./data/")
+    , fCsvFilesPath(csv_path)
     , mcTrackBranchID(-1)
     , fMCTrackArray(nullptr)
     , mvdHitsPixelBranchID(-1)

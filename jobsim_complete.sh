@@ -19,7 +19,6 @@ nevt=1000
 prefix=mumu
 gen=DBoxGEN                 # SBoxGEN, DBoxGEN or .DEC
 pBeam=1.642
-opt=""
 seed=$RANDOM
 run=$SLURM_ARRAY_TASK_ID
 
@@ -47,13 +46,15 @@ fi
 
 
 # IF ARRAY_TASK Used
-if test "$run" == ""; then
+if test "$SLURM_ARRAY_TASK_ID" == ""; then
     tmpdir="/tmp/"$USER
     outprefix=$tmpdir"/"$prefix
+    run=0
     seed=4200
 else
     tmpdir="/tmp/"$USER"_"$SLURM_JOB_ID
     outprefix=$tmpdir"/"$prefix"_"$run
+    run=$SLURM_ARRAY_TASK_ID
     seed=$SLURM_ARRAY_TASK_ID
 fi
 
@@ -72,7 +73,8 @@ fi
 # ---------------------------------------------------------------
 
 echo ""
-echo -e "\nLustre Home  : $LUSTRE_HOME"
+echo -e "--Directory--"
+echo -e "Lustre Home  : $LUSTRE_HOME"
 echo -e "Working Dir. : $nyx"
 echo -e "Temp Dir.    : $tmpdir"
 echo -e "Target Dir.  : $_target"
@@ -83,6 +85,7 @@ echo -e "Prefix    : $outprefix"
 echo -e "Decay     : $gen"
 echo -e "pBeam     : $pBeam"
 echo -e "Seed      : $seed"
+echo -e "Run       : $run"
 echo ""
 
 
@@ -96,7 +99,7 @@ exit 0;
 
 echo ""
 echo "Started Simulating..."
-root -l -b -q $nyx"/"sim_complete.C\($nevt,\"$outprefix\",\"$gen\",$mom,$seed\) > $outprefix"_sim.log" 2>&1
+root -l -b -q $nyx"/"sim_complete.C\($nevt,\"$outprefix\",\"$gen\",$pBeam,$seed\) > $outprefix"_sim.log" 2>&1
 
 echo "Started Digitization..."
 root -l -b -q $nyx"/"digi_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_digi.log" 2>&1
