@@ -41,9 +41,9 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
     
     if (inputGen.Contains("DEC")) {
         std::cout << "-I- Using EvtGen Generator..." << std::endl;
-	    fRun->SetInput(inputGen);
-	}
-	    
+        fRun->SetInput(inputGen);
+    }
+        
     fRun->SetName("TGeant4");
     fRun->SetParamAsciiFile(parAsciiFile);
     fRun->SetNumberOfEvents(nEvents);
@@ -57,9 +57,9 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
 
     //----- Event Generator
     fRun->SetGenerator();
-	
-	
-	//--------------------------------------------------------------
+
+
+    //--------------------------------------------------------------
     //                     Box Generator mu+ mu-
     //--------------------------------------------------------------
     
@@ -76,7 +76,7 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
         fRun->AddGenerator(boxGen);
     }
     
-	// Double Box Generator
+    // Double Box Generator
     if (inputGen.Contains("DBoxGEN"))
     {
         std::cout << "-I- Using Double BoxGenerator..." << std::endl;
@@ -121,12 +121,12 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
         fRun->AddGenerator(evtGenDirect);
     }
     
-	//----- Add Sim Tasks
+    //----- Add Sim Tasks
     fRun->AddSimTasks();
     
     //----- Event Display (Store Trajectories)
-	// fRun->SetStoreTraj(kTRUE);
-	
+    // fRun->SetStoreTraj(kTRUE);
+    
     //----- Intialise & Run
     PndEmcMapper::Init(1);
     fRun->Init();

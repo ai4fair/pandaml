@@ -96,7 +96,7 @@ exit 0;
 
 echo ""
 echo "Started Simulating..."
-root -l -b -q $nyx"/"sim_complete.C\($nevt,\"$outprefix\",\"$gen\"\) > $outprefix"_sim.log" 2>&1
+root -l -b -q $nyx"/"sim_complete.C\($nevt,\"$outprefix\",\"$gen\",$mom,$seed\) > $outprefix"_sim.log" 2>&1
 
 echo "Started Digitization..."
 root -l -b -q $nyx"/"digi_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_digi.log" 2>&1
@@ -104,20 +104,11 @@ root -l -b -q $nyx"/"digi_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_digi.
 echo "Started Ideal Reconstruction..."
 root -l -b -q $nyx"/"recoideal_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_reco.log" 2>&1
 
+echo "Started CSV Generator..."
+root -l -b -q $nyx"/"data_complete.C\($nevt,\"$outprefix\",$run\) > $outprefix"_data.log" 2>&1
+
 echo "Finished Simulating..."
 echo ""
-
-
-if [[ $opt == *"ana"* ]]; then
-    
-    echo "Started CSV Generator..."
-    root -l -b -q $nyx"/"data_complete.C\($nevt,\"$outprefix\",$run\) > $outprefix"_data.log" 2>&1
-    
-    mv $outprefix"_data.root" $_target
-    mv $outprefix"_data.log" $_target
-    echo "Finished CSV Generator..."
-    
-fi
 
 
 #*** Storing Files ***
@@ -130,7 +121,10 @@ mv $outprefix"_digi.root" $_target
 mv $outprefix"_digi.log" $_target
 mv $outprefix"_reco.root" $_target
 mv $outprefix"_reco.log" $_target
+mv $outprefix"_data.root" $_target
+mv $outprefix"_data.log" $_target
 
+mv $tmpdir"/*.csv" $_target
 
 #*** Tidy Up ***
 rm -rf $tmpdir
