@@ -36,18 +36,18 @@ protected:
 
 private:
 
-    /** TODO: Inline Initialization or List Initialization ** /
+    /* TODO: Inline Initialization or List Initialization */
 
-    /** SttParameters **/
+    /* SttParameters */
     PndGeoSttPar *fSttParameters;
 
-    /** EventHeader **/
+    /* EventHeader */
     TClonesArray *fEventHeader;
 
-    /** STTMapCreater **/
+    /* STTMapCreater */
     TClonesArray *fTubeArray;
 
-    /** Data Generator **/
+    /* Data Generator */
 
     // Start Counter
     unsigned int fEventId;             // Used for Naming CSV Files

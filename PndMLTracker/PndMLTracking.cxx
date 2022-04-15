@@ -30,7 +30,7 @@ ClassImp(PndMLTracking)
 *
 */
 
-/** Constructor (1) **/
+/* PndMLTracking() (1) */
 PndMLTracking::PndMLTracking()
     : fEventId(0)
     , fCsvFilesPath("./data/")
@@ -57,7 +57,7 @@ PndMLTracking::PndMLTracking()
     // list and leave the body of default constructor empyt. So
     // comment everything inside constructor and uncomment above.
     
-    /** Default Values (Order of Declaration) **/
+    /* Default Values (Order of Declaration) */
     
     /*
     fEventId = 0;
@@ -87,7 +87,7 @@ PndMLTracking::PndMLTracking()
     fSttMvdGemTrackArray = nullptr; */
 }
 
-/** Constructor (2) **/
+/* PndMLTracking() (2) */
 PndMLTracking::PndMLTracking(int start_counter)
     : fEventId(start_counter)
     , fCsvFilesPath("./data/")
@@ -111,11 +111,11 @@ PndMLTracking::PndMLTracking(int start_counter)
 }
     
 
-/** Destructor **/
+/* Destructor */
 PndMLTracking::~PndMLTracking() {
 }
 
-/** SetParContainers() **/
+/* SetParContainers() */
 void PndMLTracking::SetParContainers() {
 
     FairRuntimeDb *rtdb = FairRunAna::Instance()->GetRuntimeDb();
@@ -123,7 +123,7 @@ void PndMLTracking::SetParContainers() {
 
 }
 
-/** Init() **/
+/* Init() */
 InitStatus PndMLTracking::Init() {
 
     // Get instance of the FairRootManager to access tree branches
@@ -177,7 +177,7 @@ InitStatus PndMLTracking::Init() {
 
 }
 
-/** Exec() **/
+/* Exec() */
 void PndMLTracking::Exec(Option_t* /*opt*/) {
     
     // Debugging Tasks    
@@ -352,14 +352,14 @@ void PndMLTracking::Exec(Option_t* /*opt*/) {
 }//end-Exec()
 
 
-/**  GenerateMvdData() **/
+/* GenerateMvdData() */
 void PndMLTracking::GenerateMvdData() { /* Under Construction */ }
 
-/**  GenerateGemData() **/
+/* GenerateGemData() */
 void PndMLTracking::GenerateGemData() { /* Under Construction */ }
 
 
-/**  GenerateSttData() **/
+/* GenerateSttData() */
 void PndMLTracking::GenerateSttData() {
 
     // ------------------------------------------------------------------------
@@ -606,7 +606,7 @@ void PndMLTracking::GenerateSttData() {
 }//end-GenerateSttData()
 
 
-/**  FinishTask() **/
+/* FinishTask() */
 void PndMLTracking::FinishTask() {
     
     // Close all files
@@ -619,7 +619,7 @@ void PndMLTracking::FinishTask() {
 }
 
 
-/**  GetFairMCPoint() **/
+/* GetFairMCPoint() */
 FairMCPoint* PndMLTracking::GetFairMCPoint(TString fBranchName, FairMultiLinkedData_Interface* links, FairMultiLinkedData& array) {
     
     // get the mc point(s) from each reco hit
@@ -632,7 +632,7 @@ FairMCPoint* PndMLTracking::GetFairMCPoint(TString fBranchName, FairMultiLinkedD
 }
 
 
-/** OLD Code (Kept for Reference) **/
+/* OLD Code (Kept for Reference) */
 /*
 // GenerateData()
 void PndMLTracking::GenerateData() {
