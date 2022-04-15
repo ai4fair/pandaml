@@ -25,15 +25,15 @@ run=$SLURM_ARRAY_TASK_ID
 
 # User Inputs
 if test "$1" != ""; then
-  prefix=$1
+  nevt=$1
 fi
 
 if test "$2" != ""; then
-  nevt=$2
+  prefix=$2
 fi
 
 if test "$3" != ""; then
-  dec=$3
+  gen=$3
 fi
 
 
@@ -80,8 +80,8 @@ echo ""
 echo -e "--Macro--"
 echo -e "Events    : $nevt"
 echo -e "Prefix    : $outprefix"
-echo -e "Decay     : $dec"
-echo -e "pBeam     : $mom"
+echo -e "Decay     : $gen"
+echo -e "pBeam     : $pBeam"
 echo -e "Seed      : $seed"
 echo ""
 
