@@ -32,7 +32,6 @@ ClassImp(PndMLTracking)
 
 /** Constructor (1) **/
 PndMLTracking::PndMLTracking()
-/*
     : fEventId(0)
     , fCsvFilesPath("./data/")
     , fSttParameters(nullptr)
@@ -52,13 +51,15 @@ PndMLTracking::PndMLTracking()
     , fSttHitArray(nullptr)
     , sttMvdGemTrackBranchID(-1)
     , fSttMvdGemTrackArray(nullptr)
-*/
-{   
+{
+
     //TODO: Move initialization to either inline or initializer
     // list and leave the body of default constructor empyt. So
     // comment everything inside constructor and uncomment above.
     
     /** Default Values (Order of Declaration) **/
+    
+    /*
     fEventId = 0;
     fCsvFilesPath = "./data/";
     
@@ -83,7 +84,7 @@ PndMLTracking::PndMLTracking()
     fSttHitArray = nullptr;
     
     sttMvdGemTrackBranchID = -1;
-    fSttMvdGemTrackArray = nullptr;
+    fSttMvdGemTrackArray = nullptr; */
 }
 
 /** Constructor (2) **/

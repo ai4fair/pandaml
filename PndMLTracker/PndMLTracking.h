@@ -21,93 +21,93 @@ class PndMLTracking: public FairTask {
 
 public:
 
-	PndMLTracking();
-	virtual ~PndMLTracking();
+    PndMLTracking();
+    virtual ~PndMLTracking();
 
 protected:
 
-	virtual InitStatus Init();
-	virtual void SetParContainers();
-	virtual void Exec(Option_t* opt);
-	virtual void FinishTask();
-	
-	virtual FairMCPoint* GetFairMCPoint(TString fBranchName, FairMultiLinkedData_Interface* links, FairMultiLinkedData& array);
+    virtual InitStatus Init();
+    virtual void SetParContainers();
+    virtual void Exec(Option_t* opt);
+    virtual void FinishTask();
+
+    virtual FairMCPoint* GetFairMCPoint(TString fBranchName, FairMultiLinkedData_Interface* links, FairMultiLinkedData& array);
 
 private:
 
     /** TODO: Inline Initialization or List Initialization ** /
-    
-	/** SttParameters **/
-	PndGeoSttPar *fSttParameters;
-	
-	/** EventHeader **/
-	TClonesArray *fEventHeader;
-	
-	/** STTMapCreater **/
-	TClonesArray *fTubeArray;
-	
-	/** Data Generator **/
-	
-	// Start Counter
-	unsigned int fEventId;             // Used for Naming CSV Files
-	
-	//CSV Path
-	TString fCsvFilesPath;             // Path for CSV Files
-	
-	// MC Track
-	int mcTrackBranchID;               // BranchID for MC Points
-	TClonesArray *fMCTrackArray;       // Storage for MC Points
-	
-	// MVD Hits
-	int mvdHitsPixelBranchID;          // BranchID for MVD Pixel Hits
-	TClonesArray *fMvdHitsPixelArray;  // Storage for MVD Pixel Hits
-	
-	int mvdHitsStripBranchID;          // BranchID for MVD Strip Hits
-	TClonesArray *fMvdHitsStripArray;  // Storage for MVD Strip Hits
-	
-	// GEM Hits
-	int gemHitBranchID;                // BranchID for GEM Hits
-	TClonesArray *fGemHitArray;        // Storage for GEM Hits
-	
-	// STT MC Point
-	int sttPointBranchID;              // BranchID for STT Points (MC)
-	TClonesArray *fSttPointArray;      // Storage for STT Points (MC)
-	
-	// STT Hits
-	int sttHitBranchID;                // BranchID for STT Hits
-	TClonesArray *fSttHitArray;        // Storage for STT Hits
-	
-	// SttMvdGemTrack
-	int sttMvdGemTrackBranchID;        // BranchID for Reco. Ideal Tracks
-	TClonesArray *fSttMvdGemTrackArray;// Storage for Reco. Ideal Tracks
-	
-	//CSV Files
-	std::ofstream fHits;               // Hits
-	std::ofstream fTruths;             // Truths
-	std::ofstream fParticles;          // Particles/Tracks
-	std::ofstream fTubes;              // Tubes
-		
-	/** CSV Generators **/
-	void GenerateMvdData();            // Tracking Data from MVD (Under Construction)
-	void GenerateGemData();            // Tracking Data from GEM (Under Construction)
-	void GenerateSttData();            // Tracking Data from STT
-	
-	
-	/** OLD Code (Kept for Ref.) **/
-	
-	//Event Counter
-	//unsigned int fHitId=0;
-	
-	//CSV Files (STT)
-	//std::ofstream InFile1;
-	//std::ofstream InFile2;
-	//std::ofstream InFile3;
-	
-	//CSV Data (STT)
-	//void GenerateCSV();
-	//void GenerateData();
-	
-	ClassDef(PndMLTracking,1)
+
+    /** SttParameters **/
+    PndGeoSttPar *fSttParameters;
+
+    /** EventHeader **/
+    TClonesArray *fEventHeader;
+
+    /** STTMapCreater **/
+    TClonesArray *fTubeArray;
+
+    /** Data Generator **/
+
+    // Start Counter
+    unsigned int fEventId;             // Used for Naming CSV Files
+
+    //CSV Path
+    TString fCsvFilesPath;             // Path for CSV Files
+
+    // MC Track
+    int mcTrackBranchID;               // BranchID for MC Points
+    TClonesArray *fMCTrackArray;       // Storage for MC Points
+
+    // MVD Hits
+    int mvdHitsPixelBranchID;          // BranchID for MVD Pixel Hits
+    TClonesArray *fMvdHitsPixelArray;  // Storage for MVD Pixel Hits
+
+    int mvdHitsStripBranchID;          // BranchID for MVD Strip Hits
+    TClonesArray *fMvdHitsStripArray;  // Storage for MVD Strip Hits
+
+    // GEM Hits
+    int gemHitBranchID;                // BranchID for GEM Hits
+    TClonesArray *fGemHitArray;        // Storage for GEM Hits
+
+    // STT MC Point
+    int sttPointBranchID;              // BranchID for STT Points (MC)
+    TClonesArray *fSttPointArray;      // Storage for STT Points (MC)
+
+    // STT Hits
+    int sttHitBranchID;                // BranchID for STT Hits
+    TClonesArray *fSttHitArray;        // Storage for STT Hits
+
+    // SttMvdGemTrack
+    int sttMvdGemTrackBranchID;        // BranchID for Reco. Ideal Tracks
+    TClonesArray *fSttMvdGemTrackArray;// Storage for Reco. Ideal Tracks
+
+    //CSV Files
+    std::ofstream fHits;               // Hits
+    std::ofstream fTruths;             // Truths
+    std::ofstream fParticles;          // Particles/Tracks
+    std::ofstream fTubes;              // Tubes
+	    
+    /** CSV Generators **/
+    void GenerateMvdData();            // Tracking Data from MVD (Under Construction)
+    void GenerateGemData();            // Tracking Data from GEM (Under Construction)
+    void GenerateSttData();            // Tracking Data from STT
+
+
+    /** OLD Code (Kept for Ref.) **/
+
+    //Event Counter
+    //unsigned int fHitId=0;
+
+    //CSV Files (STT)
+    //std::ofstream InFile1;
+    //std::ofstream InFile2;
+    //std::ofstream InFile3;
+
+    //CSV Data (STT)
+    //void GenerateCSV();
+    //void GenerateData();
+
+    ClassDef(PndMLTracking,1)
 };
 
 #endif /* PNDTRACKERS_PNDMLTRACKER_PNDMLTRACKING_H_ */
