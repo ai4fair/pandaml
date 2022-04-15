@@ -30,70 +30,13 @@ ClassImp(PndMLTracking)
 *
 */
 
-/* PndMLTracking() (1) */
+/* PndMLTracking() */
 PndMLTracking::PndMLTracking()
-    : fEventId(0)
-    , fCsvFilesPath("./data/")
-    , fSttParameters(nullptr)
+    : fSttParameters(nullptr)
     , fEventHeader(nullptr)
     , fTubeArray(nullptr)
-    , mcTrackBranchID(-1)
-    , fMCTrackArray(nullptr)
-    , mvdHitsPixelBranchID(-1)
-    , fMvdHitsPixelArray(nullptr)
-    , mvdHitsStripBranchID(-1)
-    , fMvdHitsStripArray(nullptr)
-    , gemHitBranchID(-1)
-    , fGemHitArray(nullptr)
-    , sttPointBranchID(-1)
-    , fSttPointArray(nullptr)
-    , sttHitBranchID(-1)
-    , fSttHitArray(nullptr)
-    , sttMvdGemTrackBranchID(-1)
-    , fSttMvdGemTrackArray(nullptr)
-{
-
-    //TODO: Move initialization to either inline or initializer
-    // list and leave the body of default constructor empyt. So
-    // comment everything inside constructor and uncomment above.
-    
-    /* Default Values (Order of Declaration) */
-    
-    /*
-    fEventId = 0;
-    fCsvFilesPath = "./data/";
-    
-    fSttParameters = nullptr;
-    fEventHeader = nullptr;
-    fTubeArray = nullptr;
-    
-    mcTrackBranchID = -1;
-    fMCTrackArray = nullptr;
-    
-    mvdHitsPixelBranchID = -1;
-    fMvdHitsPixelArray = nullptr;
-    mvdHitsStripBranchID = -1;
-    fMvdHitsStripArray = nullptr;
-    
-    gemHitBranchID = -1;
-    fGemHitArray = nullptr;
-    
-    sttPointBranchID = -1;
-    fSttPointArray = nullptr;
-    sttHitBranchID = -1;
-    fSttHitArray = nullptr;
-    
-    sttMvdGemTrackBranchID = -1;
-    fSttMvdGemTrackArray = nullptr; */
-}
-
-/* PndMLTracking() (2) */
-PndMLTracking::PndMLTracking(int start_counter)
     : fEventId(start_counter)
     , fCsvFilesPath("./data/")
-    , fSttParameters(nullptr)
-    , fEventHeader(nullptr)
-    , fTubeArray(nullptr)
     , mcTrackBranchID(-1)
     , fMCTrackArray(nullptr)
     , mvdHitsPixelBranchID(-1)
@@ -108,8 +51,32 @@ PndMLTracking::PndMLTracking(int start_counter)
     , fSttHitArray(nullptr)
     , sttMvdGemTrackBranchID(-1)
     , fSttMvdGemTrackArray(nullptr) {
+    /* Constructor (1) */
 }
-    
+
+/* PndMLTracking(int) */
+PndMLTracking::PndMLTracking(int start_counter)
+    : fSttParameters(nullptr)
+    , fEventHeader(nullptr)
+    , fTubeArray(nullptr)
+    : fEventId(start_counter)
+    , fCsvFilesPath("./data/")
+    , mcTrackBranchID(-1)
+    , fMCTrackArray(nullptr)
+    , mvdHitsPixelBranchID(-1)
+    , fMvdHitsPixelArray(nullptr)
+    , mvdHitsStripBranchID(-1)
+    , fMvdHitsStripArray(nullptr)
+    , gemHitBranchID(-1)
+    , fGemHitArray(nullptr)
+    , sttPointBranchID(-1)
+    , fSttPointArray(nullptr)
+    , sttHitBranchID(-1)
+    , fSttHitArray(nullptr)
+    , sttMvdGemTrackBranchID(-1)
+    , fSttMvdGemTrackArray(nullptr) {
+    /* Constructor (2) */
+}
 
 /* Destructor */
 PndMLTracking::~PndMLTracking() {
