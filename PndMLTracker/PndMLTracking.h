@@ -22,7 +22,7 @@ class PndMLTracking: public FairTask {
 public:
 
     PndMLTracking();
-    PndMLTracking(int start_counter);
+    PndMLTracking(int start_counter, TString csv_path);
     virtual ~PndMLTracking();
 
 protected:
