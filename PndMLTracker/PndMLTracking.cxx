@@ -32,10 +32,7 @@ ClassImp(PndMLTracking)
 
 /* PndMLTracking() */
 PndMLTracking::PndMLTracking()
-    : fSttParameters(nullptr)
-    , fEventHeader(nullptr)
-    , fTubeArray(nullptr)
-    : fEventId(start_counter)
+    : fEventId(0)
     , fCsvFilesPath("./data/")
     , mcTrackBranchID(-1)
     , fMCTrackArray(nullptr)
@@ -50,15 +47,16 @@ PndMLTracking::PndMLTracking()
     , sttHitBranchID(-1)
     , fSttHitArray(nullptr)
     , sttMvdGemTrackBranchID(-1)
-    , fSttMvdGemTrackArray(nullptr) {
+    , fSttMvdGemTrackArray(nullptr)
+    , fSttParameters(nullptr)
+    , fEventHeader(nullptr)
+    , fTubeArray(nullptr) {
+
     /* Constructor (1) */
 }
 
 /* PndMLTracking(int) */
-PndMLTracking::PndMLTracking(int start_counter)
-    : fSttParameters(nullptr)
-    , fEventHeader(nullptr)
-    , fTubeArray(nullptr)
+PndMLTracking::PndMLTracking(start_counter)
     : fEventId(start_counter)
     , fCsvFilesPath("./data/")
     , mcTrackBranchID(-1)
@@ -74,7 +72,11 @@ PndMLTracking::PndMLTracking(int start_counter)
     , sttHitBranchID(-1)
     , fSttHitArray(nullptr)
     , sttMvdGemTrackBranchID(-1)
-    , fSttMvdGemTrackArray(nullptr) {
+    , fSttMvdGemTrackArray(nullptr)
+    , fSttParameters(nullptr)
+    , fEventHeader(nullptr)
+    , fTubeArray(nullptr) {
+
     /* Constructor (2) */
 }
 

@@ -38,17 +38,6 @@ private:
 
     /* TODO: Inline Initialization or List Initialization */
 
-    /* SttParameters */
-    PndGeoSttPar *fSttParameters;
-
-    /* EventHeader */
-    TClonesArray *fEventHeader;
-
-    /* STTMapCreater */
-    TClonesArray *fTubeArray;
-
-    /* Data Generator */
-
     // Start Counter
     unsigned int fEventId;             // Used for Naming CSV Files
 
@@ -81,7 +70,16 @@ private:
     // SttMvdGemTrack
     int sttMvdGemTrackBranchID;        // BranchID for Reco. Ideal Tracks
     TClonesArray *fSttMvdGemTrackArray;// Storage for Reco. Ideal Tracks
+    
+    /* SttParameters */
+    PndGeoSttPar *fSttParameters;
 
+    /* EventHeader */
+    TClonesArray *fEventHeader;
+
+    /* STTMapCreater */
+    TClonesArray *fTubeArray;
+    
     //CSV Files
     std::ofstream fHits;               // Hits
     std::ofstream fTruths;             // Truths
