@@ -20,14 +20,22 @@
 ClassImp(PndMLTracking)
 
 /*
-* Initialization by assignment, avoid this method as its two step process.
-* First default constructor is called (step one) and then assignment operation
-* is performed (2nd step).
+* (1) Constructor Initialization by Assignment:
+* Avoid this method as it is a two step process. In this method, first
+* default constructor is called (step 1) and then assignment operation
+* is performed to intialize the data memebers.
 *
-* One needs to initialize members right at instantiation of a class object in one go.
-* There are two ways to achiever this: (1) inline initialization (initialize in .h) only
-* available in C++11 and beyond standard, (2) initializer list (is considered best practice)
+* (2) Constructor Initialization by Inline Assignment:
+* In this case, an object is instantiated with default values of data 
+* members. Its a one step process, assignment is done in "*.h" files.
+* NOTE: Inline assignment is only available in C++11 and beyond.
 *
+* (3) Constructor Initialization by Initializer List:
+* In this case, an object is instantiated with default values of data 
+* members. Its a one step process, default values are provided using
+* and initializer list to the constructor. It is considered the BEST
+* way for instantiating a statefull class object.
+* NOTE: Initializer list depends on order of declaration of data members.
 */
 
 /* PndMLTracking() */
@@ -56,7 +64,7 @@ PndMLTracking::PndMLTracking()
 }
 
 /* PndMLTracking(int) */
-PndMLTracking::PndMLTracking(start_counter)
+PndMLTracking::PndMLTracking(int start_counter)
     : fEventId(start_counter)
     , fCsvFilesPath("./data/")
     , mcTrackBranchID(-1)
