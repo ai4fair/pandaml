@@ -173,10 +173,10 @@ void PndMLTracking::Exec(Option_t* /*opt*/) {
     *                          Open CSV Files
     *  ********************************************************************* */
 
-    fHits.open(fCsvFilesPath+"event"+fidx+"-hits.csv");
-    fTruths.open(fCsvFilesPath+"event"+fidx+"-truth.csv");
-    fParticles.open(fCsvFilesPath+"event"+fidx+"-particles.csv");
-    fTubes.open(fCsvFilesPath+"event"+fidx+"-cells.csv");
+    fHits.open(fCsvFilesPath+"/event"+fidx+"-hits.csv");
+    fTruths.open(fCsvFilesPath+"/event"+fidx+"-truth.csv");
+    fParticles.open(fCsvFilesPath+"/event"+fidx+"-particles.csv");
+    fTubes.open(fCsvFilesPath+"/event"+fidx+"-cells.csv");
 
     /* ***********************************************************************
     *                          Add CSV Header
