@@ -49,13 +49,13 @@ fi
 if test "$SLURM_ARRAY_TASK_ID" == ""; then
     tmpdir="/tmp/"$USER
     outprefix=$tmpdir"/"$prefix
-    run=0
-    seed=4200
+    run=1
+    seed=$run
 else
     tmpdir="/tmp/"$USER"_"$SLURM_JOB_ID
     outprefix=$tmpdir"/"$prefix"_"$run
     run=$SLURM_ARRAY_TASK_ID
-    seed=$SLURM_ARRAY_TASK_ID
+    seed=$run
 fi
 
 
