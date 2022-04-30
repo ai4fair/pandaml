@@ -90,7 +90,7 @@ echo ""
 
 
 # Terminate Script for Testing.
-exit 0;
+# exit 0;
 
 
 # ---------------------------------------------------------------
@@ -108,7 +108,7 @@ echo "Started Ideal Reconstruction..."
 root -l -b -q $nyx"/"recoideal_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_reco.log" 2>&1
 
 echo "Started CSV Generator..."
-root -l -b -q $nyx"/"data_complete.C\($nevt,\"$outprefix\",$tmpdir,$run\) > $outprefix"_data.log" 2>&1
+root -l -b -q $nyx"/"data_complete.C\($nevt,\"$outprefix\",\"$tmpdir\",$run\) > $outprefix"_data.log" 2>&1
 
 echo "Finished Simulating..."
 echo ""
@@ -130,6 +130,6 @@ cp $outprefix"_data.log" $_target
 cp $tmpdir"/"*.csv $_target
 
 #*** Tidy Up ***
-# rm -rf $tmpdir
+rm -rf $tmpdir
 
-echo "The Script has Finished wit SLURM_JOB_ID: $SLURM_JOB_ID."
+echo "The Script has Finished wit SLURM_JOB_ID: $run."
