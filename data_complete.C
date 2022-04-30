@@ -1,4 +1,4 @@
-int data_complete(Int_t nEvents=10, TString prefix="", Int_t Job_Id=0) {
+int data_complete(Int_t nEvents=10, TString prefix="", TString csv_path="", Int_t Job_Id=0) {
     
     // ROOT Files
     TString parFile     = prefix+"_par.root";
@@ -42,7 +42,7 @@ int data_complete(Int_t nEvents=10, TString prefix="", Int_t Job_Id=0) {
 	rtdb->setSecondInput(parIo1);
 	
 	// HERE OUR TASK GOES!
-    PndMLTracking *genDB = new PndMLTracking((nEvents*Job_Id), prefix);
+    PndMLTracking *genDB = new PndMLTracking((nEvents*Job_Id), csv_path);
     fRun->AddTask(genDB);
 
     // FairRunAna::Init()

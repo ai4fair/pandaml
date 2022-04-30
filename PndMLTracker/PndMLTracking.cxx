@@ -41,7 +41,7 @@ ClassImp(PndMLTracking)
 /* PndMLTracking() */
 PndMLTracking::PndMLTracking()
     : fEventId(0)
-    , fCsvFilesPath("./data/")
+    , fCsvFilesPath("./data")
     , mcTrackBranchID(-1)
     , fMCTrackArray(nullptr)
     , mvdHitsPixelBranchID(-1)
@@ -167,17 +167,20 @@ void PndMLTracking::Exec(Option_t* /*opt*/) {
     std::stringstream ss;
     ss << std::setw(10) << std::setfill('0') << fEventId;
     std::string fidx = ss.str();
-    std::cout << "Processing Event: " << "event"+fidx << std::endl;
-
+    
     /* ***********************************************************************
     *                          Open CSV Files
     *  ********************************************************************* */
-
-    fHits.open(fCsvFilesPath+"/event"+fidx+"-hits.csv");
-    fTruths.open(fCsvFilesPath+"/event"+fidx+"-truth.csv");
-    fParticles.open(fCsvFilesPath+"/event"+fidx+"-particles.csv");
-    fTubes.open(fCsvFilesPath+"/event"+fidx+"-cells.csv");
-
+    
+    TString csv_path = fCsvFilesPath+"/event"+fidx;
+    
+    fHits.open(csv_path+"-hits.csv");
+    fTruths.open(csv_path+"-truth.csv");
+    fParticles.open(csv_path+"-particles.csv");
+    fTubes.open(csv_path+"-cells.csv");
+    
+    std::cout << "Processing Event: " << csv_path << std::endl;
+    
     /* ***********************************************************************
     *                          Add CSV Header
     *  ********************************************************************* */
