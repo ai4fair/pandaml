@@ -49,7 +49,7 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
     //                     Select an Event Generator                //
     
     // (1) EvtGen Generator (Implicit Init.)
-    if (inputGen.Contains("DEC")) {
+    if (inputGen.Contains("dec")) {
         std::cout << "-I- Using EvtGen Generator..." << std::endl;
         fRun->SetInput(inputGen);
     }

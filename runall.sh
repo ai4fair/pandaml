@@ -17,9 +17,9 @@ echo -e "\n";
 
 # Default Inputs
 nevt=1000
-prefix=mumu
-gen=DBoxGEN             # SBoxGEN, DBoxGEN or .DEC
-pBeam=1.642
+prefix=xibar_xi1820
+gen=Xibar_Xi1820.dec             # SBoxGEN, DBoxGEN or .DEC
+pBeam=4.6                        # llbar: 1.642, xibarxi1820: 4.6 GeV/c
 seed=42
 
 # User Inputs
@@ -97,7 +97,7 @@ echo "Started Ideal Reconstruction..."
 root -l -b -q $nyx"/"recoideal_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_reco.log" 2>&1
 
 echo "Started CSV Generator..."
-root -l -b -q $nyx"/"data_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_data.log" 2>&1
+# root -l -b -q $nyx"/"data_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_data.log" 2>&1
 
 echo "Script has Finished..."
 echo ""
