@@ -13,6 +13,8 @@ if((0)); then
 fi
 
 # For CSV a directory named `data` is needed
+# mkdir -p $path will do the same trick.
+
 path=data
 if [[ ! -e $path ]]; then
     mkdir $path

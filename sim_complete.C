@@ -11,10 +11,11 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
     std::cout << "SEED : " << seed << std::endl << std::endl;
     
     // Set Seed for Random Generator
-    // gRandom->SetSeed();
-    
-    // OR from a specific seed.
-    gRandom->SetSeed(seed);
+    if(seed==0)
+        gRandom->SetSeed();
+    else
+        gRandom->SetSeed(seed);
+
     
     /* ************************************************************************
     * TString inputGen =
@@ -30,40 +31,52 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
     * LEP    -> "leplep:pid(value):gegm(value):cosTheta(min,max)"
     ************************************************************************ */
     
+    //----- User Settings
     TString parAsciiFile = "all.par";
+    TString decayMode = "UserDecayConfig.C";
+    
     //TString prefix     = "";		          // "" (auto from inputGen) or "llbar_fwp" or "evtcomplete";
     //TString inputGen   = "llbar_fwp.DEC";   // EvtGen: llbar_fwp.DEC, bkg_xixibar.DEC, etc.
     //TString inputGen   = "dpm";             // BkgGen: dpm, ftf, pythia8 (will be default)
     //TString inputGen   = "box:type(13,10):p(1.0,3.0):tht(22,140):phi(0,360)";
     
-    //----- Create the Simulation Run Manager
+    
+    //----- Init Settings
     PndMasterRunSim *fRun = new PndMasterRunSim();
     
+    
+    //--------------------------------------------------------------//
+    //                     Select an Event Generator                //
+    
+    // (1) EvtGen Generator (Implicit Init.)
     if (inputGen.Contains("DEC")) {
         std::cout << "-I- Using EvtGen Generator..." << std::endl;
         fRun->SetInput(inputGen);
     }
-        
-    fRun->SetName("TGeant4");
-    fRun->SetParamAsciiFile(parAsciiFile);
-    fRun->SetNumberOfEvents(nEvents);
-    fRun->SetBeamMom(pBeam);
-	
-	//----- Initialization
-    fRun->Setup(prefix);
-
-    //----- Geometry
-    fRun->CreateGeometry();
-
-    //----- Event Generator
-    fRun->SetGenerator();
-
-
-    //--------------------------------------------------------------
-    //                     Box Generator mu+ mu-
-    //--------------------------------------------------------------
     
-    // Single Box Generator
+    // (2) EvtGen Generator (Explicit Init.)
+    if (inputGen.Contains("EvtGenFWP")) {
+    
+        std::cout << "-I- Using EvtGen (FWP) Generator..." << std::endl;
+        
+        inputGen = "llbar_fwp.DEC";
+        PndEvtGenDirect* evtGenDirect = new PndEvtGenDirect("pbarpSystem", inputGen.Data(), pBeam);
+        evtGenDirect->SetStoreTree(kFALSE);
+        fRun->AddGenerator(evtGenDirect);
+    }
+    
+    // (3) EvtGen Generator (Explicit Init.)
+    if (inputGen.Contains("EvtGenBKG")) {
+                
+        std::cout << "-I- Using EvtGen (BKG) Generator..." << std::endl;
+        
+        inputGen = "llbar_bkg.DEC";
+        PndEvtGenDirect* evtGenDirect = new PndEvtGenDirect("pbarpSystem", inputGen.Data(), pBeam);
+        evtGenDirect->SetStoreTree(kFALSE);
+        fRun->AddGenerator(evtGenDirect);
+    }
+    
+    // (4) Single Box Generator
     if (inputGen.Contains("SBoxGEN"))
     {
         std::cout << "-I- Using Single BoxGenerator..." << std::endl;
@@ -76,7 +89,7 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
         fRun->AddGenerator(boxGen);
     }
     
-    // Double Box Generator
+    // (5) Double Box Generator
     if (inputGen.Contains("DBoxGEN"))
     {
         std::cout << "-I- Using Double BoxGenerator..." << std::endl;
@@ -99,36 +112,32 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
      
     }
     
-    // EvtGen Generator (Redundant)
-    if (inputGen.Contains("EvtGenFWP")) {
+    //                                                              //
+    //--------------------------------------------------------------//
     
-        std::cout << "-I- Using EvtGen (FWP) Generator..." << std::endl;
-        
-        inputGen = "llbar_fwp.DEC";
-        PndEvtGenDirect* evtGenDirect = new PndEvtGenDirect("pbarpSystem", inputGen.Data(), pBeam);
-        evtGenDirect->SetStoreTree(kFALSE);
-        fRun->AddGenerator(evtGenDirect);
-    }
     
-    // EvtGen Generator (Redundant)
-    if (inputGen.Contains("EvtGenBKG")) {
-                
-        std::cout << "-I- Using EvtGen (BKG) Generator..." << std::endl;
-        
-        inputGen = "llbar_bkg.DEC";
-        PndEvtGenDirect* evtGenDirect = new PndEvtGenDirect("pbarpSystem", inputGen.Data(), pBeam);
-        evtGenDirect->SetStoreTree(kFALSE);
-        fRun->AddGenerator(evtGenDirect);
-    }
+    //----- Init Settings
+    fRun->SetName("TGeant4");
+    fRun->SetParamAsciiFile(parAsciiFile);
+    fRun->SetNumberOfEvents(nEvents);
+    fRun->SetBeamMom(pBeam);
+    fRun->SetStoreTraj(kTRUE);
+    fRun->SetOptions(options);
+    fRun->SetUserDecay(decayMode);
     
-    //----- Add Sim Tasks
+	//----- Init
+    fRun->Setup(prefix);
+
+    //----- Geometry
+    fRun->CreateGeometry();
+
+    //----- Event Generator
+    fRun->SetGenerator();
+   
+    //----- AddSimTasks
     fRun->AddSimTasks();
     
-    //----- Event Display (Store Trajectories)
-    // fRun->SetStoreTraj(kTRUE);
-    
-    //----- Intialise & Run
-    PndEmcMapper::Init(1);
+    //----- Init & Run
     fRun->Init();
     fRun->Run(nEvents); 
     fRun->Finish();

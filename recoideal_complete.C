@@ -30,7 +30,7 @@ int recoideal_complete(Int_t nEvents=10, TString prefix="") {
     //----- AddRecoIdealTasks
     fRun->AddRecoIdealTasks();
     
-    //----- Intialise & Run
+    //----- Init & Run
     PndEmcMapper::Init(1);
     fRun->Init();
     fRun->Run(0, nEvents);

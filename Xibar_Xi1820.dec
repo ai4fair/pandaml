@@ -1,0 +1,18 @@
+noPhotos
+
+Decay pbarpSystem
+	1.0  	Xi(1820)- anti-Xi+ PHSP;
+Enddecay
+
+Decay Xi(1820)- 
+	1.0 	Lambda0 K-	PHSP;
+Enddecay
+
+Decay anti-Xi+
+Enddecay
+
+Decay Lambda0
+Enddecay
+
+
+End
