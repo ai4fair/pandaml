@@ -122,7 +122,6 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
     fRun->SetNumberOfEvents(nEvents);
     fRun->SetBeamMom(pBeam);
     fRun->SetStoreTraj(kTRUE);
-    fRun->SetOptions(options);
     fRun->SetUserDecay(decayMode);
     
 	//----- Init
