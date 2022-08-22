@@ -1,43 +1,18 @@
 #!/bin/sh
 
-# Script to run whole analysis chain using Singularity container.
-# The script is based on runideal.sh script with the only exeption 
-# of running the PandaRoot from a special Singularity container.
-
-if((0)); then
-  rm *.root
-  rm *.log
-  rm *.pdf
-  rm core*
-  rm *.dat
-fi
-
-# For CSV a directory named `data` is needed
-# mkdir -p $path will do the same trick.
-
-path=data
-if [[ ! -e $path ]]; then
-    mkdir $path
-elif [[ ! -d $path ]]; then
-    echo "$path already exists but is not a directory" 1>&2
-fi
-
 # PandaRoot
-#CONTAINER=$HOME/fair/stable/v12.0.3.sif     # FairSoft(nov20p1), FairRoot(18.6.3), PandaRoot(v12.0.3)
-CONTAINER=$HOME/fair/containers/dev220310    # FairSoft(nov20p1), FairRoot(18.6.3), PandaRoot(dev210810)
+CONTAINER=~/fair/containers/debian/v13.0.0.sif
 
 
-# Input Flags
+# Default Inputs
 nevt=100
-prefix=evtcomplete
-
-# gen=SBoxGEN                    # Single Box Gen
-gen=DBoxGEN                   # Double Box Gen
-# gen=llbar_bkg.DEC             # EvtGen (DEC)
-pBeam=1.642
+prefix=xibar_xi1820
+gen=Xibar_Xi1820.dec             # SBoxGEN, DBoxGEN or .DEC
+pBeam=4.6                        # llbar: 1.642, xibarxi1820: 4.6 GeV/c
 seed=42
 
 
+# User Inputs
 if test "$1" != ""; then
   nevt=$1
 fi
@@ -50,21 +25,32 @@ if test "$3" != ""; then
   gen=$3
 fi
 
-# outprefix
-outprefix=$path"/"$prefix
+
+# Make Sure $_target Exists
+_target=data
+if [ ! -d $_target ]; then
+    mkdir -p $_target;
+    echo "\nThe data dir. at '$_target' created."
+else
+    echo "\nThe data dir. at '$_target' exists."
+fi
+
+
+# Output Prefix
+outprefix=$_target"/"$prefix
 
 # ---------------------------------------------------------------
 #                              Print Flags
 # ---------------------------------------------------------------
 
-echo -e "Events    : $nevt"
-echo -e "Prefix    : $outprefix"
-echo -e "Decay     : $gen"
-echo -e "pBeam     : $pBeam"
-echo -e "Seed      : $seed"
+echo "\nEvents    : $nevt"
+echo "Prefix    : $outprefix"
+echo "Decay     : $gen"
+echo "pBeam     : $pBeam"
+echo "Seed      : $seed"
 
 # Terminate Script for Testing.
-#exit 0;
+# exit 0;
 
 # ---------------------------------------------------------------
 #                            Initiate Simulaton

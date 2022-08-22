@@ -1,18 +1,16 @@
 #!/bin/sh
 
-# Lustre Home
+# Lustre
 LUSTRE_HOME="/lustre/panda/"$USER
 nyx=$LUSTRE_HOME"/pandaml"
-
 tmpdir="/tmp/"$USER
 _target=$nyx"/data"
 
 
-# Init PandaRoot
-# . $LUSTRE_HOME"/CENTOS/v12.0.3-install/bin/config.sh" -p
-. $LUSTRE_HOME"/CENTOS/dev-install/bin/config.sh" -p
+# PandaRoot
+. $LUSTRE_HOME"/DEBIAN/v13.0.0-install/bin/config.sh" -p
 
-echo -e "\n";
+echo "\n";
 
 
 # Default Inputs
@@ -39,22 +37,22 @@ fi
 # Make Sure $_target Exists
 if [ ! -d $_target ]; then
     mkdir -p $_target;
-    echo -e "\nThe data dir. at '$_target' created."
+    echo "\nThe data dir. at '$_target' created."
 else
-    echo -e "\nThe data dir. at '$_target' exists."
+    echo "\nThe data dir. at '$_target' exists."
 fi
 
 
 # Make Sure $tempdir Exists
 if [ ! -d $tmpdir ]; then
     mkdir $tmpdir;
-    echo -e "The temporary dir. at '$tmpdir' created."
+    echo "The temporary dir. at '$tmpdir' created."
 else
-    echo -e "The temporary dir. at '$tmpdir' exists."
+    echo "The temporary dir. at '$tmpdir' exists."
 fi
 
 
-# outprefix
+# Output Prefix
 outprefix=$_target"/"$prefix
 
 
@@ -62,18 +60,16 @@ outprefix=$_target"/"$prefix
 #                              Print Flags
 # ---------------------------------------------------------------
 
-echo ""
-echo -e "\nLustre Home  : $LUSTRE_HOME"
-echo -e "Working Dir. : $nyx"
-echo -e "Temp Dir.    : $tmpdir"
-echo -e "Target Dir.  : $_target"
-echo ""
-echo -e "Events    : $nevt"
-echo -e "Prefix    : $outprefix"
-echo -e "Decay     : $gen"
-echo -e "pBeam     : $pBeam"
-echo -e "Seed      : $seed"
-echo ""
+echo "\nLustre Home  : $LUSTRE_HOME"
+echo "Working Dir. : $nyx"
+echo "Temp Dir.    : $tmpdir"
+echo "Target Dir.  : $_target"
+
+echo "\nEvents    : $nevt"
+echo "Prefix    : $outprefix"
+echo "Decay     : $gen"
+echo "pBeam     : $pBeam"
+echo "Seed      : $seed"
 
 
 # Terminate Script for Testing.
@@ -85,7 +81,7 @@ echo ""
 # ---------------------------------------------------------------
 
 echo ""
-echo -e "\nScript has Started..."
+echo "\nScript has Started..."
 
 echo "Started Simulation..."
 root -l -b -q $nyx"/"sim_complete.C\($nevt,\"$outprefix\",\"$gen\"\) > $outprefix"_sim.log" 2>&1
@@ -99,5 +95,5 @@ root -l -b -q $nyx"/"recoideal_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_
 echo "Started CSV Generator..."
 # root -l -b -q $nyx"/"data_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_data.log" 2>&1
 
-echo "Script has Finished..."
+echo "Script has Finished...\n"
 echo ""
