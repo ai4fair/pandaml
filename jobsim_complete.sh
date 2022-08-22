@@ -60,44 +60,32 @@ fi
 
 # Make sure $tempdir exists
 if [ ! -d $tmpdir ]; then
-    mkdir $tmpdir;
+    mkdir -p $tmpdir;
     echo "The temporary dir. at '$tmpdir' created."
 else
     echo "The temporary dir. at '$tmpdir' exists."
 fi
 
 
-# ---------------------------------------------------------------
-#                              Print Flags
-# ---------------------------------------------------------------
-
-echo ""
-echo "--Directory--"
-echo "Lustre Home  : $LUSTRE_HOME"
+#*** Print Flags ***
+echo "\nLustre Home  : $LUSTRE_HOME"
 echo "Working Dir. : $nyx"
 echo "Temp Dir.    : $tmpdir"
 echo "Target Dir.  : $_target"
-echo ""
-echo "--Macro--"
-echo "Events    : $nevt"
+echo "\nEvents    : $nevt"
 echo "Prefix    : $outprefix"
 echo "Decay     : $gen"
 echo "pBeam     : $pBeam"
 echo "Seed      : $seed"
 echo "Run       : $run"
-echo ""
 
 
 # Terminate Script for Testing.
 # exit 0;
 
 
-# ---------------------------------------------------------------
-#                            Initiate Simulaton
-# ---------------------------------------------------------------
-
-echo ""
-echo "Started Simulating..."
+#*** Initiate Simulaton ***
+echo "\nStarted Simulating..."
 root -l -b -q $nyx"/"sim_complete.C\($nevt,\"$outprefix\",\"$gen\",$pBeam,$seed\) > $outprefix"_sim.log" 2>&1
 
 echo "Started Digitization..."
@@ -109,8 +97,7 @@ root -l -b -q $nyx"/"recoideal_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_
 echo "Started CSV Generator..."
 root -l -b -q $nyx"/"data_complete.C\($nevt,\"$outprefix\",\"$tmpdir\",$run\) > $outprefix"_data.log" 2>&1
 
-echo "Finished Simulating..."
-echo ""
+echo "Finished Simulating...\n"
 
 
 #*** Storing Files ***
@@ -127,6 +114,7 @@ cp $outprefix"_data.root" $_target
 cp $outprefix"_data.log" $_target
 
 cp $tmpdir"/"*.csv $_target
+
 
 #*** Tidy Up ***
 rm -rf $tmpdir
