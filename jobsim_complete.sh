@@ -1,24 +1,23 @@
 #!/bin/bash
 
+# Lustre
 LUSTRE_HOME="/lustre/panda/"$USER
 nyx=$LUSTRE_HOME"/pandaml"
-
 tmpdir="/tmp/"$USER
 _target=$nyx"/data"
 
 
-# Init PandaRoot
-# . $LUSTRE_HOME"/CENTOS/v12.0.3-install/bin/config.sh" -p
-. $LUSTRE_HOME"/CENTOS/dev-install/bin/config.sh" -p
+# PandaRoot
+. $LUSTRE_HOME"/DEBIAN/v13.0.0-install/bin/config.sh" -p
 
-echo -e "\n";
+echo "\n";
 
 
 # Default Inputs
 nevt=1000
 prefix=mumu
-gen=DBoxGEN                 # SBoxGEN, DBoxGEN or .DEC
-pBeam=1.642
+gen=DBoxGEN                           # SBoxGEN, DBoxGEN or .DEC
+pBeam=1.642                           # llbar: 1.642, xibarxi1820: 4.6 GeV/c
 seed=$RANDOM
 run=$SLURM_ARRAY_TASK_ID
 
@@ -36,15 +35,6 @@ if test "$3" != ""; then
 fi
 
 
-# Make sure `$_target` Exists
-if [ ! -d $_target ]; then
-    mkdir -p $_target;
-    echo -e "\nThe data dir. at '$_target' created."
-else
-    echo -e "\nThe data dir. at '$_target' exists."
-fi
-
-
 # IF ARRAY_TASK Used
 if test "$SLURM_ARRAY_TASK_ID" == ""; then
     tmpdir="/tmp/"$USER
@@ -59,12 +49,21 @@ else
 fi
 
 
+# Make sure `$_target` Exists
+if [ ! -d $_target ]; then
+    mkdir -p $_target;
+    echo "\nThe data dir. at '$_target' created."
+else
+    echo "\nThe data dir. at '$_target' exists."
+fi
+
+
 # Make sure $tempdir exists
 if [ ! -d $tmpdir ]; then
     mkdir $tmpdir;
-    echo -e "The temporary dir. at '$tmpdir' created."
+    echo "The temporary dir. at '$tmpdir' created."
 else
-    echo -e "The temporary dir. at '$tmpdir' exists."
+    echo "The temporary dir. at '$tmpdir' exists."
 fi
 
 
@@ -73,19 +72,19 @@ fi
 # ---------------------------------------------------------------
 
 echo ""
-echo -e "--Directory--"
-echo -e "Lustre Home  : $LUSTRE_HOME"
-echo -e "Working Dir. : $nyx"
-echo -e "Temp Dir.    : $tmpdir"
-echo -e "Target Dir.  : $_target"
+echo "--Directory--"
+echo "Lustre Home  : $LUSTRE_HOME"
+echo "Working Dir. : $nyx"
+echo "Temp Dir.    : $tmpdir"
+echo "Target Dir.  : $_target"
 echo ""
-echo -e "--Macro--"
-echo -e "Events    : $nevt"
-echo -e "Prefix    : $outprefix"
-echo -e "Decay     : $gen"
-echo -e "pBeam     : $pBeam"
-echo -e "Seed      : $seed"
-echo -e "Run       : $run"
+echo "--Macro--"
+echo "Events    : $nevt"
+echo "Prefix    : $outprefix"
+echo "Decay     : $gen"
+echo "pBeam     : $pBeam"
+echo "Seed      : $seed"
+echo "Run       : $run"
 echo ""
 
 

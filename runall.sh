@@ -19,6 +19,7 @@ prefix=xibar_xi1820
 gen=Xibar_Xi1820.dec             # SBoxGEN, DBoxGEN or .DEC
 pBeam=4.6                        # llbar: 1.642, xibarxi1820: 4.6 GeV/c
 seed=42
+run=1
 
 # User Inputs
 if test "$1" != ""; then
@@ -53,7 +54,7 @@ fi
 
 
 # Output Prefix
-outprefix=$_target"/"$prefix
+outprefix=$tmpdir"/"$prefix
 
 
 # ---------------------------------------------------------------
@@ -93,7 +94,28 @@ echo "Started Ideal Reconstruction..."
 root -l -b -q $nyx"/"recoideal_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_reco.log" 2>&1
 
 echo "Started CSV Generator..."
-# root -l -b -q $nyx"/"data_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_data.log" 2>&1
+root -l -b -q $nyx"/"data_complete.C\($nevt,\"$outprefix\",\"$tmpdir\",$run\) > $outprefix"_data.log" 2>&1
 
 echo "Script has Finished...\n"
 echo ""
+
+
+#*** Storing Files ***
+echo "Moving Files from '$tmpdir' to '$_target'"
+
+cp $outprefix"_par.root" $_target
+cp $outprefix"_sim.root" $_target
+cp $outprefix"_sim.log" $_target
+cp $outprefix"_digi.root" $_target
+cp $outprefix"_digi.log" $_target
+cp $outprefix"_reco.root" $_target
+cp $outprefix"_reco.log" $_target
+cp $outprefix"_data.root" $_target
+cp $outprefix"_data.log" $_target
+
+cp $tmpdir"/"*.csv $_target
+
+#*** Tidy Up ***
+rm -rf $tmpdir
+
+echo "The Script has Finished wit SLURM_JOB_ID: $run."
