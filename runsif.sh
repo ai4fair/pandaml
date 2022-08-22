@@ -58,9 +58,8 @@ echo "Seed      : $seed"
 
 echo ""
 echo "Script has Started..."
-
 echo "Started Simulation..."
-singularity exec $CONTAINER root -l -b -q sim_complete.C\($nevt,\"$outprefix\",\"$gen\"\) > $outprefix"_sim.log" 2>&1
+singularity exec $CONTAINER root -l -b -q sim_complete.C\($nevt,\"$outprefix\",\"$gen\",$pBeam,$seed\) > $outprefix"_sim.log" 2>&1
 
 echo "Started Digitization..."
 singularity exec $CONTAINER root -l -b -q digi_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_digi.log" 2>&1
