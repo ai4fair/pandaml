@@ -42,10 +42,11 @@ int data_complete(Int_t nEvents=10, TString prefix="", TString csv_path="", Int_
 	rtdb->setSecondInput(parIo1);
 	
 	// HERE OUR TASK GOES!
-    PndMLTracking *genDB = new PndMLTracking((nEvents*Job_Id), csv_path);
+    Int_t start_counter = nEvents*Job_Id;
+    PndMLTracking *genDB = new PndMLTracking(start_counter, csv_path);
     fRun->AddTask(genDB);
 
-    // FairRunAna::Init()
+    // FairRunAna Init
     PndEmcMapper::Init(1);
     fRun->Init();
     fRun->Run(0,nEvents);
