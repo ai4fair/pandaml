@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # PandaRoot
-CONTAINER=~/gsi/containers/v13.0.0.sif
+. "/home/"$USER"/gsi/pandaroot/install-v13.0.0/bin/config.sh" -p
 
 
 # Default Inputs
@@ -58,16 +58,16 @@ echo "Seed      : $seed"
 
 echo ""
 echo "Started Simulation..."
-singularity exec $CONTAINER root -l -b -q sim_complete.C\($nevt,\"$outprefix\",\"$gen\",$pBeam,$seed\) > $outprefix"_sim.log" 2>&1
+root -l -b -q sim_complete.C\($nevt,\"$outprefix\",\"$gen\",$pBeam,$seed\) > $outprefix"_sim.log" 2>&1
 
 echo "Started Digitization..."
-singularity exec $CONTAINER root -l -b -q digi_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_digi.log" 2>&1
+root -l -b -q digi_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_digi.log" 2>&1
 
 echo "Started Ideal Reconstruction..."
-singularity exec $CONTAINER root -l -b -q recoideal_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_reco.log" 2>&1
+root -l -b -q recoideal_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_reco.log" 2>&1
 
 echo "Started CSV Generator..."
-singularity exec $CONTAINER root -l -b -q data_complete.C\($nevt,\"$outprefix\",\"$_target\"\) > $outprefix"_data.log" 2>&1
+root -l -b -q data_complete.C\($nevt,\"$outprefix\",\"$_target\"\) > $outprefix"_data.log" 2>&1
 
 echo "Finished Simulation..."
 echo ""

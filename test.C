@@ -1,5 +1,5 @@
 
-void root () {
+void test () {
     
     double x=0.0025, y=1253.5;
     std::cout << "Running Macro..." << std::endl;
