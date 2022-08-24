@@ -67,9 +67,9 @@ private:
     int sttHitBranchID;                // BranchID for STT Hits
     TClonesArray *fSttHitArray;        // Storage for STT Hits
 
-    // SttMvdGemTrack
-    int sttMvdGemTrackBranchID;        // BranchID for Reco. Ideal Tracks
-    TClonesArray *fSttMvdGemTrackArray;// Storage for Reco. Ideal Tracks
+    // BarrelTrack
+    int barrelTrackBranchID;           // BranchID for Reco. Ideal Tracks
+    TClonesArray *fBarrelTrackArray;   // Storage for Reco. Ideal Tracks
     
     /* SttParameters */
     PndGeoSttPar *fSttParameters;

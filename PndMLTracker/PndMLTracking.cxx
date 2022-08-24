@@ -54,8 +54,8 @@ PndMLTracking::PndMLTracking()
     , fSttPointArray(nullptr)
     , sttHitBranchID(-1)
     , fSttHitArray(nullptr)
-    , sttMvdGemTrackBranchID(-1)
-    , fSttMvdGemTrackArray(nullptr)
+    , barrelTrackBranchID(-1)       // formerly SttMvdGemTrack
+    , fBarrelTrackArray(nullptr)    // formerly SttMvdGemTrack
     , fSttParameters(nullptr)
     , fEventHeader(nullptr)
     , fTubeArray(nullptr) {
@@ -79,8 +79,8 @@ PndMLTracking::PndMLTracking(int start_counter, TString csv_path)
     , fSttPointArray(nullptr)
     , sttHitBranchID(-1)
     , fSttHitArray(nullptr)
-    , sttMvdGemTrackBranchID(-1)
-    , fSttMvdGemTrackArray(nullptr)
+    , barrelTrackBranchID(-1)       //formerly SttMvdGemTrack
+    , fBarrelTrackArray(nullptr)    // formerly SttMvdGemTrack
     , fSttParameters(nullptr)
     , fEventHeader(nullptr)
     , fTubeArray(nullptr) {
@@ -145,9 +145,9 @@ InitStatus PndMLTracking::Init() {
     fSttHitArray = (TClonesArray*) ioman->GetObject("STTHit");
     sttHitBranchID = ioman->GetBranchId("STTHit");
 
-    // Access SttMvdGemGenTrack branch and determine its branch ID
-    fSttMvdGemTrackArray = (TClonesArray*) ioman->GetObject("SttMvdGemTrack");
-    sttMvdGemTrackBranchID = ioman->GetBranchId("SttMvdGemTrack");
+    // Access BarrelTrack (formerly SttMvdGemTrack) branch and determine its branch ID
+    fBarrelTrackArray = (TClonesArray*) ioman->GetObject("BarrelTrack");
+    barrelTrackBranchID = ioman->GetBranchId("BarrelTrack");
     
     std::cout << "-I- PndMLTracking: Initialisation successful" << std::endl;
     return kSUCCESS;
@@ -498,17 +498,17 @@ void PndMLTracking::GenerateSttData() {
     FairMultiLinkedData linksSTT;
     PndMCTrack *mcTrack;
     
-    std::cout << "Starting fParticle with number of tracks: " << fSttMvdGemTrackArray->GetEntries() << std::endl;
+    std::cout << "Starting fParticle with number of tracks: " << fBarrelTrackArray->GetEntries() << std::endl;
     
     // Get FairRootManager Instance
     FairRootManager *ioman = FairRootManager::Instance();
     
     // Loop over ideal tracks i.e. SttMvdGemTrackArray
-    for (Int_t i_Array = 0; i_Array < fSttMvdGemTrackArray->GetEntries(); i_Array++) { //loop over trackarray
+    for (Int_t i_Array = 0; i_Array < fBarrelTrackArray->GetEntries(); i_Array++) { //loop over trackarray
         std::cout << "IdealTrack # : " << i_Array << std::endl;
         
         // Fetch a PndTrack from the array
-        PndTrack *sttMvdGemTrack = (PndTrack *)fSttMvdGemTrackArray->At(i_Array);
+        PndTrack *sttMvdGemTrack = (PndTrack *)fBarrelTrackArray->At(i_Array);
         
         mcTrack = NULL;
         links = sttMvdGemTrack->GetLinksWithType(ioman->GetBranchId("MCTrack")); // create the links between the track and the MCTrack
