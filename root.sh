@@ -7,7 +7,7 @@ if [ $# -lt 1 ]; then
 fi
 
 FILE=$1
-CONTAINER=~/fair/containers/debian/v13.0.0.sif
+CONTAINER=~/gsi/containers/v13.0.0.sif
 # singularity exec $CONTAINER root -l -b -q $FILE && exit
 singularity run $CONTAINER -c "root -l -b -q $FILE" && exit
 

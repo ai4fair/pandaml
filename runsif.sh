@@ -1,11 +1,11 @@
 #!/bin/sh
 
 # PandaRoot
-CONTAINER=~/fair/containers/debian/v13.0.0.sif
+CONTAINER=~/gsi/containers/v13.0.0.sif
 
 
 # Default Inputs
-nevt=100
+nevt=10
 prefix=xibar_xi1820
 gen=Xibar_Xi1820.dec             # SBoxGEN, DBoxGEN or .DEC
 pBeam=4.6                        # llbar: 1.642, xibarxi1820: 4.6 GeV/c
@@ -68,7 +68,7 @@ echo "Started Ideal Reconstruction..."
 singularity exec $CONTAINER root -l -b -q recoideal_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_reco.log" 2>&1
 
 echo "Started CSV Generator..."
-singularity exec $CONTAINER root -l -b -q data_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_data.log" 2>&1
+singularity exec $CONTAINER root -l -b -q data_complete.C\($nevt,\"$outprefix\",\"$_target\"\) > $outprefix"_data.log" 2>&1
 
 echo "Script has Finished..."
 echo ""
