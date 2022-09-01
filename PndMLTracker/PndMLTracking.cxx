@@ -125,6 +125,15 @@ InitStatus PndMLTracking::Init() {
     fMCTrackArray = (TClonesArray*) ioman->GetObject("MCTrack");
     mcTrackBranchID = ioman->GetBranchId("MCTrack");
     
+    if (!fMCTrackArray) {
+        LOG(error) << " " << GetName() << "::Init: No MCTrack array!";
+        return kERROR;
+    }
+    
+    // Access STTPoint (MC) branch and determine its branch ID
+    fSttPointArray = (TClonesArray*) ioman->GetObject("STTPoint");
+    sttPointBranchID = ioman->GetBranchId("STTPoint");
+    
     // Access MVDHitsPixel branch and determine its branch ID
     fMvdHitsPixelArray = (TClonesArray*) ioman->GetObject("MvdHitsPixel");
     mvdHitsPixelBranchID = ioman->GetBranchId("MvdHitsPixel");
@@ -136,11 +145,7 @@ InitStatus PndMLTracking::Init() {
     // Access GEMHit branch and determine its branch ID
     fGemHitArray = (TClonesArray*) ioman->GetObject("GEMHit");
     gemHitBranchID = ioman->GetBranchId("GEMHit");
-    
-    // Access STTPoint (MC) branch and determine its branch ID
-    fSttPointArray = (TClonesArray*) ioman->GetObject("STTPoint");
-    sttPointBranchID = ioman->GetBranchId("STTPoint");
-    
+
     // Access STTHit branch and determine its branch ID
     fSttHitArray = (TClonesArray*) ioman->GetObject("STTHit");
     sttHitBranchID = ioman->GetBranchId("STTHit");
@@ -179,7 +184,7 @@ void PndMLTracking::Exec(Option_t* /*opt*/) {
     fParticles.open(csv_path+"-particles.csv");
     fTubes.open(csv_path+"-cells.csv");
     
-    std::cout << "Processing Event: " << csv_path << std::endl;
+    std::cout << "\nProcessing Event: " << csv_path << std::endl;
     
     /* ***********************************************************************
     *                          Add CSV Header
@@ -346,6 +351,8 @@ void PndMLTracking::GenerateSttData() {
     //               Data from STT (fSttHitArray) to CSVs
     // ------------------------------------------------------------------------
     
+    
+    
     int hit_counter = 0;
     
     for (int hit_idx=0; hit_idx < fSttHitArray->GetEntriesFast(); hit_idx++) {
@@ -474,8 +481,7 @@ void PndMLTracking::GenerateSttData() {
                         << (mcTrack->GetMomentum()).Y()           << ","   // py = y-component of track momentum
                         << (mcTrack->GetMomentum()).Z()           << ","   // pz = z-component of track momentum
                         << ((mcTrack->GetPdgCode()>0)?1:-1)       << ","   // q = charge of mu-/mu+
-                        //<< mcTrack->GetNPoints(DetectorID::kSTT)<< ","   // FIXME: nhits (Not tested yet).
-                        << 26                                     << ","   // FIXME: nhits==26 (Just assume)
+                        << mcTrack->GetNPoints(DetectorId::kSTT)  << ","   // FIXME: nhits in STT (Not tested yet).
                         << mcTrack->GetPdgCode()                  << ","   // pdgcode e.g. mu- has pdgcode=-13
                         << mcTrack->GetStartTime()                         // start_time = starting time of particle track
                         << std::endl;
@@ -494,43 +500,45 @@ void PndMLTracking::GenerateSttData() {
     // in STT using FairLinks, one can also get nhits == linksSTT.GetNLinks()
     
     
-    FairMultiLinkedData links;
-    FairMultiLinkedData linksSTT;
-    PndMCTrack *mcTrack;
+    FairMultiLinkedData linksMC, linksSTT;
+    FairMultiLinkedData linksMVDPixel,linksMVDStrip,linksGEM,linksSTT;
+
     
-    std::cout << "Starting fParticle with number of tracks: " << fBarrelTrackArray->GetEntries() << std::endl;
+    std::cout << "\nStarting fParticle with number of tracks: " << fBarrelTrackArray->GetEntries() << std::endl;
     
     // Get FairRootManager Instance
     FairRootManager *ioman = FairRootManager::Instance();
     
-    // Loop over ideal tracks i.e. SttMvdGemTrackArray
-    for (Int_t i_Array = 0; i_Array < fBarrelTrackArray->GetEntries(); i_Array++) { //loop over trackarray
-        std::cout << "IdealTrack # : " << i_Array << std::endl;
+    // Loop over ideal tracks i.e. BarrelTrackArray
+    for (Int_t idx = 0; idx < fBarrelTrackArray->GetEntries(); idx++) { //loop over trackarray
+        std::cout << "IdealTrack # : " << idx << std::endl;
         
-        // Fetch a PndTrack from the array
-        PndTrack *sttMvdGemTrack = (PndTrack *)fBarrelTrackArray->At(i_Array);
+        // Fetch a PndTrack from the fBarrelTrackArray
+        PndTrack *barrelTrack = (PndTrack *)fBarrelTrackArray->At(idx);
         
-        mcTrack = NULL;
-        links = sttMvdGemTrack->GetLinksWithType(ioman->GetBranchId("MCTrack")); // create the links between the track and the MCTrack
+        // Create the links between the BarrelTrack and the MCTrack
+        linksMC = barrelTrack->GetLinksWithType(ioman->GetBranchId("MCTrack")); 
         
-        // Check if FairLinks are non-zero
-        if (links.GetNLinks()>0) {
-            for (Int_t i=0; i<links.GetNLinks(); i++) {
-                
-                if (links.GetLink(i).GetIndex()==sttMvdGemTrack->GetTrackCand().getMcTrackId()) {
+        // Here, linksMC.GetNLinks()==1 always.
+        if (linksMC.GetNLinks()>0) {
+            for (Int_t i=0; i<linksMC.GetNLinks(); i++) {
+                if (linksMC.GetLink(i).GetIndex()==barrelTrack->GetTrackCand().getMcTrackId()) {
+
+                    PndMCTrack *mcTrack = (PndMCTrack *)ioman->GetCloneOfLinkData(linksMC.GetLink(i));
                     
-                    mcTrack = (PndMCTrack *)ioman->GetCloneOfLinkData(links.GetLink(i));
-                    
-                    // Get Only Primary Tracks (Skip Secondaries e.g. e+/e-)
+                    // Get Only Primary Tracks
                     if (mcTrack->IsGeneratorCreated()) {
-                    
-                        // Check the number of STT hits
-                        linksSTT = sttMvdGemTrack->GetLinksWithType(ioman->GetBranchId("STTHit"));
+
+                        // Links of Primary Tracks
+                        //linksMVDPixel = barrelTrack->GetLinksWithType(ioman->GetBranchId("MvdHitsPixel"));
+                        //linksMVDStrip = barrelTrack->GetLinksWithType(ioman->GetBranchId("MvdHitsPixel"));
+                        //linksGEM = barrelTrack->GetLinksWithType(ioman->GetBranchId("GEMHit"));
+                        linksSTT = barrelTrack->GetLinksWithType(ioman->GetBranchId("STTHit"));
                         
-                        // If the number of STT hits greater than 0, write MC track to file!!
+                        // If the number of STT hits greater than 0, write MC track to file!! if linksSTT.GetNLinks() > 0
 
                         // CSV:: Writting Info to CSV File.
-                        fParticles  << (std::to_string(links.GetLink(i).GetIndex() + 1)) << "," // track_id > 0
+                        fParticles  << (std::to_string(linksMC.GetLink(i).GetIndex() + 1)) << "," // track_id > 0
                                     << (mcTrack->GetStartVertex()).X() << ","   // vx = start x [cm, ns]
                                     << (mcTrack->GetStartVertex()).Y() << ","   // vy = start y [cm, ns]
                                     << (mcTrack->GetStartVertex()).Z() << ","   // vz = start z [cm, ns]
@@ -538,7 +546,7 @@ void PndMLTracking::GenerateSttData() {
                                     << (mcTrack->GetMomentum()).Y()    << ","   // py = y-component of track momentum
                                     << (mcTrack->GetMomentum()).Z()    << ","   // pz = z-component of track momentum
                                     << ((mcTrack->GetPdgCode()>0)?1:-1)<< ","   // q = charge of mu-/mu+
-                                    << (linksSTT.GetNLinks())          << ","   // nhits
+                                    << (linksSTT.GetNLinks())          << ","   // nhits in STT
                                     << mcTrack->GetPdgCode()           << ","   // pdgcode e.g. mu- has pdgcode=-13
                                     << mcTrack->GetStartTime()                  // start_time = starting time of particle track
                                     << std::endl;
@@ -549,7 +557,7 @@ void PndMLTracking::GenerateSttData() {
                     
                 }//end-for(GetNLinks)
             }//end-if(GetNLinks)
-    }//end-for (SttMvdGemTrack)
+    }//end-for (barrelTrack)
     
     
     /*
