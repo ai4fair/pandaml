@@ -37,7 +37,7 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
     
     //TString prefix     = "";		          // "" (auto from inputGen) or "llbar_fwp" or "evtcomplete";
     //TString inputGen   = "llbar_fwp.DEC";   // EvtGen: llbar_fwp.DEC, bkg_xixibar.DEC, etc.
-    //TString inputGen   = "dpm";             // BkgGen: dpm, ftf, pythia8 (will be default)
+    //TString inputGen   = "dpm";             // BkgGen: dpm, ftf, pythia8 set as fRun->SetInput(inputGen)
     //TString inputGen   = "box:type(13,10):p(1.0,3.0):tht(22,140):phi(0,360)";
     
     
@@ -48,16 +48,18 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
     //--------------------------------------------------------------//
     //                     Select an Event Generator                //
     
-    // (1) EvtGen Generator (Implicit Init.)
+    // Signal Studies
+    
+    // (EvtGen Generator
     if (inputGen.Contains("dec")) {
         std::cout << "-I- Using EvtGen Generator..." << std::endl;
         fRun->SetInput(inputGen);
     }
-    
-    // (2) EvtGen Generator (Explicit Init.)
+        
+    // EvtGen Generator (Explicit Init.)
     if (inputGen.Contains("EvtGenFWP")) {
     
-        std::cout << "-I- Using EvtGen (FWP) Generator..." << std::endl;
+        std::cout << "-I- Using EvtGen (Explicitly) Generator..." << std::endl;
         
         inputGen = "llbar_fwp.DEC";
         PndEvtGenDirect* evtGenDirect = new PndEvtGenDirect("pbarpSystem", inputGen.Data(), pBeam);
@@ -65,20 +67,9 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
         fRun->AddGenerator(evtGenDirect);
     }
     
-    // (3) EvtGen Generator (Explicit Init.)
-    if (inputGen.Contains("EvtGenBKG")) {
-                
-        std::cout << "-I- Using EvtGen (BKG) Generator..." << std::endl;
-        
-        inputGen = "llbar_bkg.DEC";
-        PndEvtGenDirect* evtGenDirect = new PndEvtGenDirect("pbarpSystem", inputGen.Data(), pBeam);
-        evtGenDirect->SetStoreTree(kFALSE);
-        fRun->AddGenerator(evtGenDirect);
-    }
+    // Single Box Generator
+    if (inputGen.Contains("SBoxGEN")) {
     
-    // (4) Single Box Generator
-    if (inputGen.Contains("SBoxGEN"))
-    {
         std::cout << "-I- Using Single BoxGenerator..." << std::endl;
         
         FairBoxGenerator* boxGen = new FairBoxGenerator(13, 5);    // 13 = muon; 5 = multiplicity
@@ -89,9 +80,9 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
         fRun->AddGenerator(boxGen);
     }
     
-    // (5) Double Box Generator
-    if (inputGen.Contains("DBoxGEN"))
-    {
+    // Double Box Generator
+    if (inputGen.Contains("DBoxGEN")) {
+    
         std::cout << "-I- Using Double BoxGenerator..." << std::endl;
         
         // 1st BoxGenerator
@@ -110,6 +101,24 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
         boxGen2->SetXYZ(0., 0., 0.);                                // mm or cm ??
         fRun->AddGenerator(boxGen2);
      
+    }
+    
+    // Background Studies
+    // It is a coctail of everything from pbarp interaction
+    
+    if (inputGen.Contains("dpm")) {
+        std::cout << "-I- Using DPM Generator..." << std::endl;
+        fRun->SetInput(inputGen);
+    }
+    
+    if (inputGen.Contains("ftf")) {
+        std::cout << "-I- Using FTF Generator..." << std::endl;
+        fRun->SetInput(inputGen);
+    }
+    
+    if (inputGen.Contains("pythia8")) {
+        std::cout << "-I- Using Pythia8 Generator..." << std::endl;
+        fRun->SetInput(inputGen);
     }
     
     //                                                              //

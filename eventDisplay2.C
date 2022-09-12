@@ -1,5 +1,5 @@
 
-int eventDisplay2(TString prefix = "data/xibar_xi1820") {
+int eventDisplay2(TString prefix = "data/mumu") {
 
   // ----- User Settings
 

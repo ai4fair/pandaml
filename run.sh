@@ -1,14 +1,19 @@
 #!/bin/sh
 
+# Running Script with User Inputs
+# ./run <nevt> <prefix> <gen> <pBeam>
+# e.g.
+# ./run 10 ftf ftf 7.1
+
 # PandaRoot
 . "/home/"$USER"/gsi/pandaroot/install-v13.0.0/bin/config.sh" -p
 
 
 # Default Inputs
 nevt=10
-prefix=xibar_xi1820
-gen=Xibar_Xi1820.dec             # SBoxGEN, DBoxGEN or .DEC
-pBeam=4.6                        # llbar: 1.642, xibarxi1820: 4.6 GeV/c
+prefix=mumu
+gen=SBoxGEN             # .dec, SBoxGEN, DBoxGEN OR dpm, ftf, pythia8
+pBeam=4.6               # llbar: 1.642, xibarxi1820: 4.6 GeV/c
 seed=42
 
 
@@ -23,6 +28,10 @@ fi
 
 if test "$3" != ""; then
   gen=$3
+fi
+
+if test "$4" != ""; then
+  pBeam=$4
 fi
 
 
