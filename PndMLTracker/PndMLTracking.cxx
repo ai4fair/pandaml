@@ -378,8 +378,8 @@ void PndMLTracking::GenerateSttData() {
         if (mctrack == 0) {continue;}
         
         // Terminate if not Primary
-        if (!mctrack->IsGeneratorCreated())
-            continue;
+        // if (!mctrack->IsGeneratorCreated())
+        //    continue;
         
         // Hit Counter (very important in case number of tracks vary per event)
         hit_counter++;
@@ -500,7 +500,7 @@ void PndMLTracking::GenerateSttData() {
     // in STT using FairLinks, one can also get nhits == linksSTT.GetNLinks()
     
     
-    FairMultiLinkedData linksMC, linksSTT;
+    FairMultiLinkedData linksMC;
     FairMultiLinkedData linksMVDPixel,linksMVDStrip,linksGEM,linksSTT;
 
     
@@ -527,7 +527,7 @@ void PndMLTracking::GenerateSttData() {
                     PndMCTrack *mcTrack = (PndMCTrack *)ioman->GetCloneOfLinkData(linksMC.GetLink(i));
                     
                     // Get Only Primary Tracks
-                    if (mcTrack->IsGeneratorCreated()) {
+                    //if (mcTrack->IsGeneratorCreated()) {
 
                         // Links of Primary Tracks
                         //linksMVDPixel = barrelTrack->GetLinksWithType(ioman->GetBranchId("MvdHitsPixel"));
@@ -551,7 +551,7 @@ void PndMLTracking::GenerateSttData() {
                                     << mcTrack->GetStartTime()                  // start_time = starting time of particle track
                                     << std::endl;
                                     
-                        }//end-IsGeneratorCreated()
+                       // }//end-IsGeneratorCreated()
                         
                     }//end-if(GetLink(i))
                     

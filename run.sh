@@ -11,9 +11,9 @@
 
 # Default Inputs
 nevt=10
-prefix=mumu
-gen=SBoxGEN             # .dec, SBoxGEN, DBoxGEN OR dpm, ftf, pythia8
-pBeam=4.6               # llbar: 1.642, xibarxi1820: 4.6 GeV/c
+prefix=fwp
+gen=llbar_fwp.dec         # .dec, SBoxGEN, DBoxGEN OR dpm, ftf, pythia8
+pBeam=1.642               # llbar: 1.642, xibarxi1820: 4.6 GeV/c
 seed=42
 
 
