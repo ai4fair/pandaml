@@ -314,7 +314,8 @@ void PndMLTracking::Exec(Option_t* /*opt*/) {
                 << "q"  << ","
                 << "nhits" << ","
                 << "pdgcode" << ","
-                << "start_time"
+                << "start_time" << ","
+                << "primary"
                 << std::endl;
     
     /* ************************************************************************
@@ -548,7 +549,8 @@ void PndMLTracking::GenerateSttData() {
                                     << ((mcTrack->GetPdgCode()>0)?1:-1)<< ","   // q = charge of mu-/mu+
                                     << (linksSTT.GetNLinks())          << ","   // nhits in STT
                                     << mcTrack->GetPdgCode()           << ","   // pdgcode e.g. mu- has pdgcode=-13
-                                    << mcTrack->GetStartTime()                  // start_time = starting time of particle track
+                                    << mcTrack->GetStartTime()         << ","   // start_time = start time of particle track
+                                    << mcTrack->IsGeneratorCreated()            // If a particle is primary or not
                                     << std::endl;
                                     
                        // }//end-IsGeneratorCreated()
