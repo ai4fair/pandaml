@@ -10,8 +10,6 @@ _target=$nyx"/data"
 # PandaRoot
 . $LUSTRE_HOME"/DEBIAN/v13.0.0-install/bin/config.sh" -p
 
-echo "\n";
-
 
 # Default Inputs
 nevt=1000
@@ -52,56 +50,56 @@ fi
 # Make sure `$_target` Exists
 if [ ! -d $_target ]; then
     mkdir -p $_target;
-    echo "\nThe data dir. at '$_target' created."
+    printf "The data dir. at '$_target' created."
 else
-    echo "\nThe data dir. at '$_target' exists."
+    printf "The data dir. at '$_target' exists."
 fi
 
 
 # Make sure $tempdir exists
 if [ ! -d $tmpdir ]; then
     mkdir -p $tmpdir;
-    echo "The temporary dir. at '$tmpdir' created."
+    printf "The temporary dir. at '$tmpdir' created."
 else
-    echo "The temporary dir. at '$tmpdir' exists."
+    printf "The temporary dir. at '$tmpdir' exists."
 fi
 
 
 #*** Print Flags ***
-echo "\nLustre Home  : $LUSTRE_HOME"
-echo "Working Dir. : $nyx"
-echo "Temp Dir.    : $tmpdir"
-echo "Target Dir.  : $_target"
-echo "\nEvents    : $nevt"
-echo "Prefix    : $outprefix"
-echo "Decay     : $gen"
-echo "pBeam     : $pBeam"
-echo "Seed      : $seed"
-echo "Run       : $run"
+printf "Lustre Home  : $LUSTRE_HOME"
+printf "Working Dir. : $nyx"
+printf "Temp Dir.    : $tmpdir"
+printf "Target Dir.  : $_target"
+printf "Events    : $nevt"
+printf "Prefix    : $outprefix"
+printf "Decay     : $gen"
+printf "pBeam     : $pBeam"
+printf "Seed      : $seed"
+printf "Run       : $run"
 
 
 # Terminate Script for Testing.
-# exit 0;
+exit 0;
 
 
 #*** Initiate Simulaton ***
-echo "\nStarted Simulating..."
+printf "Started Simulating..."
 root -l -b -q $nyx"/"sim_complete.C\($nevt,\"$outprefix\",\"$gen\",$pBeam,$seed\) > $outprefix"_sim.log" 2>&1
 
-echo "Started Digitization..."
+printf "Started Digitization..."
 root -l -b -q $nyx"/"digi_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_digi.log" 2>&1
 
-echo "Started Ideal Reconstruction..."
+printf "Started Ideal Reconstruction..."
 root -l -b -q $nyx"/"recoideal_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_reco.log" 2>&1
 
-echo "Started CSV Generator..."
+printf "Started CSV Generator..."
 root -l -b -q $nyx"/"data_complete.C\($nevt,\"$outprefix\",\"$tmpdir\",$run\) > $outprefix"_data.log" 2>&1
 
-echo "Finished Simulating...\n"
+printf "Finished Simulating...\n"
 
 
 #*** Storing Files ***
-echo "Moving Files from '$tmpdir' to '$_target'"
+printf "Moving Files from '$tmpdir' to '$_target'"
 
 cp $outprefix"_par.root" $_target
 cp $outprefix"_sim.root" $_target
@@ -119,4 +117,4 @@ cp $tmpdir"/"*.csv $_target
 #*** Tidy Up ***
 rm -rf $tmpdir
 
-echo "The Script has Finished wit SLURM_JOB_ID: $run."
+printf "The Script has Finished wit SLURM_JOB_ID: $run."
