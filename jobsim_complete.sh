@@ -50,32 +50,32 @@ fi
 # Make sure `$_target` Exists
 if [ ! -d $_target ]; then
     mkdir -p $_target;
-    printf "The data dir. at '$_target' created."
+    echo -e "The data dir. at '$_target' created."
 else
-    printf "The data dir. at '$_target' exists."
+    echo -e "The data dir. at '$_target' exists."
 fi
 
 
 # Make sure $tempdir exists
 if [ ! -d $tmpdir ]; then
     mkdir -p $tmpdir;
-    printf "The temporary dir. at '$tmpdir' created."
+    echo -e "The temporary dir. at '$tmpdir' created."
 else
-    printf "The temporary dir. at '$tmpdir' exists."
+    echo -e "The temporary dir. at '$tmpdir' exists."
 fi
 
 
 #*** Print Flags ***
-printf "Lustre Home  : $LUSTRE_HOME"
-printf "Working Dir. : $nyx"
-printf "Temp Dir.    : $tmpdir"
-printf "Target Dir.  : $_target"
-printf "Events    : $nevt"
-printf "Prefix    : $outprefix"
-printf "Decay     : $gen"
-printf "pBeam     : $pBeam"
-printf "Seed      : $seed"
-printf "Run       : $run"
+echo -e "\nLustre Home  : $LUSTRE_HOME"
+echo -e "Working Dir. : $nyx"
+echo -e "Temp Dir.    : $tmpdir"
+echo -e "Target Dir.  : $_target"
+echo -e "\nEvents    : $nevt"
+echo -e "Prefix    : $outprefix"
+echo -e "Decay     : $gen"
+echo -e "pBeam     : $pBeam"
+echo -e "Seed      : $seed"
+echo -e "Run       : $run"
 
 
 # Terminate Script for Testing.
@@ -83,23 +83,23 @@ exit 0;
 
 
 #*** Initiate Simulaton ***
-printf "Started Simulating..."
+echo -e "\nStarted Simulating..."
 root -l -b -q $nyx"/"sim_complete.C\($nevt,\"$outprefix\",\"$gen\",$pBeam,$seed\) > $outprefix"_sim.log" 2>&1
 
-printf "Started Digitization..."
+echo "Started Digitization..."
 root -l -b -q $nyx"/"digi_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_digi.log" 2>&1
 
-printf "Started Ideal Reconstruction..."
+echo "Started Ideal Reconstruction..."
 root -l -b -q $nyx"/"recoideal_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_reco.log" 2>&1
 
-printf "Started CSV Generator..."
+echo "Started CSV Generator..."
 root -l -b -q $nyx"/"data_complete.C\($nevt,\"$outprefix\",\"$tmpdir\",$run\) > $outprefix"_data.log" 2>&1
 
-printf "Finished Simulating...\n"
+echo -e "Finished Simulating..."
 
 
 #*** Storing Files ***
-printf "Moving Files from '$tmpdir' to '$_target'"
+echo -e "\nMoving Files from '$tmpdir' to '$_target'"
 
 cp $outprefix"_par.root" $_target
 cp $outprefix"_sim.root" $_target
@@ -117,4 +117,4 @@ cp $tmpdir"/"*.csv $_target
 #*** Tidy Up ***
 rm -rf $tmpdir
 
-printf "The Script has Finished wit SLURM_JOB_ID: $run."
+echo -e "The Script has Finished wit SLURM_JOB_ID: $run."
