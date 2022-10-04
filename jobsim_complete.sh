@@ -50,9 +50,9 @@ fi
 # Make sure `$_target` Exists
 if [ ! -d $_target ]; then
     mkdir -p $_target;
-    echo -e "The data dir. at '$_target' created."
+    echo -e "\nThe data dir. at '$_target' created."
 else
-    echo -e "The data dir. at '$_target' exists."
+    echo -e "\nThe data dir. at '$_target' exists."
 fi
 
 
