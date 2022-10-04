@@ -1,5 +1,5 @@
 
-int eventDisplay2(TString prefix = "data/mumu") {
+int eventDisplay2(TString prefix = "data/fwp") {
 
   // ----- User Settings
 

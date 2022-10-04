@@ -61,7 +61,17 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
     
         std::cout << "-I- Using EvtGen (Explicitly) Generator..." << std::endl;
         
-        inputGen = "llbar_fwp.DEC";
+        inputGen = "llbar_fwp.dec";
+        PndEvtGenDirect* evtGenDirect = new PndEvtGenDirect("pbarpSystem", inputGen.Data(), pBeam);
+        evtGenDirect->SetStoreTree(kFALSE);
+        fRun->AddGenerator(evtGenDirect);
+    }
+    
+    if (inputGen.Contains("EvtGenBKG")) {
+    
+        std::cout << "-I- Using EvtGen (Explicitly) Generator..." << std::endl;
+        
+        inputGen = "llbar_bkg.dec";
         PndEvtGenDirect* evtGenDirect = new PndEvtGenDirect("pbarpSystem", inputGen.Data(), pBeam);
         evtGenDirect->SetStoreTree(kFALSE);
         fRun->AddGenerator(evtGenDirect);
