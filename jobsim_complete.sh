@@ -79,7 +79,7 @@ echo -e "Run       : $run"
 
 
 # Terminate Script for Testing.
-exit 0;
+# exit 0;
 
 
 #*** Initiate Simulaton ***

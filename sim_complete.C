@@ -7,8 +7,10 @@
 
 int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Double_t pBeam=1.642, Int_t seed=42) {
 
+
     std::cout << "\nFLAGS: " << nEvents << "," << prefix << "," << inputGen << "," << pBeam << std::endl;
     std::cout << "SEED : " << seed << std::endl << std::endl;
+    
     
     // Set Seed for Random Generator
     if(seed==0)
@@ -33,13 +35,13 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
     
     //----- User Settings
     TString parAsciiFile = "all.par";
-    TString decayMode = "UserDecayConfig.C";
-    
+        
     //TString prefix     = "";		          // "" (auto from inputGen) or "llbar_fwp" or "evtcomplete";
-    //TString inputGen   = "llbar_fwp.DEC";   // EvtGen: llbar_fwp.DEC, bkg_xixibar.DEC, etc.
-    //TString inputGen   = "dpm";             // BkgGen: dpm, ftf, pythia8 set as fRun->SetInput(inputGen)
+    //TString inputGen   = "llbar_fwp.dec";   // EvtGen: llbar_fwp.dec, bkg_xixibar.dec, etc.
+    //TString inputGen   = "ftf";             // BkgGen: dpm, ftf, pythia8 set as fRun->SetInput(inputGen)
     //TString inputGen   = "box:type(13,10):p(1.0,3.0):tht(22,140):phi(0,360)";
     
+    TString decayMode = "UserDecayConfig.C";  // only for Xibar_Xi1820.dec
     
     //----- Init Settings
     PndMasterRunSim *fRun = new PndMasterRunSim();
@@ -141,7 +143,7 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
     fRun->SetNumberOfEvents(nEvents);
     fRun->SetBeamMom(pBeam);
     fRun->SetStoreTraj(kTRUE);
-    fRun->SetUserDecay(decayMode);
+    //fRun->SetUserDecay(decayMode);              // Only for Xibar_Xi1820
     
 	//----- Init
     fRun->Setup(prefix);
@@ -149,7 +151,7 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
     //----- Geometry
     fRun->CreateGeometry();
 
-    //----- Event Generator
+    //----- Generator
     fRun->SetGenerator();
    
     //----- AddSimTasks
