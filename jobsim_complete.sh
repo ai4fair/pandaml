@@ -37,6 +37,20 @@ if test "$3" != ""; then
 fi
 
 
+# Prepend Absolute Path to '.DEC' File
+if [[ $gen == *".dec"* ]]; then
+  if [[ $gen != \/* ]] ; then
+    gen=$nyx"/"$gen
+  fi
+fi
+
+if [[ $gen == *".DEC"* ]]; then
+  if [[ $gen != \/* ]] ; then
+    gen=$nyx"/"$gen
+  fi
+fi
+
+
 # IF ARRAY_TASK Used
 if test "$SLURM_ARRAY_TASK_ID" == ""; then
     tmpdir="/tmp/"$USER
