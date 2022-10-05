@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 # Lustre
 LUSTRE_HOME="/lustre/panda/"$USER
 nyx=$LUSTRE_HOME"/pandaml"
@@ -10,6 +11,8 @@ _target=$nyx"/data"
 # PandaRoot
 . $LUSTRE_HOME"/DEBIAN/v13.0.0-install/bin/config.sh" -p
 
+echo -e "\n"
+
 
 # Default Inputs
 nevt=1000
@@ -18,6 +21,7 @@ gen=DBoxGEN                           # SBoxGEN, DBoxGEN or .DEC
 pBeam=1.642                           # llbar: 1.642, xibarxi1820: 4.6 GeV/c
 seed=$RANDOM
 run=$SLURM_ARRAY_TASK_ID
+
 
 # User Inputs
 if test "$1" != ""; then
