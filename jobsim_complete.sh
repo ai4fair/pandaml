@@ -88,12 +88,12 @@ echo -e "\nLustre Home  : $LUSTRE_HOME"
 echo -e "Working Dir. : $nyx"
 echo -e "Temp Dir.    : $tmpdir"
 echo -e "Target Dir.  : $_target"
-echo -e "\nEvents    : $nevt"
-echo -e "Prefix    : $outprefix"
-echo -e "Decay     : $gen"
-echo -e "pBeam     : $pBeam"
-echo -e "Seed      : $seed"
-echo -e "Run       : $run"
+echo -e "\nEvents       : $nevt"
+echo -e "Prefix       : $outprefix"
+echo -e "Decay        : $gen"
+echo -e "pBeam        : $pBeam"
+echo -e "Seed         : $seed"
+echo -e "Run          : $run"
 
 
 # Terminate Script for Testing.
