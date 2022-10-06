@@ -13,3 +13,4 @@
 core*
 __pycache__
 data*
+logs*
