@@ -4,10 +4,12 @@
 # ----- Export Variables
 # ***
 
+rm -rf logs
+
 export LUSTRE_HOME="/lustre/panda/"$USER
 export SLURM_SUBMIT_DIR=$LUSTRE_HOME"/pandaml"
 export SLURM_WORKING_DIR=$LUSTRE_HOME"/pandaml/logs"
 mkdir -p $SLURM_WORKING_DIR;
-export SLURM_JOB_NAME="llbar"
+export SLURM_JOB_NAME="fwp"
 
-sbatch -a0-9 --get-user-env -t 8:00:00 -o '%x-%a.out' -e '%x-%a.err' -J fwp --mail-type=END --mail-user=a.akram@gsi.de -D $SLURM_WORKING_DIR -- $SLURM_SUBMIT_DIR/jobsim_complete.sh 1000 fwp llbar_fwp.dec
+sbatch -a0-9 --get-user-env -t 8:00:00 -o '%x-%a.out' -e '%x-%a.err' -J $SLURM_JOB_NAME --mail-type=END --mail-user=a.akram@gsi.de -D $SLURM_WORKING_DIR -- $SLURM_SUBMIT_DIR/jobsim_complete.sh 1000 fwp llbar_fwp.dec

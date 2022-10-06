@@ -11,8 +11,6 @@ _target=$nyx"/data"
 # PandaRoot
 . $LUSTRE_HOME"/DEBIAN/v13.0.0-install/bin/config.sh" -p
 
-echo -e "\n"
-
 
 # Default Inputs
 nevt=1000
