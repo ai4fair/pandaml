@@ -1,11 +1,4 @@
-
-
-## Virgo Cluster
-
-```bash
-# connect to virgo
-ssh lxpool-virgo-debian10
-```
+## _Mount Lustre_
 
 ```bash
 # mount lustre
@@ -17,11 +10,18 @@ sshfs lxpool-lustre:/lustre/panda/aakram/ $mnt
 fusermount -u $mnt
 ```
 
-```bash
-# run simulation
-./jobsim_complete.sh <total_events> <output_prefix> <generator_type>
+## _Run Simulation_
+### _1. Virgo Cluster_
 
-# For example
+```bash
+# connect to virgo
+ssh lxpool-virgo-debian10
+```
+
+
+
+```bash
+# one job (single node)
 ./jobsim_complete.sh 100 llbar llbar_fwp.dec
 ```
 
@@ -30,12 +30,7 @@ fusermount -u $mnt
 ./submit.jobs
 ```
 
-## Desktop PC
-
-```bash
-# run simulation
-./runall  <total_events> <output_prefix> <generator_type>
-```
+### _2. Local Machine_
 
 To run simulation one needs to run either `runall.sh` (local) or `runsif.sh` (singularity) scripts _e.g._
 
@@ -47,9 +42,6 @@ To run simulation one needs to run either `runall.sh` (local) or `runsif.sh` (si
 Similary if one have singularity container for PandaRoot, then just run `runsif.sh`.
 
 ```bash
-# run on local machine
+# run on container
 ./runsif 100 box DBGEN
 ```
-
-
-

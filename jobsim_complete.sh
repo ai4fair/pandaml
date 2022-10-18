@@ -15,8 +15,8 @@ _target=$nyx"/data"
 # Default Inputs
 nevt=1000
 prefix=mumu
-gen=DBoxGEN                           # SBoxGEN, DBoxGEN or .DEC
-pBeam=1.642                           # llbar: 1.642, xibarxi1820: 4.6 GeV/c
+gen=DBoxGEN                   # SBoxGEN, DBoxGEN or .DEC
+pBeam=1.642                   # llbar: 1.642, xibarxi1820: 4.6, J/Psi: 6.231552
 seed=$RANDOM
 run=$SLURM_ARRAY_TASK_ID
 
