@@ -19,7 +19,7 @@ int data_complete(Int_t nEvents=10, TString prefix="", TString csv_path="", Int_
 	fSrc->AddFriend(digiFile);
 	
 	// Add Friend File to FairFileSource
-	fSrc->AddFriend(recoFile);
+	// fSrc->AddFriend(recoFile);
 
     // Add Output File to FairRootFileSink
     FairRootFileSink *fSink = new FairRootFileSink(outFile);

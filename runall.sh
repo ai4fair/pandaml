@@ -10,10 +10,10 @@
 
 
 # Default Inputs
-nevt=100
-prefix=ftf
-gen=ftf            # .dec, SBoxGEN, DBoxGEN OR dpm, ftf, pythia8
-pBeam=6.231552     # llbar: 1.642, xibarxi1820: 4.6 GeV/c, j/psi: 6.231552
+nevt=10000
+prefix=llbar
+gen=llbar_fwp.dec  # .dec, SBoxGEN, DBoxGEN OR dpm, ftf, pythia8
+pBeam=1.642  # llbar: 1.642, xibarxi1820: 4.6 GeV/c, j/psi: 6.231552
 seed=42
 
 
@@ -67,13 +67,13 @@ echo "Seed      : $seed"
 
 echo ""
 echo "Started Simulation..."
-root -l -b -q sim_complete.C\($nevt,\"$outprefix\",\"$gen\",$pBeam,$seed\) > $outprefix"_sim.log" 2>&1
+#root -l -b -q sim_complete.C\($nevt,\"$outprefix\",\"$gen\",$pBeam,$seed\) > $outprefix"_sim.log" 2>&1
 
 echo "Started Digitization..."
-root -l -b -q digi_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_digi.log" 2>&1
+#root -l -b -q digi_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_digi.log" 2>&1
 
 echo "Started Ideal Reconstruction..."
-root -l -b -q recoideal_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_reco.log" 2>&1
+#root -l -b -q recoideal_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_reco.log" 2>&1
 
 echo "Started CSV Generator..."
 root -l -b -q data_complete.C\($nevt,\"$outprefix\",\"$_target\"\) > $outprefix"_data.log" 2>&1
