@@ -10,11 +10,12 @@
 
 
 # Default Inputs
-nevt=10000
-prefix=llbar
-gen=llbar_fwp.dec  # .dec, SBoxGEN, DBoxGEN OR dpm, ftf, pythia8
+nevt=100
+prefix=mumu
+gen=DBoxGEN  # .dec, SBoxGEN, DBoxGEN OR dpm, ftf, pythia8
 pBeam=1.642  # llbar: 1.642, xibarxi1820: 4.6 GeV/c, j/psi: 6.231552
 seed=42
+flag="WithIdeal"
 
 
 # User Inputs
@@ -76,7 +77,7 @@ echo "Started Ideal Reconstruction..."
 #root -l -b -q recoideal_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_reco.log" 2>&1
 
 echo "Started CSV Generator..."
-root -l -b -q data_complete.C\($nevt,\"$outprefix\",\"$_target\"\) > $outprefix"_data.log" 2>&1
+root -l -b -q data_complete.C\($nevt,\"$outprefix\",\"$_target\",\"$flag\"\) > $outprefix"_data.log" 2>&1
 
 echo "Finished Simulation..."
 echo ""

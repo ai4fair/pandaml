@@ -18,6 +18,7 @@ prefix=mumu
 gen=DBoxGEN                   # SBoxGEN, DBoxGEN or .DEC
 pBeam=1.642                   # llbar: 1.642, xibarxi1820: 4.6, J/Psi: 6.231552
 seed=$RANDOM
+flag="WithIdeal"              # With/Without IdealTrackFinder to Fill fParticles CSV
 run=$SLURM_ARRAY_TASK_ID
 
 
@@ -109,7 +110,7 @@ echo "Started Ideal Reconstruction..."
 root -l -b -q $nyx"/"recoideal_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_reco.log" 2>&1
 
 echo "Started CSV Generator..."
-root -l -b -q $nyx"/"data_complete.C\($nevt,\"$outprefix\",\"$tmpdir\",$run\) > $outprefix"_data.log" 2>&1
+root -l -b -q $nyx"/"data_complete.C\($nevt,\"$outprefix\",\"$tmpdir\",\"$flag\",$run\) > $outprefix"_data.log" 2>&1
 
 echo -e "Finished Simulating..."
 

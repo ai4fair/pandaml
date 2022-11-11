@@ -16,8 +16,13 @@ Set(SYSTEM_INCLUDE_DIRECTORIES
 ############### Include Directories
 Set(INCLUDE_DIRECTORIES
     ${CMAKE_SOURCE_DIR}/tracking/PndMLTracker
+    ${CMAKE_SOURCE_DIR}/tools
+    ${CMAKE_SOURCE_DIR}/detectors/mvd
+    ${CMAKE_SOURCE_DIR}/detectors/gem 
     ${CMAKE_SOURCE_DIR}/detectors/stt
     ${CMAKE_SOURCE_DIR}/pnddata
+    ${CMAKE_SOURCE_DIR}/pnddata/SdsData
+    ${CMAKE_SOURCE_DIR}/pnddata/GemData
     ${CMAKE_SOURCE_DIR}/pnddata/SttData
     ${CMAKE_SOURCE_DIR}/pnddata/TrackData
 )
@@ -38,7 +43,7 @@ link_directories(${LINK_DIRECTORIES})
 
 ############### Adeel: libMLTracker (start) #############
 set(SRCS
-PndFeature.cxx
+#Particle.cxx
 PndMLTracking.cxx
 )
 
@@ -46,6 +51,6 @@ set(LINKDEF  PndMLTrackingLinkDef.h)
 set(LIBRARY_NAME MLTracker)
 ############### Adeel: libMLTracker (start) #############
 
-set(DEPENDENCIES Base PndData)
-GENERATE_LIBRARY()
+set(DEPENDENCIES Base GeoBase ParBase PndData Geane Gem Stt)
+PANDA_GENERATE_LIBRARY()
  
