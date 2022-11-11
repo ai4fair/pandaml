@@ -1,5 +1,5 @@
 /*
- * Particle.h
+ * Particles.h
  *
  *  Created on: Nov 1, 2022
  *      Author: Adeel Akram
@@ -13,21 +13,21 @@
 #include "TLorentzVector.h"
 
 
-class Particle // : public TObject {
-
+class Particles // : public TObject
 {
+
 public:
     
     // Constructor
-    Particle();
+    Particles();
     
     // Destructor
-    virtual ~Particle();
+    virtual ~Particles();
     
         
-    
+    /*
     void Print() {
-    
+       // FIXME: Not functioning properly
        cout << "\n Momentum (" << fPx << ", " << fPy << ", " << fPz << ") GeV/c "
             << "\n Start Vertex (" << fStartX << ", " << fStartY << ", " << fStartZ << ") cm "
             << "\n Particle_Id:" << fParticleId
@@ -38,8 +38,8 @@ public:
             << std::endl;
     }
     
-    /*
-    friend std::ostream &operator<<(std::ostream &out, Particle &p) {
+    
+    friend std::ostream &operator<<(std::ostream &out, Particles &p) {
         // FIXME: together with Print() 
         out << "\n Particle_Id:" << p.GetParticleId() 
             << "\n Start Vertex (" << p.fStartX << ", " << p.GetVy() << ", " << p.GetVz() << ") cm "
@@ -58,9 +58,15 @@ public:
     
     // Setters
     void SetStartTime(Double_t t) { fStartT=t; }
-    void SetStartVertex(TVector3 pos3);
-    void SetMomentum(TVector3 mom3);
-    void Set4Momentum(TLorentzVector mom4);
+    
+    // FIXME: Why these functions defined in Particles.cxx doesn't work?
+    //void SetMomentum(TVector3 m);
+    //void Set4Momentum(TLorentzVector m4);
+    //void SetStartVertex(TVector3 v);
+    
+    void SetMomentum(TVector3 m) { fPx=m.Px(); fPy=m.Py(); fPz=m.Pz(); }
+    void Set4Momentum(TLorentzVector m4) { fPx=m4.Px(); fPy=m4.Py(); fPz=m4.Pz(); fE =m4.E(); }
+    void SetStartVertex(TVector3 v) { fStartX=v.X(); fStartY=v.Y(); fStartZ=v.Z(); }
     
     void SetParticleId(Int_t pid) { fParticleId=pid; }
     void SetCharge(Int_t q) { fQ=q; }
@@ -92,7 +98,7 @@ private:
     Int_t fPdgCode;
     Bool_t fIsGenCreated;
     
-    ClassDef(Particle,1);
+    ClassDef(Particles,1);
 };
 
 #endif /* PNDTRACKERS_PNDMLTRACKER_PARTICLE_H_ */

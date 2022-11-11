@@ -5,7 +5,7 @@
 
 
 
-#include "Particle.h"
+#include "Particles.h"
 
 bool CheckFile(TString fn);
 
@@ -107,70 +107,56 @@ void ttree(Int_t nEvents = 1, TString prefix = "data/mumu") {
                         // So, in other words, I am getting MCTruth of the a particular BarrelTrack.
                         
                         PndMCTrack *mcTrack = (PndMCTrack *)ioman->GetCloneOfLinkData(linksMC.GetLink(i));
-                        
-                        
-                        // Check the number of STT hits
                         linksSTT = barrelTrack->GetLinksWithType(ioman->GetBranchId("STTHit"));
-                        
-                        // Check the number of GEM hits
                         linksGEM = barrelTrack->GetLinksWithType(ioman->GetBranchId("GEMHit"));
-                        
-                        // Check the number of MVDPixel hits
                         linksMVDPixel = barrelTrack->GetLinksWithType(ioman->GetBranchId("MvdHitsPixel"));
-                        
-                        // Check the number of MVDStrip hits
                         linksMVDStrip = barrelTrack->GetLinksWithType(ioman->GetBranchId("MvdHitsStrip"));
+                        
+                        Int_t Nhits = (linksMVDPixel.GetNLinks()+linksMVDStrip.GetNLinks()+linksGEM.GetNLinks()+linksSTT.GetNLinks());
                         
                         // If the number of STT hits greater than 0, write MC track to file!!
                         
                         
                         // Init Particle Object
-                        Particle part;
+                        Particles* part = new Particles();
+                        
+                        // Print Particles
+                        // part->Print();
+                        
                         
                         // Fill Particle Object
-                        part.Print();
-                        
-                        TVector3 v = mcTrack->GetStartVertex();
-                        part.SetStartVertex(v);
-                        
-                        cout << "\n StartVertex:" << mcTrack->GetStartVertex().X() << ", " << part.GetStartVertex().X() << endl;
-                        
-                        
-                        //part->SetMomentum(mcTrack->GetMomentum());
-                        //part->SetParticleId(linksMC.GetLink(i).GetIndex());
-                        //part->SetCharge((mcTrack->GetPdgCode()>0)?1:-1);
-                        //part->SetNHits(linksSTT.GetNLinks());
-                        //part->SetPdgCode(mcTrack->GetPdgCode());
-                        //part->SetStartTime(mcTrack->GetStartTime());
-                        //part->SetIsGenCreated(mcTrack->IsGeneratorCreated());                        
+                        part->SetStartVertex(mcTrack->GetStartVertex());
+                        part->SetMomentum(mcTrack->GetMomentum());
+                        part->SetParticleId(linksMC.GetLink(i).GetIndex());
+                        part->SetCharge((mcTrack->GetPdgCode()>0)?1:-1);
+                        part->SetNHits(Nhits);                            // Can we use linksMC?
+                        part->SetPdgCode(mcTrack->GetPdgCode());
+                        part->SetStartTime(mcTrack->GetStartTime());
+                        part->SetIsGenCreated(mcTrack->IsGeneratorCreated());                        
                         
                         // Add the Object to fParticle branch.
                         //tree->Branch("fParticle","Particle",&part,32000,0);
                         //tree->Fill();
  
                         
-                        /*
+                        
                         cout << "Printing to CSV" << endl;
                         
                         // Write to CSV
-                        std::cout   << (linksMC.GetLink(i).GetIndex()    == part->GetParticleId() )   << ","   // track_id > 0
-                                    << "---"
-                                    << (mcTrack->GetStartVertex().X()    == part->GetStartVertex().X() )   << ","   // vx = start x [cm, ns]
-                                    << (mcTrack->GetStartVertex().Y()    == part->GetStartVertex().Y() )   << ","   // vy = start y [cm, ns]
-                                    << (mcTrack->GetStartVertex().Z()    == part->GetStartVertex().Z() )   << ","   // vz = start z [cm, ns]
-                                    << (mcTrack->GetMomentum().X()       == part->GetMomentum().X() ) << ","   // px = x-component of track momentum
-                                    << (mcTrack->GetMomentum().Y()       == part->GetMomentum().Y() ) << ","   // py = y-component of track momentum
-                                    << (mcTrack->GetMomentum().Z()       == part->GetMomentum().Z() ) << ","   // pz = z-component of track momentum
-                                    << "---"
-                                    << (((mcTrack->GetPdgCode()>0)?1:-1) == part->GetCharge() )       << ","   // q = charge of mu-/mu+
-                                    << (linksSTT.GetNLinks()             == part->GetNHits())         << ","   // nhits
-                                    << (mcTrack->GetPdgCode()            == part->GetPdgCode() )      << ","   // pdgcode e.g. mu- has pdgcode=-13
-                                    << (mcTrack->GetStartTime()          == part->GetStartTime())     << ","   // start_time = starting time of particle track
+                        std::cout   << (linksMC.GetLink(i).GetIndex()    == part->GetParticleId() )      << ","   // track_id > 0
+                                    << (mcTrack->GetStartVertex().X()    == part->GetStartVertex().X() ) << ","   // vx = start x [cm, ns]
+                                    << (mcTrack->GetStartVertex().Y()    == part->GetStartVertex().Y() ) << ","   // vy = start y [cm, ns]
+                                    << (mcTrack->GetStartVertex().Z()    == part->GetStartVertex().Z() ) << ","   // vz = start z [cm, ns]
+                                    << (mcTrack->GetMomentum().X()       == part->GetMomentum().X() )    << ","   // px = x-component of track momentum
+                                    << (mcTrack->GetMomentum().Y()       == part->GetMomentum().Y() )    << ","   // py = y-component of track momentum
+                                    << (mcTrack->GetMomentum().Z()       == part->GetMomentum().Z() )    << ","   // pz = z-component of track momentum
+                                    << (((mcTrack->GetPdgCode()>0)?1:-1) == part->GetCharge() )          << ","   // q = charge of mu-/mu+
+                                    << (Nhits)                           == part->GetNHits())            << ","   // nhits
+                                    << (mcTrack->GetPdgCode()            == part->GetPdgCode() )         << ","   // pdgcode e.g. mu- has pdgcode=-13
+                                    << (mcTrack->GetStartTime()          == part->GetStartTime())        << ","   // start_time = starting time of particle track
                                     << (mcTrack->IsGeneratorCreated()    == part->GetIsGenCreated())           // If a particle is primary or not
                                     << std::endl;                        
-                       
-                       */
-                       
+                        del part;
                     }//end-if(GetLink(i))
                 }//end-for(GetNLinks)
             }//end-if(GetNLinks)
