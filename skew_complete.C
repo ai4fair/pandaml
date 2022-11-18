@@ -28,12 +28,13 @@ int skew_complete(Int_t nEvents=10, TString prefix="") {
     fRun->SetParamAsciiFile(parAsciiFile);
     fRun->Setup(prefix);
 
-    //----- AddDigiTasks
+    //----- Add SkewedCombined
     FairGeane *Geane = new FairGeane();
     fRun->AddTask(Geane);
     PndSttSkewedCombineTask *SkewedCombined = new PndSttSkewedCombineTask();
     SkewedCombined->SetPersistence(kTRUE);
-
+    fRun->AddTask(SkewedCombined);
+    
     //----- Init & Run
     fRun->Init();
     fRun->Run(0, nEvents);

@@ -83,6 +83,10 @@ private:
     // STT Hits
     int fSttHitBranchID;               // BranchID for STT Hits
     TClonesArray *fSttHitArray;        // Storage for STT Hits
+    
+    // STT Hits
+    int fSttSkewHitBranchID;           // BranchID for STT Hits
+    TClonesArray *fSttSkewHitArray;    // Storage for STT Hits
 
     // BarrelTrack
     int fBarrelTrackBranchID;          // BranchID for Reco. Ideal Tracks
@@ -112,7 +116,8 @@ private:
     /** CSV Generators **/
     void GenerateMvdData();            // Tracking Data from MVD
     void GenerateGemData();            // Tracking Data from GEM
-    void GenerateSttData();            // Tracking Data from STT
+    void GenerateSttData();            // Tracking Data from STT (Non-skewed Hits)
+    void GenerateSttSkewData();        // Tracking Data from STT (Skewed Hits Correction)
     void GenerateParticlesData();      // Particles for MVD, GEM and STT
     
     /** Layer Map **/

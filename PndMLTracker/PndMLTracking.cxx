@@ -58,8 +58,10 @@ PndMLTracking::PndMLTracking()
     , fGemHitArray(nullptr)
     , fSttPointBranchID(-1)
     , fSttPointArray(nullptr)
-    , fSttHitBranchID(-1)
-    , fSttHitArray(nullptr)
+    , fSttHitBranchID(-1)           // SttHitBranchID
+    , fSttHitArray(nullptr)         // SttHitArray
+    , fSttSkewHitBranchID(-1)       // SttSkewHitBranchID
+    , fSttSkewHitArray(nullptr)     // SttSkewHitArray
     , fBarrelTrackBranchID(-1)       //formerly SttMvdGemTrack
     , fBarrelTrackArray(nullptr)    // formerly SttMvdGemTrack
     , fSttParameters(nullptr)
@@ -93,9 +95,11 @@ PndMLTracking::PndMLTracking(int start_counter, TString csv_path, TString assist
     , fGemHitArray(nullptr)
     , fSttPointBranchID(-1)
     , fSttPointArray(nullptr)
-    , fSttHitBranchID(-1)
-    , fSttHitArray(nullptr)
-    , fBarrelTrackBranchID(-1)       //formerly SttMvdGemTrack
+    , fSttHitBranchID(-1)           // SttHitBranchID
+    , fSttHitArray(nullptr)         // SttHitArray
+    , fSttSkewHitBranchID(-1)       // SttSkewHitBranchID
+    , fSttSkewHitArray(nullptr)     // SttSkewHitArray
+    , fBarrelTrackBranchID(-1)      //formerly SttMvdGemTrack
     , fBarrelTrackArray(nullptr)    // formerly SttMvdGemTrack
     , fSttParameters(nullptr)
     , fEventHeader(nullptr)
@@ -184,8 +188,12 @@ InitStatus PndMLTracking::Init() {
     //Access STTPoint, STTHit branches and their Ids
     fSttPointArray = (TClonesArray*) ioman->GetObject("STTPoint");
     fSttPointBranchID = ioman->GetBranchId("STTPoint");
+    
     fSttHitArray = (TClonesArray*) ioman->GetObject("STTHit");
     fSttHitBranchID = ioman->GetBranchId("STTHit");
+    
+    fSttSkewHitArray = (TClonesArray*) ioman->GetObject("STTCombinedSkewedHits");
+    fSttSkewHitBranchID = ioman->GetBranchId("STTCombinedSkewedHits");
 
     std::cout << "-I- PndMLTracking: Initialisation successful" << std::endl;
     return kSUCCESS;
@@ -357,6 +365,7 @@ void PndMLTracking::Exec(Option_t* /*opt*/) {
     GenerateMvdData();
     GenerateGemData();
     GenerateSttData();
+    GenerateSttSkewData();
     GenerateParticlesData();
     
     //Close CSVs
@@ -417,13 +426,13 @@ void PndMLTracking::GenerateMvdData() {
         // ---------------------------------------------------------------------------
         PndSdsHit* sdsHit = (PndSdsHit*)fMvdHitsPixelArray->At(idx);
         
-        fHits << fHitId                  << ","      // hit_id
-              << sdsHit->GetX()          << ","      // x-position
-              << sdsHit->GetY()          << ","      // y-position
-              << sdsHit->GetZ()          << ","      // z-position
-              << sdsHit->GetDetectorID() << ","      // volume_id
-              << GetLayerMvd(sdsHit)     << ","      // layer_id
-              << sdsHit->GetSensorID()               // sensor_id/module_id
+        fHits << fHitId                    << ","   // hit_id
+              << sdsHit->GetX()            << ","   // x-position
+              << sdsHit->GetY()            << ","   // y-position
+              << sdsHit->GetZ()            << ","   // z-position
+              << sdsHit->GetDetectorID()   << ","   // volume_id
+              << GetLayerMvd(sdsHit)       << ","   // layer_id
+              << sdsHit->GetSensorID()              // sensor_id/module_id
               << std::endl;
 
 
@@ -441,15 +450,15 @@ void PndMLTracking::GenerateMvdData() {
             particle_id = std::to_string(mcTrackLinks_sorted[trackIndex].GetIndex() + 1);
         }
         
-        fTruths << fHitId            << ","   // hit_id  
-                << sdsPoint->GetX()  << ","   // tx = true x
-                << sdsPoint->GetY()  << ","   // ty = true y
-                << sdsPoint->GetZ()  << ","   // tz = true z
-                << sdsPoint->GetPx() << ","   // tpx = true px
-                << sdsPoint->GetPy() << ","   // tpy = true py
-                << sdsPoint->GetPz() << ","   // tpz = true pz
-                << (1.0)             << ","   // FIXME: Weight Placeholder, but sum of weights of hits in track == 1)
-                << particle_id                // Particle_id from above   
+        fTruths << fHitId                  << ","   // hit_id  
+                << sdsPoint->GetX()        << ","   // tx = true x
+                << sdsPoint->GetY()        << ","   // ty = true y
+                << sdsPoint->GetZ()        << ","   // tz = true z
+                << sdsPoint->GetPx()       << ","   // tpx = true px
+                << sdsPoint->GetPy()       << ","   // tpy = true py
+                << sdsPoint->GetPz()       << ","   // tpz = true pz
+                << (1.0)                   << ","   // FIXME: Weight Placeholder, but sum of weights of hits in track == 1)
+                << particle_id                      // Particle_id from above   
                 << std::endl;    
        
        
@@ -507,13 +516,13 @@ void PndMLTracking::GenerateMvdData() {
         // ---------------------------------------------------------------------------
         PndSdsHit* sdsHit = (PndSdsHit*)fMvdHitsStripArray->At(idx);
         
-        fHits << fHitId                  << ","      // hit_id
-              << sdsHit->GetX()          << ","      // x-position
-              << sdsHit->GetY()          << ","      // y-position
-              << sdsHit->GetZ()          << ","      // z-position
-              << sdsHit->GetDetectorID() << ","      // volume_id
-              << GetLayerMvd(sdsHit)     << ","      // layer_id
-              << sdsHit->GetSensorID()               // sensor_id/module_id
+        fHits << fHitId                    << ","   // hit_id
+              << sdsHit->GetX()            << ","   // x-position
+              << sdsHit->GetY()            << ","   // y-position
+              << sdsHit->GetZ()            << ","   // z-position
+              << sdsHit->GetDetectorID()   << ","   // volume_id
+              << GetLayerMvd(sdsHit)       << ","   // layer_id
+              << sdsHit->GetSensorID()              // sensor_id/module_id
               << std::endl;
 
 
@@ -531,15 +540,15 @@ void PndMLTracking::GenerateMvdData() {
             particle_id = std::to_string(mcTrackLinks_sorted[trackIndex].GetIndex() + 1);
         }
         
-        fTruths << fHitId            << ","   // hit_id  
-                << sdsPoint->GetX()  << ","   // tx = true x
-                << sdsPoint->GetY()  << ","   // ty = true y
-                << sdsPoint->GetZ()  << ","   // tz = true z
-                << sdsPoint->GetPx() << ","   // tpx = true px
-                << sdsPoint->GetPy() << ","   // tpy = true py
-                << sdsPoint->GetPz() << ","   // tpz = true pz
-                << (1.0)             << ","   // FIXME: Weight Placeholder, but sum of weights of hits in track == 1)
-                << particle_id                // Particle_id from above   
+        fTruths << fHitId                  << ","   // hit_id  
+                << sdsPoint->GetX()        << ","   // tx = true x
+                << sdsPoint->GetY()        << ","   // ty = true y
+                << sdsPoint->GetZ()        << ","   // tz = true z
+                << sdsPoint->GetPx()       << ","   // tpx = true px
+                << sdsPoint->GetPy()       << ","   // tpy = true py
+                << sdsPoint->GetPz()       << ","   // tpz = true pz
+                << (1.0)                   << ","   // FIXME: Weight Placeholder, but sum of weights of hits in track == 1)
+                << particle_id                      // Particle_id from above   
                 << std::endl;    
        
        
@@ -606,14 +615,14 @@ void PndMLTracking::GenerateGemData() {
         // ---------------------------------------------------------------------------        
         PndGemHit* gemHit = (PndGemHit*)fGemHitArray->At(idx);
         
-        fHits << fHitId                  << ","      // hit_id
-              << gemHit->GetX()          << ","      // x-position
-              << gemHit->GetY()          << ","      // y-position
-              << gemHit->GetZ()          << ","      // z-position
-              //<<gemHit->GetDetectorID()<< ","      // volume_id (strange numbers)
-              << (6)                     << ","      // volume_id (let's say its 6)
-              << GetLayerGem(gemHit)     << ","      // layer_id
-              << gemHit->GetSensorNr()               // sensor_id/module_id
+        fHits << fHitId                    << ","   // hit_id
+              << gemHit->GetX()            << ","   // x-position
+              << gemHit->GetY()            << ","   // y-position
+              << gemHit->GetZ()            << ","   // z-position
+              //<<gemHit->GetDetectorID()  << ","   // volume_id (strange numbers)
+              << (6)                       << ","   // volume_id (let's say its 6)
+              << GetLayerGem(gemHit)       << ","   // layer_id
+              << gemHit->GetSensorNr()              // sensor_id/module_id
               << std::endl;
 
 
@@ -631,15 +640,15 @@ void PndMLTracking::GenerateGemData() {
             particle_id = std::to_string(mcTrackLinks_sorted[trackIndex].GetIndex() + 1);
         }
         
-        fTruths << fHitId            << ","   // hit_id  
-                << gemPoint->GetX()  << ","   // tx = true x
-                << gemPoint->GetY()  << ","   // ty = true y
-                << gemPoint->GetZ()  << ","   // tz = true z
-                << gemPoint->GetPx() << ","   // tpx = true px
-                << gemPoint->GetPy() << ","   // tpy = true py
-                << gemPoint->GetPz() << ","   // tpz = true pz
-                << (1.0)             << ","   // FIXME: Weight Placeholder, but sum of weights of hits in track == 1)
-                << particle_id                // Particle_id from above   
+        fTruths << fHitId                  << ","   // hit_id  
+                << gemPoint->GetX()        << ","   // tx = true x
+                << gemPoint->GetY()        << ","   // ty = true y
+                << gemPoint->GetZ()        << ","   // tz = true z
+                << gemPoint->GetPx()       << ","   // tpx = true px
+                << gemPoint->GetPy()       << ","   // tpy = true py
+                << gemPoint->GetPz()       << ","   // tpz = true pz
+                << (1.0)                   << ","   // FIXME: Weight Placeholder, but sum of weights of hits in track == 1)
+                << particle_id                      // Particle_id from above   
                 << std::endl;    
        
        
@@ -704,12 +713,16 @@ void PndMLTracking::GenerateSttData() {
         PndSttHit* stthit = (PndSttHit*)fSttHitArray->At(idx);
         PndSttTube *tube = (PndSttTube*) fTubeArray->At(stthit->GetTubeID());
         
-        fHits << fHitId                << ","      // hit_id
-              << stthit->GetX()         << ","      // x-position
-              << stthit->GetY()         << ","      // y-position
-              << stthit->GetZ()         << ","      // z-position
-              << stthit->GetDetectorID()<< ","      // volume_id
-              << tube->GetLayerID()     << ","      // layer_id
+        // TODO: Skewed Hits Correction Separately.
+        // Skip Skewed Tubes, Will handle them in GenerateSttSkewData()
+        if (tube->IsSkew()) {continue;}
+        
+        fHits << fHitId                    << ","   // hit_id
+              << stthit->GetX()            << ","   // x-position
+              << stthit->GetY()            << ","   // y-position
+              << stthit->GetZ()            << ","   // z-position
+              << stthit->GetDetectorID()   << ","   // volume_id
+              << tube->GetLayerID()        << ","   // layer_id
               << stthit->GetTubeID()                // tube_id/module_id
               << std::endl;
         
@@ -727,15 +740,15 @@ void PndMLTracking::GenerateSttData() {
             particle_id = std::to_string(mcTrackLinks_sorted[trackIndex].GetIndex() + 1);
         }
         
-         fTruths << fHitId           << ","   // hit_id  
-                << sttpoint->GetX()  << ","   // tx = true x
-                << sttpoint->GetY()  << ","   // ty = true y
-                << sttpoint->GetZ()  << ","   // tz = true z
-                << sttpoint->GetPx() << ","   // tpx = true px
-                << sttpoint->GetPy() << ","   // tpy = true py
-                << sttpoint->GetPz() << ","   // tpz = true pz
-                << (1.0)             << ","   // FIXME: weight (sum of weights of hits in track == 1)
-                << particle_id                // Particle_id from above   
+         fTruths << fHitId                 << ","   // hit_id  
+                << sttpoint->GetX()        << ","   // tx = true x
+                << sttpoint->GetY()        << ","   // ty = true y
+                << sttpoint->GetZ()        << ","   // tz = true z
+                << sttpoint->GetPx()       << ","   // tpx = true px
+                << sttpoint->GetPy()       << ","   // tpy = true py
+                << sttpoint->GetPz()       << ","   // tpz = true pz
+                << (1.0)                   << ","   // FIXME: weight (sum of weights of hits in track == 1)
+                << particle_id                      // Particle_id from above   
                 << std::endl;    
 
 
@@ -808,7 +821,157 @@ void PndMLTracking::GenerateSttData() {
     
 }//end-GenerateSttData()
 
-/* FinishTask() */
+
+
+/* GenerateSttSkewedData() */
+void PndMLTracking::GenerateSttSkewData() {
+    
+    std::cout << "-I- PndMLTracking: Runing GenerateSttSkewData()" << std::endl;
+    
+    // SttSkewHitArray
+    if (fSttSkewHitArray->GetEntries()==0)
+         std::cout << "Warning! SttSkewHitArray is Empty." << std::endl;
+         
+    for (int idx=0; idx < fSttSkewHitArray->GetEntries(); idx++) {
+
+        // Get FairRootManager Instance
+        FairRootManager *ioman = FairRootManager::Instance();
+
+        // Get sttHitsLinks from STTHit
+        FairMultiLinkedData_Interface *sttHitsLinks = (FairMultiLinkedData_Interface*)fSttSkewHitArray->At(idx);
+
+        // Get sttPointLinks & Data (TCloneArray) from sttHitsLinks
+        FairMultiLinkedData sttPointLinks = sttHitsLinks->GetLinksWithType(fSttPointBranchID);
+        FairMCPoint *sttpoint = (FairMCPoint*)ioman->GetCloneOfLinkData(sttPointLinks.GetLink(0));
+        
+        // Terminate if sttpoint=NULL
+        if (sttpoint == 0) {continue;}
+        
+        // Get mcTrackLinks & Data (TCloneArray) from sttpoint (OR sttPointLinks?)
+        FairMultiLinkedData mcTrackLinks = sttpoint->GetLinksWithType(fMCTrackBranchID); 
+        PndMCTrack *mctrack = (PndMCTrack*)ioman->GetCloneOfLinkData(mcTrackLinks.GetLink(0));
+        
+        // Terminate if mcTrack=NULL
+        if (mctrack == 0) {continue;}
+        
+        // Terminate if not Primary
+        // if (!mctrack->IsGeneratorCreated())
+        //    continue;
+        
+        // Hit Counter (very important in case number of tracks vary per event)
+        fHitId++;
+        
+        // Write to xxx-hits.csv
+        // ---------------------------------------------------------------------------
+        PndSttHit* stthit = (PndSttHit*)fSttSkewHitArray->At(idx);
+        PndSttTube *tube = (PndSttTube*) fTubeArray->At(stthit->GetTubeID());
+        
+        fHits << fHitId                    << ","   // hit_id
+              << stthit->GetX()            << ","   // x-position
+              << stthit->GetY()            << ","   // y-position
+              << stthit->GetZ()            << ","   // z-position
+              << stthit->GetDetectorID()   << ","   // volume_id
+              << tube->GetLayerID()        << ","   // layer_id
+              << stthit->GetTubeID()                // tube_id/module_id
+              << std::endl;
+        
+        
+        // Write to xxx-truth.csv
+        // ---------------------------------------------------------------------------
+        
+        // Get Particle Id
+        TString particle_id = "";
+        std::vector<FairLink> mcTrackLinks_sorted = sttHitsLinks->GetSortedMCTracks();
+         
+        for (unsigned int trackIndex = 0; trackIndex < mcTrackLinks_sorted.size(); trackIndex++) {
+            
+            // Append "particle_id" to xxx-truth.csv
+            particle_id = std::to_string(mcTrackLinks_sorted[trackIndex].GetIndex() + 1);
+        }
+        
+         fTruths << fHitId                 << ","   // hit_id  
+                << sttpoint->GetX()        << ","   // tx = true x
+                << sttpoint->GetY()        << ","   // ty = true y
+                << sttpoint->GetZ()        << ","   // tz = true z
+                << sttpoint->GetPx()       << ","   // tpx = true px
+                << sttpoint->GetPy()       << ","   // tpy = true py
+                << sttpoint->GetPz()       << ","   // tpz = true pz
+                << (1.0)                   << ","   // FIXME: weight (sum of weights of hits in track == 1)
+                << particle_id                      // Particle_id from above   
+                << std::endl;    
+
+
+        // Write to xxx-cells.csv
+        // ---------------------------------------------------------------------------
+        fCells  << fHitId                  << ","   // hit_id
+                << stthit->GetDepCharge()  << ","   // deposited charge 
+                << stthit->GetEnergyLoss() << ","   // energy loss (silicon)
+                << stthit->GetDetectorID() << ","   // volume_id
+                << tube->GetLayerID()      << ","   // layer_id
+                << stthit->GetTubeID()     << ","   // module_id
+                << stthit->GetIsochrone()  << ","   // isochrone
+                << tube->IsSkew()          << ","   // skewed
+                << tube->GetSectorID()              // sector_id
+                << std::endl;
+
+
+
+        // Write to xxx-particles.csv
+        // ---------------------------------------------------------------------------
+        
+        /** -----------------------------------------------------------------------
+        * FIXME: The issue is fParticles should contain unique particle_ids (tracks)
+        * e.g. if there are 10 particles/event then it should contain only 10 records.
+        * But right now fParticles contain a particle records which are equal to the
+        * size of fSttSkewHitArray. Which mean there will be repition of data in the file.
+        * One solution might be to write the fParticles outside of fSttSkewHitArray. So I
+        * shifted the this piece of code outside of fSttSkewHitArray loop. Note, however, 
+        * that if MVD and GEM are also included then fParticles should be generated in 
+        * Exec() rather than GenerateMvdData()/GenerateGemData() or GenerateSttData()
+        * ---------------------------------------------------------------------- */
+        
+        // NOTE: In particle.csv dataframe, count duplicate particle_ids and add this 
+        // number as nhits. After that one can drop_duplicates from particle dataframe.
+        
+
+        //std::cout << "Number of MCTracks (fParticles): " << mcTrackLinks_sorted.size() << std::endl;
+        //std::vector<FairLink> mcTrackLinks_sorted = sttHitsLinks->GetSortedMCTracks();
+        
+        if (fAssistedByIdeal.Contains("WithoutIdeal")) {
+            for (unsigned int trackIndex=0; trackIndex < mcTrackLinks_sorted.size(); trackIndex++) {
+            
+                // Fetch mcTrack associated with SttHit
+                PndMCTrack *mcTrack = (PndMCTrack*)ioman->GetCloneOfLinkData(mcTrackLinks_sorted[trackIndex]);
+                
+                // std::cout << "No. of MCPoints in STT: " << mcTrack->GetNPoints(DetectorID::kSTT) << std::endl;
+                
+                // CSV:: Writting Info to CSV File. 
+                fParticles  << std::to_string(mcTrackLinks_sorted[trackIndex].GetIndex() + 1)   
+                                                                       << ","   // track_id > 0
+                            << (mcTrack->GetStartVertex()).X()         << ","   // vx = start x
+                            << (mcTrack->GetStartVertex()).Y()         << ","   // vy = start y
+                            << (mcTrack->GetStartVertex()).Z()         << ","   // vz = start z
+                            << (mcTrack->GetMomentum()).X()            << ","   // px = x-component of track momentum
+                            << (mcTrack->GetMomentum()).Y()            << ","   // py = y-component of track momentum
+                            << (mcTrack->GetMomentum()).Z()            << ","   // pz = z-component of track momentum
+                            << ((mcTrack->GetPdgCode()>0)?1:-1)        << ","   // q = charge of mu-/mu+
+                            // <<mcTrack->GetNPoints(DetectorId::kSTT) << ","   // FIXME: nhits in STT (Not tested yet).
+                            << 1                                       << ","   // FIXME: nhits==1 (just a placeholder)
+                            << mcTrack->GetPdgCode()                   << ","   // pdgcode e.g. mu- has pdgcode=-13
+                            << mcTrack->GetStartTime()                 << ","   // start_time = start time of particle track
+                            << mcTrack->IsGeneratorCreated()                    // flag 'primary' particle
+                            << std::endl;
+                  
+                delete (mcTrack);
+                
+            }//McTracks
+        }//fAssistedByIdeal
+    }//SttHitArray
+    
+}//end-GenerateSttSkewedData()
+
+
+/* GenerateParticlesData() */
 void PndMLTracking::GenerateParticlesData() {
     
     // Write to xxx-particles.csv (Using IdealTrackFinder)
@@ -879,13 +1042,6 @@ void PndMLTracking::GenerateParticlesData() {
         std::cout << "-I- PndMLTracking: Skipping IdealTrackFinder for Particles" << std::endl;
 
 }//GenerateParticlesData
-
-
-
-
-
-
-
 
 
 /* FinishTask() */

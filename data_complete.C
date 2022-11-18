@@ -6,6 +6,7 @@ int data_complete(Int_t nEvents=10, TString prefix="", TString csv_path="", TStr
     TString parFile     = prefix+"_par.root";
     TString simFile     = prefix+"_sim.root";
     TString digiFile    = prefix+"_digi.root";
+    TString skewFile    = prefix+"_skew.root";  // For Skewed Hit Correction
     TString recoFile    = prefix+"_reco.root";
     TString outFile     = prefix+"_data.root"; // its dummy file, usually out.root
     
@@ -19,6 +20,9 @@ int data_complete(Int_t nEvents=10, TString prefix="", TString csv_path="", TStr
 	
 	// Add Friend File to FairFileSource
 	fSrc->AddFriend(digiFile);
+	
+	// Add Friend File to FairFileSource
+	fSrc->AddFriend(skewFile);
 	
 	// Add Friend File to FairFileSource
 	fSrc->AddFriend(recoFile);
