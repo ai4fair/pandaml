@@ -321,9 +321,9 @@ void PndMLTracking::Exec(Option_t* /*opt*/) {
             << "volume_id" << ","       // Detector Identifier
             << "layer_id"  << ","       // Layer inside a detector
             << "module_id" << ","       // Module Id: MVD Sensor/GEM Sensor/Straw Tube
+            << "sector_id" << ","       // sector of tube (only for STT)
             << "isochrone" << ","       // isochrone radius (only for STT)
-            << "skewed"    << ","       // if tube is skewed (only for STT)
-            << "sector_id"              // sector of tube (only for STT)
+            << "skewed"                 // if tube is skewed (only for STT)
             << std::endl;
             
     /* ------------------------------------------------------------------------
@@ -430,7 +430,7 @@ void PndMLTracking::GenerateMvdData() {
               << sdsHit->GetX()            << ","   // x-position
               << sdsHit->GetY()            << ","   // y-position
               << sdsHit->GetZ()            << ","   // z-position
-              << sdsHit->GetDetectorID()   << ","   // volume_id
+              << sdsHit->GetDetectorID()   << ","   // volume_id (2 for Pixel)
               << GetLayerMvd(sdsHit)       << ","   // layer_id
               << sdsHit->GetSensorID()              // sensor_id/module_id
               << std::endl;
@@ -467,12 +467,12 @@ void PndMLTracking::GenerateMvdData() {
         fCells  << fHitId                  << ","   // hit_id
                 << sdsHit->GetCharge()     << ","   // deposited charge 
                 << sdsHit->GetEloss()      << ","   // energy loss (silicon)
-                << sdsHit->GetDetectorID() << ","   // volume_id
+                << sdsHit->GetDetectorID() << ","   // volume_id (2 for Pixel)
                 << GetLayerMvd(sdsHit)     << ","   // layer_id
                 << sdsHit->GetSensorID()   << ","   // module_id
-                << ("-nan")                << ","   // isochrone
+                << ("-nan")                << ","   // sector_id
                 << ("-nan")                << ","   // skewed
-                << ("-nan")                         // sector_id
+                << ("-nan")                         // isochrone
                 << std::endl;
                 
     }//fMvdHitsPixelArray
@@ -520,7 +520,8 @@ void PndMLTracking::GenerateMvdData() {
               << sdsHit->GetX()            << ","   // x-position
               << sdsHit->GetY()            << ","   // y-position
               << sdsHit->GetZ()            << ","   // z-position
-              << sdsHit->GetDetectorID()   << ","   // volume_id
+              //<< sdsHit->GetDetectorID() << ","   // volume_id (27 for strip)
+              << (3)                       << ","   // volume_id (27 --> 3)
               << GetLayerMvd(sdsHit)       << ","   // layer_id
               << sdsHit->GetSensorID()              // sensor_id/module_id
               << std::endl;
@@ -557,12 +558,13 @@ void PndMLTracking::GenerateMvdData() {
         fCells  << fHitId                  << ","   // hit_id
                 << sdsHit->GetCharge()     << ","   // deposited charge 
                 << sdsHit->GetEloss()      << ","   // energy loss (silicon)
-                << sdsHit->GetDetectorID() << ","   // volume_id
+                //<<sdsHit->GetDetectorID()<< ","   // volume_id (27 for strip)
+                << (3)                     << ","   // volume_id (27 --> 3)
                 << GetLayerMvd(sdsHit)     << ","   // layer_id
                 << sdsHit->GetSensorID()   << ","   // module_id
-                << ("-nan")                << ","   // isochrone
+                << ("-nan")                << ","   // sector_id
                 << ("-nan")                << ","   // skewed
-                << ("-nan")                         // sector_id
+                << ("-nan")                         // isochrone
                 << std::endl;
                 
     }//fMvdHitsStripArray
@@ -661,9 +663,9 @@ void PndMLTracking::GenerateGemData() {
                 << (6)                     << ","   // volume_id (let's say its 6)
                 << GetLayerGem(gemHit)     << ","   // layer_id
                 << gemHit->GetSensorNr()   << ","   // module_id
-                << ("-nan")                << ","   // isochrone
+                << ("-nan")                << ","   // sector_id
                 << ("-nan")                << ","   // skewed
-                << ("-nan")                         // sector_id
+                << ("-nan")                         // isochrone
                 << std::endl;
     }//GemHitArray
 
@@ -760,9 +762,9 @@ void PndMLTracking::GenerateSttData() {
                 << stthit->GetDetectorID() << ","   // volume_id
                 << tube->GetLayerID()      << ","   // layer_id
                 << stthit->GetTubeID()     << ","   // module_id
+                << tube->GetSectorID()     << ","   // sector_id
                 << stthit->GetIsochrone()  << ","   // isochrone
-                << tube->IsSkew()          << ","   // skewed
-                << tube->GetSectorID()              // sector_id
+                << tube->IsSkew()                   // skewed
                 << std::endl;
 
 
@@ -909,9 +911,9 @@ void PndMLTracking::GenerateSttSkewData() {
                 << stthit->GetDetectorID() << ","   // volume_id
                 << tube->GetLayerID()      << ","   // layer_id
                 << stthit->GetTubeID()     << ","   // module_id
+                << tube->GetSectorID()     << ","   // sector_id
                 << stthit->GetIsochrone()  << ","   // isochrone
-                << tube->IsSkew()          << ","   // skewed
-                << tube->GetSectorID()              // sector_id
+                << tube->IsSkew()                   // skewed
                 << std::endl;
 
 
