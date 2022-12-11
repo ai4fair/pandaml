@@ -45,3 +45,14 @@ Similary if one have singularity container for PandaRoot, then just run `runsif.
 # run on container
 ./runsif 100 box DBGEN
 ```
+
+
+All bash scripts should run following simulation chain:
+
+```bash
+root -l -b -q sim_complete.C\($nevt,\"$outprefix\",\"$gen\",$pBeam,$seed\) > $outprefix"_sim.log" 2>&1
+root -l -b -q digi_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_digi.log" 2>&1
+root -l -b -q skew_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_skew.log" 2>&1
+root -l -b -q recoideal_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_reco.log" 2>&1
+root -l -b -q data_complete.C\($nevt,\"$outprefix\",\"$_target\",\"$flag\"\) > $outprefix"_data.log" 2>&1
+```

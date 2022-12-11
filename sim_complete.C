@@ -102,6 +102,7 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
         boxGen1->SetPRange(0.1, 1.5);                               // GeV/c (1.0 to 3.0), 100 MeV to 1.5 GeV
         boxGen1->SetPhiRange(0., 360.);                             // Azimuth angle range [degree]
         boxGen1->SetThetaRange(22., 140.);                          // Polar angle in lab system range [degree]
+        boxGen1->SetThetaRange(3., 150.);                           // Polar angle in lab system range [degree], CTS
         boxGen1->SetXYZ(0., 0., 0.);                                // mm or cm ??
         fRun->AddGenerator(boxGen1);
 
@@ -109,7 +110,8 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
         FairBoxGenerator* boxGen2 = new FairBoxGenerator(-13, 5);   // -13 = antimuon; 5 = multiplicity
         boxGen2->SetPRange(0.1, 1.5);                               // GeV/c (1.0 to 3.0), 100 MeV to 1.5 GeV
         boxGen2->SetPhiRange(0., 360.);                             // Azimuth angle range [degree]
-        boxGen2->SetThetaRange(22., 140.);                          // Polar angle in lab system range [degree]
+        //boxGen2->SetThetaRange(22., 140.);                        // Polar angle in lab system range [degree], STT
+        boxGen2->SetThetaRange(3., 150.);                           // Polar angle in lab system range [degree], CTS
         boxGen2->SetXYZ(0., 0., 0.);                                // mm or cm ??
         fRun->AddGenerator(boxGen2);
      
