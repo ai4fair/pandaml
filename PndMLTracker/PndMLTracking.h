@@ -114,7 +114,8 @@ private:
     std::ofstream fCells;              // Cells (tubes, pixels, sensors)
 	    
     /** CSV Generators **/
-    void GenerateMvdData();            // Tracking Data from MVD
+    void GenerateMvdPixelData();       // Tracking Data from MVDPixel
+    void GenerateMvdStripData();       // Tracking Data from MVDStrip
     void GenerateGemData();            // Tracking Data from GEM
     void GenerateSttData();            // Tracking Data from STT (Non-skewed Hits)
     void GenerateSttSkewData();        // Tracking Data from STT (Skewed Hits Correction)

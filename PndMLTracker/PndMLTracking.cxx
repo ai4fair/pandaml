@@ -362,7 +362,8 @@ void PndMLTracking::Exec(Option_t* /*opt*/) {
     *                       Add CSV Data according to Header
     *  ********************************************************************* */
     
-    GenerateMvdData();
+    GenerateMvdPixelData();
+    GenerateMvdStripData();
     GenerateGemData();
     GenerateSttData();
     GenerateSttSkewData();
@@ -383,10 +384,10 @@ void PndMLTracking::Exec(Option_t* /*opt*/) {
 }//end-Exec()
 
 
-/* GenerateMvdData() */
-void PndMLTracking::GenerateMvdData() { 
+/* GenerateMvdPixelData() */
+void PndMLTracking::GenerateMvdPixelData() { 
     
-    std::cout << "-I- PndMLTracking: Runing GenerateMvdData()" << std::endl;
+    std::cout << "-I- PndMLTracking: Runing GenerateMvdPixelData()" << std::endl;
     
     // MvdHitsPixel
     if (fMvdHitsPixelArray->GetEntries()==0)
@@ -475,8 +476,15 @@ void PndMLTracking::GenerateMvdData() {
                 << ("-nan")                         // isochrone
                 << std::endl;
                 
-    }//fMvdHitsPixelArray
-      
+    }//fMvdHitsPixelArray  
+    
+}//GenerateMvdPixelData
+
+
+
+void PndMLTracking::GenerateMvdStripData() { 
+    
+    std::cout << "-I- PndMLTracking: Runing GenerateMvdStripData()" << std::endl;   
     
     // MvdHitsStripArray
     if (fMvdHitsStripArray->GetEntries()==0)
@@ -570,7 +578,8 @@ void PndMLTracking::GenerateMvdData() {
     }//fMvdHitsStripArray
     
     
-}//GenerateMvdData
+}//GenerateMvdStripData
+
 
 
 /* GenerateGemData() */
@@ -872,7 +881,8 @@ void PndMLTracking::GenerateSttSkewData() {
               << stthit->GetX()            << ","   // x-position
               << stthit->GetY()            << ","   // y-position
               << stthit->GetZ()            << ","   // z-position
-              << stthit->GetDetectorID()   << ","   // volume_id
+              //<< stthit->GetDetectorID() << ","   // volume_id (-1 for stt skewed layers)
+              << (9)                       << ","   // volume_id (9 for stt)
               << tube->GetLayerID()        << ","   // layer_id
               << stthit->GetTubeID()                // tube_id/module_id
               << std::endl;
@@ -891,7 +901,7 @@ void PndMLTracking::GenerateSttSkewData() {
             particle_id = std::to_string(mcTrackLinks_sorted[trackIndex].GetIndex() + 1);
         }
         
-         fTruths << fHitId                 << ","   // hit_id  
+        fTruths << fHitId                  << ","   // hit_id  
                 << sttpoint->GetX()        << ","   // tx = true x
                 << sttpoint->GetY()        << ","   // ty = true y
                 << sttpoint->GetZ()        << ","   // tz = true z
@@ -908,7 +918,8 @@ void PndMLTracking::GenerateSttSkewData() {
         fCells  << fHitId                  << ","   // hit_id
                 << stthit->GetDepCharge()  << ","   // deposited charge 
                 << stthit->GetEnergyLoss() << ","   // energy loss (silicon)
-                << stthit->GetDetectorID() << ","   // volume_id
+                //<< stthit->GetDetectorID()<< ","  // volume_id (-1 for stt skewed layers)
+                << (9)                     << ","   // volume_id (9 for stt)
                 << tube->GetLayerID()      << ","   // layer_id
                 << stthit->GetTubeID()     << ","   // module_id
                 << tube->GetSectorID()     << ","   // sector_id
