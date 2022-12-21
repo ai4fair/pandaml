@@ -458,7 +458,7 @@ void PndMLTracking::GenerateMvdPixelData() {
                 << sdsPoint->GetPx()       << ","   // tpx = true px
                 << sdsPoint->GetPy()       << ","   // tpy = true py
                 << sdsPoint->GetPz()       << ","   // tpz = true pz
-                << (1.0)                   << ","   // FIXME: Weight Placeholder, but sum of weights of hits in track == 1)
+                << (1.0)                   << ","   // Weight placeholder (sum of weights of hits in track == 1)
                 << particle_id                      // Particle_id from above   
                 << std::endl;    
        
@@ -556,7 +556,7 @@ void PndMLTracking::GenerateMvdStripData() {
                 << sdsPoint->GetPx()       << ","   // tpx = true px
                 << sdsPoint->GetPy()       << ","   // tpy = true py
                 << sdsPoint->GetPz()       << ","   // tpz = true pz
-                << (1.0)                   << ","   // FIXME: Weight Placeholder, but sum of weights of hits in track == 1)
+                << (1.0)                   << ","   // Weight placeholder (sum of weights of hits in track == 1)
                 << particle_id                      // Particle_id from above   
                 << std::endl;    
        
@@ -658,7 +658,7 @@ void PndMLTracking::GenerateGemData() {
                 << gemPoint->GetPx()       << ","   // tpx = true px
                 << gemPoint->GetPy()       << ","   // tpy = true py
                 << gemPoint->GetPz()       << ","   // tpz = true pz
-                << (1.0)                   << ","   // FIXME: Weight Placeholder, but sum of weights of hits in track == 1)
+                << (1.0)                   << ","   // Weight placeholder (sum of weights of hits in track == 1)
                 << particle_id                      // Particle_id from above   
                 << std::endl;    
        
@@ -758,7 +758,7 @@ void PndMLTracking::GenerateSttData() {
                 << sttpoint->GetPx()       << ","   // tpx = true px
                 << sttpoint->GetPy()       << ","   // tpy = true py
                 << sttpoint->GetPz()       << ","   // tpz = true pz
-                << (1.0)                   << ","   // FIXME: weight (sum of weights of hits in track == 1)
+                << (1.0)                   << ","   // Weight placeholder (sum of weights of hits in track == 1)
                 << particle_id                      // Particle_id from above   
                 << std::endl;    
 
@@ -908,7 +908,7 @@ void PndMLTracking::GenerateSttSkewData() {
                 << sttpoint->GetPx()       << ","   // tpx = true px
                 << sttpoint->GetPy()       << ","   // tpy = true py
                 << sttpoint->GetPz()       << ","   // tpz = true pz
-                << (1.0)                   << ","   // FIXME: weight (sum of weights of hits in track == 1)
+                << (1.0)                   << ","   // Weight placeholder (sum of weights of hits in track == 1)
                 << particle_id                      // Particle_id from above   
                 << std::endl;    
 
