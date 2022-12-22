@@ -27,6 +27,7 @@ class PndTrackImport: public FairTask {
 public:
 
     PndTrackImport();
+    PndTrackImport(int start_counter, TString csv_path);
     virtual ~PndTrackImport();
 
 protected:
@@ -82,6 +83,10 @@ private:
     int fSttSkewHitBranchID;           // BranchID for STTCombinedSkewedHits
     TClonesArray *fSttSkewHitArray;    // Storage for STTCombinedSkewedHits
     
+    // BarrelTrack
+    int fBarrelTrackBranchID;          // BranchID for Reco. Ideal Tracks
+    TClonesArray *fBarrelTrackArray;   // Storage for Reco. Ideal Tracks
+    
     /* SttParameters */
     PndGeoSttPar *fSttParameters;
 
@@ -94,38 +99,6 @@ private:
     std::ofstream fInfile;               // Reading a CSV
     void SttTrackCand();
     
-    
-    
-    /*
-    // LayerMap for MVD/GEM
-    PndGeoHandling* fGeoH;
-    vector<vector<int>> fLayers;       //< contains layer information of hits
-    map<TString, int> fLayerMap;       //< identifier string, assigned layer id
-    int fLastLayerId;                  //< last layer Id assigned
-    
-    //CSV Files
-    std::ofstream fHits;               // Hits
-    std::ofstream fTruths;             // Truths
-    std::ofstream fParticles;          // Particles
-    std::ofstream fCells;              // Cells (tubes, pixels, sensors)
-	    
-    // CSV Generators
-    void GenerateMvdPixelData();       // Tracking Data from MVDPixel
-    void GenerateMvdStripData();       // Tracking Data from MVDStrip
-    void GenerateGemData();            // Tracking Data from GEM
-    void GenerateSttData();            // Tracking Data from STT (Non-skewed Hits)
-    void GenerateSttSkewData();        // Tracking Data from STT (Skewed Hits Correction)
-    void GenerateParticlesData();      // Particles for MVD, GEM and STT
-    
-    // Layer Map
-    int GetLayer(TString identifier);
-    int GetLayerGem(FairHit *hit);
-    int GetLayerMvd(FairHit *hit);
-    void InitLayerMap();
-    void InitLayerMapMvd();
-    void InitLayerMapGem();
-    */
-
     ClassDef(PndTrackImport,1)
 };
 

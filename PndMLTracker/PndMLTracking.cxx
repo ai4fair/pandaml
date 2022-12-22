@@ -231,6 +231,8 @@ void PndMLTracking::Exec(Option_t* /*opt*/) {
     *                          Add CSV Header
     *  ********************************************************************* */
 
+    // TODO: Add TClonesArray Indices, as fCIdx, in the CSVs along with fHitId.
+    // fCIdx is the exact location of a hit one can use to build PndTrackCand.
         
     /* ------------------------------------------------------------------------
     *                          (1) Event Hits
