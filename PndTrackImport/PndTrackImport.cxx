@@ -72,7 +72,7 @@ PndTrackImport::PndTrackImport(int start_counter, TString csv_path)
     , fSttHitArray(nullptr)         // SttHitArray
     , fSttSkewHitBranchID(-1)       // SttSkewHitBranchID
     , fSttSkewHitArray(nullptr)     // SttSkewHitArray
-    , fBarrelTrackBranchID(-1)      //formerly SttMvdGemTrack
+    , fBarrelTrackBranchID(-1)      // formerly SttMvdGemTrack
     , fBarrelTrackArray(nullptr)    // formerly SttMvdGemTrack
     , fSttParameters(nullptr)
     , fEventHeader(nullptr)
@@ -162,26 +162,54 @@ InitStatus PndTrackImport::Init() {
 /* Exec() */
 void PndTrackImport::Exec(Option_t* /*opt*/) {
     
+    // Filename of CSV
     std::stringstream ss;
     ss << std::setw(4) << std::setfill('0') << fEventId;
     std::string fidx = ss.str();   
     TString prefix = fCsvFilesPath+"/"+fidx;
-    TString filename = prefix+".csv";
+    TString filename = prefix+".root";
     
     std::cout << "\nProcessing Event: " << (fEventId) << " with Prefix: " << prefix << std::endl;
     
 
     // RDataFrame from CSVs
-    //auto tdf = ROOT::RDF::FromCSV(filename);             // Root v6.26    
-    //auto rdf = ROOT::RDF::MakeCsvDataFrame(filename);    // Root v6.22
+    // auto rdf = ROOT::RDF::FromCSV(filename);             // Root v6.26    
+    // auto rdf = ROOT::RDF::MakeCsvDataFrame(filename);    // Root v6.22
+    
     
     // TTree from CSVs
-    TTree *t = new TTree("t", "Track Cand");
-    t->ReadFile(filename, "hit_id/I:track_id"); // we should get tree with branches hit_id, track_id
-    t->Print();
-    //t->Scan();
-   
+    // TTree *t = new TTree("t", "Track Cand");
+    // t->ReadFile(filename, "hit_id/I:track_id");
+    
+    
+    // Reading TTree from ROOT
+    TFile *myFile = TFile::Open(filename);
+    TTreeReader myReader("TrackML", myFile);
+
+    TTreeReaderValue<int> hit_id(myReader, "hit_id");
+    TTreeReaderValue<long long> track_id(myReader, "track_id");
+
+    // Loop over all entries of the TTree or TChain.
+    while (myReader.Next()) {
+        
+        // Just access the data as if they were iterators (note the '*' in front of them):
+        cout  << "hit_id: " << *hit_id << ", track_id: " << *track_id << endl;
+        
+        
+        
+        
+    }
+    
+    
     // TODO: Loop over TTree Branches to Get Track Cands e.g. as track_id: {list of hids/cids}
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     std::cout << " Finishing Event: " << (fEventId) << " with Prefix: " << prefix << std::endl;
