@@ -72,11 +72,13 @@ PndTrackImport::PndTrackImport(int start_counter, TString csv_path)
     , fSttHitArray(nullptr)         // SttHitArray
     , fSttSkewHitBranchID(-1)       // SttSkewHitBranchID
     , fSttSkewHitArray(nullptr)     // SttSkewHitArray
-    , fBarrelTrackBranchID(-1)      // formerly SttMvdGemTrack
-    , fBarrelTrackArray(nullptr)    // formerly SttMvdGemTrack
+    //, fBarrelTrackBranchID(-1)      // formerly SttMvdGemTrack
+    //, fBarrelTrackArray(nullptr)    // formerly SttMvdGemTrack
     , fSttParameters(nullptr)
     , fEventHeader(nullptr)
-    , fTubeArray(nullptr) {
+    , fTubeArray(nullptr) 
+    , fBarrelTrackArray(nullptr) 
+    , fBarrelTrackCandArray(nullptr) {
 
     /* Constructor */
 }
@@ -124,8 +126,8 @@ InitStatus PndTrackImport::Init() {
     } 
     
     // Access BarrelTrack (formerly SttMvdGemTrack) Branch and its ID
-    fBarrelTrackArray = (TClonesArray*) ioman->GetObject("BarrelTrack");
-    fBarrelTrackBranchID = ioman->GetBranchId("BarrelTrack");
+    //fBarrelTrackArray = (TClonesArray*) ioman->GetObject("BarrelTrack");
+    //fBarrelTrackBranchID = ioman->GetBranchId("BarrelTrack");
     
     //Access MVDPoint, MVDHitsPixel, MvdHitsStrip Branches and their Ids
     fMvdPointArray = (TClonesArray*) ioman->GetObject("MVDPoint");
@@ -153,7 +155,15 @@ InitStatus PndTrackImport::Init() {
     //Access STTCombinedSkewedHits Branches and their Ids
     fSttSkewHitArray = (TClonesArray*) ioman->GetObject("STTCombinedSkewedHits");
     fSttSkewHitBranchID = ioman->GetBranchId("STTCombinedSkewedHits");
+    
+    
+    // TODO:  Adding PndTrack and PndTrackCand
+    // Create and register PndTrack and PndTrackCand arrays
+    //fBarrelTrackArray = new TClonesArray("PndTrack", 100);
+    //ioman->Register("BarrelTrack", "Barrel Track", fBarrelTrackArray, GetPersistency());
 
+    
+    
     std::cout << "-I- PndTrackImport: Initialisation successful" << std::endl;
     return kSUCCESS;
 
@@ -186,24 +196,45 @@ void PndTrackImport::Exec(Option_t* /*opt*/) {
     TFile *myFile = TFile::Open(filename);
     TTreeReader myReader("TrackML", myFile);
 
-    TTreeReaderValue<int> hit_id(myReader, "hit_id");
+    TTreeReaderValue<int> hit_id(myReader, "hit_id");           // or cids
     TTreeReaderValue<long long> track_id(myReader, "track_id");
-
+    
+    // Set to Unique Track Ids
+    std::set<long long> unique_track_ids;
+    
+    // Multimap for TrackCand
+	std::unordered_multimap<int, long long> umap_track_cands;
+	
+	
+    
     // Loop over all entries of the TTree or TChain.
     while (myReader.Next()) {
         
         // Just access the data as if they were iterators (note the '*' in front of them):
-        cout  << "hit_id: " << *hit_id << ", track_id: " << *track_id << endl;
+        // cout  << "hit_id: " << *hit_id << ", track_id: " << *track_id << endl;
         
+        // How about making a C++ Map so one can fetch a track_id with all of its hits
         
-        
+        // Insert TrackCand
+        umap_track_cands.insert({*track_id, *hit_id});
+        unique_track_ids.insert(*track_id);
         
     }
     
     
-    // TODO: Loop over TTree Branches to Get Track Cands e.g. as track_id: {list of hids/cids}
+    // Test Multimap and Set
+    std::cout << "\nSet Elements:" << std::endl;
+	for (auto const& iter : unique_track_ids) {  // c++11 
+    	std::cout << ' ' << iter; 
+    }
     
-    
+    // Find list of hits for a track?
+    // Lets filter values based on certain key
+	std::cout << "\nFilter Values for a Key:" << std::endl;
+    auto range = umap_track_cands.equal_range(0);
+    for (auto it = range.first; it != range.second; ++it) {
+        std::cout << it->first << ' ' << it->second << '\n';
+    }
     
     
     

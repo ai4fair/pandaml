@@ -84,8 +84,8 @@ private:
     TClonesArray *fSttSkewHitArray;    // Storage for STTCombinedSkewedHits
     
     // BarrelTrack
-    int fBarrelTrackBranchID;          // BranchID for Reco. Ideal Tracks
-    TClonesArray *fBarrelTrackArray;   // Storage for Reco. Ideal Tracks
+    //int fBarrelTrackBranchID;          // BranchID for Reco. Ideal Tracks
+    //TClonesArray *fBarrelTrackArray;   // Storage for Reco. Ideal Tracks
     
     /* SttParameters */
     PndGeoSttPar *fSttParameters;
@@ -95,6 +95,13 @@ private:
 
     /* STTMapCreater */
     TClonesArray *fTubeArray;
+    
+    // TODO: PndTrack and PndTrackCand
+    /** Output array of global tracks **/
+    TClonesArray *fBarrelTrackArray; ///< Output array of PndTrackCands
+    TClonesArray *fBarrelTrackCandArray;
+    
+    
     
     std::ofstream fInfile;               // Reading a CSV
     void SttTrackCand();
