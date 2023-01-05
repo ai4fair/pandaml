@@ -12,5 +12,6 @@ export SLURM_WORKING_DIR=$LUSTRE_HOME"/pandaml/logs"
 mkdir -p $SLURM_WORKING_DIR;
 export SLURM_JOB_NAME="panda"
 
+sbatch -a95-99 --get-user-env -t 8:00:00 -o '%x-%a.out' -e '%x-%a.err' -J $SLURM_JOB_NAME --mail-type=END --mail-user=a.akram@gsi.de -D $SLURM_WORKING_DIR -- $SLURM_SUBMIT_DIR/jobsim_complete.sh 1000 mumu DBoxGEN
 # sbatch -a0-9 --get-user-env -t 8:00:00 -o '%x-%a.out' -e '%x-%a.err' -J $SLURM_JOB_NAME --mail-type=END --mail-user=a.akram@gsi.de -D $SLURM_WORKING_DIR -- $SLURM_SUBMIT_DIR/jobsim_complete.sh 1000 ftf ftf
-sbatch -a0-9 --get-user-env -t 8:00:00 -o '%x-%a.out' -e '%x-%a.err' -J $SLURM_JOB_NAME --mail-type=END --mail-user=a.akram@gsi.de -D $SLURM_WORKING_DIR -- $SLURM_SUBMIT_DIR/jobsim_complete.sh 1000 fwp llbar_fwp.dec
+# sbatch -a0-9 --get-user-env -t 8:00:00 -o '%x-%a.out' -e '%x-%a.err' -J $SLURM_JOB_NAME --mail-type=END --mail-user=a.akram@gsi.de -D $SLURM_WORKING_DIR -- $SLURM_SUBMIT_DIR/jobsim_complete.sh 1000 fwp llbar_fwp.dec
