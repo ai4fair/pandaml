@@ -57,6 +57,10 @@ private:
     int fMCTrackBranchID;              // BranchID for MC Points
     TClonesArray *fMCTrackArray;       // Storage for MC Points
     
+    // BarrelTrack
+    int fBarrelTrackBranchID;          // BranchID for Reco. Ideal Tracks
+    TClonesArray *fBarrelTrackArray;   // Storage for Reco. Ideal Tracks
+        
     // MVD Point
     int fMvdPointBranchID;             // BranchID for MVD Points (MC)
     TClonesArray *fMvdPointArray;      // Storage for MVD Points (MC)
@@ -87,10 +91,6 @@ private:
     // STT Hits
     int fSttSkewHitBranchID;           // BranchID for STT Hits
     TClonesArray *fSttSkewHitArray;    // Storage for STT Hits
-
-    // BarrelTrack
-    int fBarrelTrackBranchID;          // BranchID for Reco. Ideal Tracks
-    TClonesArray *fBarrelTrackArray;   // Storage for Reco. Ideal Tracks
     
     /* SttParameters */
     PndGeoSttPar *fSttParameters;

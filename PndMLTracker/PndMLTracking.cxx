@@ -46,6 +46,8 @@ PndMLTracking::PndMLTracking()
     , fAssistedByIdeal("NoIdealTracker")
     , fMCTrackBranchID(-1)
     , fMCTrackArray(nullptr)
+    , fBarrelTrackBranchID(-1)      //formerly SttMvdGemTrack
+    , fBarrelTrackArray(nullptr)    // formerly SttMvdGemTrack
     , fMvdPointBranchID(-1)
     , fMvdPointArray(nullptr)
     , fMvdHitsPixelBranchID(-1)
@@ -62,8 +64,6 @@ PndMLTracking::PndMLTracking()
     , fSttHitArray(nullptr)         // SttHitArray
     , fSttSkewHitBranchID(-1)       // SttSkewHitBranchID
     , fSttSkewHitArray(nullptr)     // SttSkewHitArray
-    , fBarrelTrackBranchID(-1)       //formerly SttMvdGemTrack
-    , fBarrelTrackArray(nullptr)    // formerly SttMvdGemTrack
     , fSttParameters(nullptr)
     , fEventHeader(nullptr)
     , fTubeArray(nullptr) 
@@ -83,6 +83,8 @@ PndMLTracking::PndMLTracking(int start_counter, TString csv_path, TString assist
     , fAssistedByIdeal(assist_by_ideal)
     , fMCTrackBranchID(-1)
     , fMCTrackArray(nullptr)
+    , fBarrelTrackBranchID(-1)      // formerly SttMvdGemTrack
+    , fBarrelTrackArray(nullptr)    // formerly SttMvdGemTrack
     , fMvdPointBranchID(-1)
     , fMvdPointArray(nullptr)
     , fMvdHitsPixelBranchID(-1)
@@ -99,8 +101,6 @@ PndMLTracking::PndMLTracking(int start_counter, TString csv_path, TString assist
     , fSttHitArray(nullptr)         // SttHitArray
     , fSttSkewHitBranchID(-1)       // SttSkewHitBranchID
     , fSttSkewHitArray(nullptr)     // SttSkewHitArray
-    , fBarrelTrackBranchID(-1)      //formerly SttMvdGemTrack
-    , fBarrelTrackArray(nullptr)    // formerly SttMvdGemTrack
     , fSttParameters(nullptr)
     , fEventHeader(nullptr)
     , fTubeArray(nullptr) 
@@ -259,7 +259,9 @@ void PndMLTracking::Exec(Option_t* /*opt*/) {
             << "z" << ","
             << "volume_id" << ","       // e.g. STT (sub-detectors)
             << "layer_id"  << ","       // e.g. layer_id in STT
-            << "module_id"              // e.g. module_id==tube_id
+            << "module_id" << ","       // e.g. module_id==tube_id
+            << "tclone_id" << ","       // e.g. TCloneArray Index
+            << "fair_link"              // e.g. FairLinks= sttHitsLinks
             << std::endl;
     
     /* ------------------------------------------------------------------------
@@ -367,8 +369,10 @@ void PndMLTracking::Exec(Option_t* /*opt*/) {
     GenerateMvdPixelData();
     GenerateMvdStripData();
     GenerateGemData();
+    
     GenerateSttData();
     GenerateSttSkewData();
+    
     GenerateParticlesData();
     
     //Close CSVs
@@ -435,7 +439,9 @@ void PndMLTracking::GenerateMvdPixelData() {
               << sdsHit->GetZ()            << ","   // z-position
               << sdsHit->GetDetectorID()   << ","   // volume_id (2 for Pixel)
               << GetLayerMvd(sdsHit)       << ","   // layer_id
-              << sdsHit->GetSensorID()              // sensor_id/module_id
+              << sdsHit->GetSensorID()     << ","   // sensor_id/module_id
+              << idx                       << ","   // TCloneArray Index
+              << mvdHitsLinks                       // or mvdHitsLinks
               << std::endl;
 
 
@@ -533,7 +539,9 @@ void PndMLTracking::GenerateMvdStripData() {
               //<< sdsHit->GetDetectorID() << ","   // volume_id (27 for strip)
               << (3)                       << ","   // volume_id (27 --> 3)
               << GetLayerMvd(sdsHit)       << ","   // layer_id
-              << sdsHit->GetSensorID()              // sensor_id/module_id
+              << sdsHit->GetSensorID()     << ","   // sensor_id/module_id
+              << idx                       << ","   // TCloneArray Index
+              << mvdHitsLinks                       // or mvdHitsLinks
               << std::endl;
 
 
@@ -635,7 +643,9 @@ void PndMLTracking::GenerateGemData() {
               //<<gemHit->GetDetectorID()  << ","   // volume_id (strange numbers)
               << (6)                       << ","   // volume_id (let's say its 6)
               << GetLayerGem(gemHit)       << ","   // layer_id
-              << gemHit->GetSensorNr()              // sensor_id/module_id
+              << gemHit->GetSensorNr()     << ","   // sensor_id/module_id
+              << idx                       << ","   // TCloneArray Index
+              << gemHitsLinks                       // or mvdHitsLinks
               << std::endl;
 
 
@@ -736,7 +746,9 @@ void PndMLTracking::GenerateSttData() {
               << stthit->GetZ()            << ","   // z-position
               << stthit->GetDetectorID()   << ","   // volume_id
               << tube->GetLayerID()        << ","   // layer_id
-              << stthit->GetTubeID()                // tube_id/module_id
+              << stthit->GetTubeID()       << ","   // tube_id/module_id
+              << idx                       << ","   // TCloneArray Index
+              << sttHitsLinks                       // or sttHitsLinks
               << std::endl;
         
         
@@ -886,7 +898,9 @@ void PndMLTracking::GenerateSttSkewData() {
               //<< stthit->GetDetectorID() << ","   // volume_id (-1 for stt skewed layers)
               << (9)                       << ","   // volume_id (9 for stt)
               << tube->GetLayerID()        << ","   // layer_id
-              << stthit->GetTubeID()                // tube_id/module_id
+              << stthit->GetTubeID()       << ","   // tube_id/module_id
+              << idx                       << ","   // TCloneArray Index
+              << sttHitsLinks                       // or sttHitsLinks
               << std::endl;
         
         
