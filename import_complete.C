@@ -1,6 +1,6 @@
-int import_complete(Int_t nEvents=10, TString prefix="", TString csv_path="", Int_t Job_Id=0) {
+int import_complete(Int_t nEvents=10, TString prefix="", TString inputdir="", Int_t start_counter=0) {
     
-    std::cout << "\nFLAGS: " << nEvents << "," << prefix << "," << csv_path << "," << Job_Id << std::endl;
+    std::cout << "\nFLAGS: " << nEvents << "," << prefix << "," << inputdir << "," << start_counter << std::endl;
     
     // ROOT Files
     TString parFile     = prefix+"_par.root";
@@ -47,8 +47,8 @@ int import_complete(Int_t nEvents=10, TString prefix="", TString csv_path="", In
 	rtdb->setFirstInput(parInput1);
 	rtdb->setSecondInput(parIo1);
 	
-	// HERE OUR TASK GOES!
-    PndTrackImport *obj = new PndTrackImport(Job_Id, csv_path);
+    // HERE OUR TASK GOES!
+    PndTrackImport *obj = new PndTrackImport(start_counter, inputdir);
     fRun->AddTask(obj);
 
     // FairRunAna Init

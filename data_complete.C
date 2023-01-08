@@ -1,6 +1,6 @@
-int data_complete(Int_t nEvents=10, TString prefix="", TString csv_path="", TString flag="", Int_t Job_Id=0) {
+int data_complete(Int_t nEvents=10, TString prefix="", TString outputdir="", TString flag="", Int_t Job_Id=0) {
     
-    std::cout << "\nFLAGS: " << nEvents << "," << prefix << "," << csv_path << "," << Job_Id << "," << flag << std::endl;
+    std::cout << "\nFLAGS: " << nEvents << "," << prefix << "," << outputdir << "," << Job_Id << "," << flag << std::endl;
     
     // ROOT Files
     TString parFile     = prefix+"_par.root";
@@ -49,7 +49,7 @@ int data_complete(Int_t nEvents=10, TString prefix="", TString csv_path="", TStr
 	
 	// HERE OUR TASK GOES!
     Int_t start_counter = nEvents*Job_Id;
-    PndMLTracking *genDB = new PndMLTracking(start_counter, csv_path, flag);
+    PndMLTracking *genDB = new PndMLTracking(start_counter, outputdir, flag);
     fRun->AddTask(genDB);
 
     // FairRunAna Init

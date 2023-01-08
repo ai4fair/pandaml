@@ -53,13 +53,13 @@ fi
 # IF ARRAY_TASK Used
 if test "$SLURM_ARRAY_TASK_ID" == ""; then
     tmpdir="/tmp/"$USER
-    outprefix=$tmpdir"/"$prefix
-    run=1
+    run=0
+    outprefix=$tmpdir"/"$prefix"_"$run
     seed=$run
 else
     tmpdir="/tmp/"$USER"_"$SLURM_JOB_ID
-    outprefix=$tmpdir"/"$prefix"_"$run
     run=$SLURM_ARRAY_TASK_ID
+    outprefix=$tmpdir"/"$prefix"_"$run
     seed=$run
 fi
 
@@ -85,7 +85,7 @@ fi
 #*** Print Flags ***
 echo -e "\nLustre Home  : $LUSTRE_HOME"
 echo -e "Working Dir. : $nyx"
-echo -e "Temp Dir.    : $tmpdir"
+echo -e "Storage Dir. : $tmpdir"
 echo -e "Target Dir.  : $_target"
 echo -e "\nEvents       : $nevt"
 echo -e "Prefix       : $outprefix"
@@ -106,6 +106,9 @@ root -l -b -q $nyx"/"sim_complete.C\($nevt,\"$outprefix\",\"$gen\",$pBeam,$seed\
 echo "Started Digitization..."
 root -l -b -q $nyx"/"digi_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_digi.log" 2>&1
 
+echo "Started Skewed Correction..."
+root -l -b -q $nyx"/"skew_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_skew.log" 2>&1
+
 echo "Started Ideal Reconstruction..."
 root -l -b -q $nyx"/"recoideal_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_reco.log" 2>&1
 
@@ -118,18 +121,23 @@ echo -e "Finished Simulating..."
 #*** Storing Files ***
 echo -e "\nMoving Files from '$tmpdir' to '$_target'"
 
-cp $outprefix"_par.root" $_target
-cp $outprefix"_sim.root" $_target
-cp $outprefix"_sim.log" $_target
-cp $outprefix"_digi.root" $_target
-cp $outprefix"_digi.log" $_target
-cp $outprefix"_reco.root" $_target
-cp $outprefix"_reco.log" $_target
-cp $outprefix"_data.root" $_target
-cp $outprefix"_data.log" $_target
+# Move everything
+mv $tmpdir"/"*.root $_target
+mv $tmpdir"/"*.log $_target
+mv $tmpdir"/"*.csv $_target
 
-cp $tmpdir"/"*.csv $_target
-
+# Or, move explicitly
+# mv $outprefix"_par.root" $_target
+# mv $outprefix"_sim.root" $_target
+# mv $outprefix"_sim.log" $_target
+# mv $outprefix"_digi.root" $_target
+# mv $outprefix"_digi.log" $_target
+# mv $outprefix"_skew.root" $_target
+# mv $outprefix"_skew.log" $_target
+# mv $outprefix"_reco.root" $_target
+# mv $outprefix"_reco.log" $_target
+# mv $outprefix"_data.root" $_target
+# mv $outprefix"_data.log" $_target
 
 #*** Tidy Up ***
 rm -rf $tmpdir

@@ -5,6 +5,10 @@
 # e.g.
 # ./run 10 ftf ftf 7.1
 
+_target=data
+tmpdir="/tmp/"$USER
+
+
 # PandaRoot
 . "/home/"$USER"/gsi/pandaroot/install-v13.0.0/bin/config.sh" -p
 
@@ -43,7 +47,6 @@ fi
 
 
 # Make Sure $_target Exists
-_target=data
 if [ ! -d $_target ]; then
     mkdir -p $_target;
     echo "\nThe data dir. at '$_target' created."
@@ -51,22 +54,30 @@ else
     echo "\nThe data dir. at '$_target' exists."
 fi
 
+# Make sure $tempdir exists
+if [ ! -d $tmpdir ]; then
+    mkdir -p $tmpdir;
+    echo "\nThe temporary dir. at '$tmpdir' created."
+else
+    echo "\nThe temporary dir. at '$tmpdir' exists."
+fi
 
 # Output Prefix
-outprefix=$_target"/"$prefix
+outprefix=$tmpdir"/"$prefix
 
 # ---------------------------------------------------------------
 #                              Print Flags
 # ---------------------------------------------------------------
-
-echo "\nEvents    : $nevt"
-echo "Prefix    : $outprefix"
-echo "Decay     : $gen"
-echo "pBeam     : $pBeam"
-echo "Seed      : $seed"
+echo "Storage Dir. : $tmpdir"
+echo "Target Dir.  : $_target"
+echo "Events       : $nevt"
+echo "Prefix       : $outprefix"
+echo "Decay        : $gen"
+echo "pBeam        : $pBeam"
+echo "Seed         : $seed"
 
 # Terminate Script for Testing.
-# exit 0;
+exit 0;
 
 # ---------------------------------------------------------------
 #                            Initiate Simulaton
@@ -74,23 +85,31 @@ echo "Seed      : $seed"
 
 echo ""
 echo "Started Simulation..."
-# root -l -b -q sim_complete.C\($nevt,\"$outprefix\",\"$gen\",$pBeam,$seed\) > $outprefix"_sim.log" 2>&1
+root -l -b -q sim_complete.C\($nevt,\"$outprefix\",\"$gen\",$pBeam,$seed\) > $outprefix"_sim.log" 2>&1
 
 echo "Started Digitization..."
-# root -l -b -q digi_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_digi.log" 2>&1
+root -l -b -q digi_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_digi.log" 2>&1
 
 echo "Started Skewed Correction..."
-# root -l -b -q skew_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_skew.log" 2>&1
+root -l -b -q skew_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_skew.log" 2>&1
 
 echo "Started Ideal Reconstruction..."
-# root -l -b -q recoideal_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_reco.log" 2>&1
+root -l -b -q recoideal_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_reco.log" 2>&1
 
 echo "Started CSV Generator..."
-# root -l -b -q data_complete.C\($nevt,\"$outprefix\",\"$_target\",\"$flag\"\) > $outprefix"_data.log" 2>&1
+root -l -b -q data_complete.C\($nevt,\"$outprefix\",\"$tmpdir\",\"$flag\"\) > $outprefix"_data.log" 2>&1
 
 echo "Finished Simulation..."
 
-echo "Started Track Import..."
-root -l -b -q import_complete.C\($nevt,\"$outprefix\",\"$_target\",5000\) # > $outprefix"_import.log" 2>&1
-
 echo ""
+
+#*** Storing Files ***
+echo -e "\nMoving Files from '$tmpdir' to '$_target'"
+
+mv $tmpdir"/"*.root $_target
+mv $tmpdir"/"*.log $_target
+mv $tmpdir"/"*.csv $_target
+
+#*** Tidy Up ***
+rm -rf $tmpdir
+
