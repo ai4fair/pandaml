@@ -126,20 +126,8 @@ mv $tmpdir"/"*.root $_target
 mv $tmpdir"/"*.log $_target
 mv $tmpdir"/"*.csv $_target
 
-# Or, move explicitly
-# mv $outprefix"_par.root" $_target
-# mv $outprefix"_sim.root" $_target
-# mv $outprefix"_sim.log" $_target
-# mv $outprefix"_digi.root" $_target
-# mv $outprefix"_digi.log" $_target
-# mv $outprefix"_skew.root" $_target
-# mv $outprefix"_skew.log" $_target
-# mv $outprefix"_reco.root" $_target
-# mv $outprefix"_reco.log" $_target
-# mv $outprefix"_data.root" $_target
-# mv $outprefix"_data.log" $_target
-
 #*** Tidy Up ***
 rm -rf $tmpdir
 
 echo -e "The Script has Finished wit SLURM_JOB_ID: $run."
+
