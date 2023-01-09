@@ -1,20 +1,16 @@
 bool CheckFile(TString fn);
-int import_prod(Int_t nEvents=10, TString prefix="", TString inputdir="", Int_t start_counter=0) {
+int data_prod(Int_t nEvents=10, TString prefix="", TString outputdir="", TString flag="", Int_t Job_Id=0) {
     
-    // prefix: get sim/digi/reco root files
-    // inpudir: track cands from trackml, start_counter: starting name of track cands.
-
-    std::cout << "\nFLAGS: " << nEvents << "," << prefix << "," << inputdir << "," << start_counter << std::endl;
+    std::cout << "\nFLAGS: " << nEvents << "," << prefix << "," << outputdir << "," << Job_Id << "," << flag << std::endl;
 
     // Cluster ROOTs
-    int from = 95, to = 95;    
+    int from = 100, to = 104;    
     TString parFile  = TString::Format("%s_%d_par.root", prefix.Data(), from);
     TString simFile  = TString::Format("%s_%d_sim.root", prefix.Data(), from);
     TString digiFile = TString::Format("%s_%d_digi.root", prefix.Data(), from);
     TString recoFile = TString::Format("%s_%d_reco.root", prefix.Data(), from);
-    TString outFile  = "out.root";  // SetOutputFile() of the FairRunAna
+    TString outFile  = "out.root";  // dummy file for FairRunAna
 
-    cout << "simFile: " <<  simFile << endl;
 
     // Initialization
     FairLogger::GetLogger()->SetLogToFile(kFALSE);
@@ -25,22 +21,22 @@ int import_prod(Int_t nEvents=10, TString prefix="", TString inputdir="", Int_t 
     // (1) Add First File to FairFileSource
     FairFileSource *fSrc = new FairFileSource(simFile);
 
-    // (2) Add Rest Files to FairFileSource as AddFile() and AddFriend()
+    // (2) Add Rest Files to FairFileSource as AddFriend
     for (int i=from+1; i<=to; ++i) {
         TString simFile  = TString::Format("%s_%d_sim.root", prefix.Data(), i);
-        if (CheckFile(simFile)) {fSrc->AddFile(simFile); cout << "simFile: " <<  simFile << endl;}
+        if (CheckFile(simFile)) fSrc->AddFile(simFile);  // Mind 'AddFile()', here
     }
 
     fSrc->AddFriend(digiFile);
     for (int i=from+1; i<=to; ++i) {
         TString digiFile = TString::Format("%s_%d_digi.root", prefix.Data(), i);
-        if (CheckFile(digiFile)) {fSrc->AddFriend(digiFile); cout << "digiFile: " <<  simFile << endl;}
+        if (CheckFile(digiFile)) fSrc->AddFriend(digiFile);  // Mind 'AddFriend()', here
     }
 
     fSrc->AddFriend(recoFile);
     for (int i=from+1; i<=to; ++i) {
         TString recoFile = TString::Format("%s_%d_reco.root", prefix.Data(), i);
-        if (CheckFile(recoFile)) {fSrc->AddFriend(recoFile); cout << "recoFile: " <<  simFile << endl;}
+        if (CheckFile(recoFile)) fSrc->AddFriend(recoFile);  // Mind 'AddFriend()', here
     }
 
     fRun->SetSource(fSrc);
@@ -65,8 +61,9 @@ int import_prod(Int_t nEvents=10, TString prefix="", TString inputdir="", Int_t 
     rtdb->setSecondInput(parIo1);
 
     // HERE OUR TASK GOES!
-    PndTrackImport *obj = new PndTrackImport(start_counter, inputdir);
-    fRun->AddTask(obj);
+    Int_t start_counter = nEvents*Job_Id;
+    PndMLTracking *genDB = new PndMLTracking(100000, outputdir, flag);
+    fRun->AddTask(genDB);
 
     // FairRunAna Init
     PndEmcMapper::Init(1);

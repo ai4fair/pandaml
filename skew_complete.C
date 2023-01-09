@@ -16,9 +16,8 @@ int skew_complete(Int_t nEvents=10, TString prefix="") {
     TString friend4      = "";
     TString output       = "skew";
     
-    
-     //----- Init Settings
-    PndMasterRunAna *fRun= new PndMasterRunAna();
+    //----- Init Settings
+    PndMasterRunAna *fRun = new PndMasterRunAna();
     fRun->SetInput(input);
     fRun->AddFriend(friend1);
     fRun->AddFriend(friend2);
