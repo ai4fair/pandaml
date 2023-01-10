@@ -56,6 +56,8 @@ PndTrackImport::PndTrackImport(int start_counter, TString csv_path)
     , fCsvFilesPath(csv_path)
     , fMCTrackBranchID(-1)
     , fMCTrackArray(nullptr)
+    //, fBarrelTrackBranchID(-1)      // formerly SttMvdGemTrack
+    //, fBarrelTrackArray(nullptr)    // formerly SttMvdGemTrack
     , fMvdPointBranchID(-1)
     , fMvdPointArray(nullptr)
     , fMvdHitsPixelBranchID(-1)
@@ -70,10 +72,6 @@ PndTrackImport::PndTrackImport(int start_counter, TString csv_path)
     , fSttPointArray(nullptr)
     , fSttHitBranchID(-1)           // SttHitBranchID
     , fSttHitArray(nullptr)         // SttHitArray
-    , fSttSkewHitBranchID(-1)       // SttSkewHitBranchID
-    , fSttSkewHitArray(nullptr)     // SttSkewHitArray
-    //, fBarrelTrackBranchID(-1)      // formerly SttMvdGemTrack
-    //, fBarrelTrackArray(nullptr)    // formerly SttMvdGemTrack
     , fSttParameters(nullptr)
     , fEventHeader(nullptr)
     , fTubeArray(nullptr) 
@@ -152,18 +150,12 @@ InitStatus PndTrackImport::Init() {
     fSttHitArray = (TClonesArray*) ioman->GetObject("STTHit");
     fSttHitBranchID = ioman->GetBranchId("STTHit");
     
-    //Access STTCombinedSkewedHits Branches and their Ids
-    fSttSkewHitArray = (TClonesArray*) ioman->GetObject("STTCombinedSkewedHits");
-    fSttSkewHitBranchID = ioman->GetBranchId("STTCombinedSkewedHits");
-    
     
     // TODO:  Adding PndTrack and PndTrackCand
     // Create and register PndTrack and PndTrackCand arrays
     //fBarrelTrackArray = new TClonesArray("PndTrack", 100);
     //ioman->Register("BarrelTrack", "Barrel Track", fBarrelTrackArray, GetPersistency());
 
-    
-    
     std::cout << "-I- PndTrackImport: Initialisation successful" << std::endl;
     return kSUCCESS;
 
@@ -180,12 +172,10 @@ void PndTrackImport::Exec(Option_t* /*opt*/) {
     TString filename = prefix+".root";
     
     std::cout << "\nProcessing Event: " << (fEventId) << " with Prefix: " << prefix << std::endl;
-    
 
     // RDataFrame from CSVs
     // auto rdf = ROOT::RDF::FromCSV(filename);             // Root v6.26    
     // auto rdf = ROOT::RDF::MakeCsvDataFrame(filename);    // Root v6.22
-    
     
     // TTree from CSVs
     // TTree *t = new TTree("t", "Track Cand");
@@ -193,57 +183,120 @@ void PndTrackImport::Exec(Option_t* /*opt*/) {
     
     
     // Reading TTree from ROOT
-    TFile *myFile = TFile::Open(filename);
-    TTreeReader myReader("TrackML", myFile);
-
+    TFile *f = TFile::Open(filename);
+    
+    // Get TTree from TFile (It already has a TTree)
+    TTree *t = (TTree*)f->Get("TrackML");
+    
+    // Or, TTreeReader to get an iterator over TTree
+    TTreeReader myReader("TrackML", f);
     TTreeReaderValue<int> hit_id(myReader, "hit_id");           // or cids
     TTreeReaderValue<long long> track_id(myReader, "track_id");
     
     // Set to Unique Track Ids
-    std::set<long long> unique_track_ids;
+    std::set<int> unique_tracks;
     
     // Multimap for TrackCand
-	std::unordered_multimap<int, long long> umap_track_cands;
+	std::unordered_multimap<int, int> umap_track_cands;
 	
+	// Map for TrackCand
+    std::map<int, std::vector<int> > map_track_cands;
 	
+	// PndTrackCand
+	std::map<int, PndTrackCand*> mycands;
     
-    // Loop over all entries of the TTree or TChain.
+    // Fill Up
     while (myReader.Next()) {
         
-        // Just access the data as if they were iterators (note the '*' in front of them):
-        // cout  << "hit_id: " << *hit_id << ", track_id: " << *track_id << endl;
+        int tid = int(*track_id);
+        int hid = *hit_id;
         
-        // How about making a C++ Map so one can fetch a track_id with all of its hits
+        // Unique Tracks
+        unique_tracks.insert(tid);
         
-        // Insert TrackCand
-        umap_track_cands.insert({*track_id, *hit_id});
-        unique_track_ids.insert(*track_id);
+        // UMap: TrackCands
+        umap_track_cands.insert({tid, hid});
         
-    }
+        // Map: TrackCands
+        map_track_cands[tid].push_back(hid);
+        
+        // Map: PndTrackCands
+        //if(mycands[tid]==nullptr) {
+        //    mycands[tid] = new PndTrackCand(); 
+        //}
+        
+        
+        //PndTrackCand* myT = mycands[tid];
+
+        //... get hit pointer from hitID & Pandaroot
+        //myT->AddHit(...);
+      
+    }  
     
+     
+     
+     
+    cout << "TrackML TTree Size: " << t->GetEntries() << endl;
+    cout << "fSttHitArray Size : " << fSttHitArray->GetEntries() << endl;
     
-    // Test Multimap and Set
-    std::cout << "\nSet Elements:" << std::endl;
-	for (auto const& iter : unique_track_ids) {  // c++11 
+    // Display Unique Tracks
+    std::cout << "\nUnique Track IDs:" << std::endl;
+	for (auto const& iter : unique_tracks) {  // c++11 
     	std::cout << ' ' << iter; 
     }
     
-    // Find list of hits for a track?
-    // Lets filter values based on certain key
+        
+    // Filter UMap
+    /*
 	std::cout << "\nFilter Values for a Key:" << std::endl;
     auto range = umap_track_cands.equal_range(0);
     for (auto it = range.first; it != range.second; ++it) {
         std::cout << it->first << ' ' << it->second << '\n';
     }
+    */
+    
+    /* RALF:
+    
+    std::map<int, std::vector<int> > map_track_cands;
+    while(){
+      map_track_cands[*trID].push_pack(*hitID):
+    }
+    ... loop map and create track Cands
+
+
+      ----- OR
+
+
+    std::map<PndTrackCand*> mycands;
+    while(){
+
+      if(mycands[*trID]==nullptr) {
+        mycands[*trID] = new PndTrackCand(...); 
+      }
+
+      PndTrackCand* myT = mycands[*trID];
+
+      ... get hit pointer from hitID & Pandaroot
+      myT->AddHit(...);
+    }
+    
+    */
+    
+    // Track Candidates
+	std::cout << "\nTrack Cands:" << std::endl;
+	for (auto const &iter : map_track_cands) {  // c++11
+	 
+    	std::cout << iter.first << ':' ;
+    	
+    	for(auto const& iter1: iter.second) 
+        	std::cout << ' ' << iter1;
+        	
+        cout << endl;
+    }
     
     
     
-    
-    
-    
-    
-    
-    std::cout << " Finishing Event: " << (fEventId) << " with Prefix: " << prefix << std::endl;
+    std::cout << "Finishing Event: " << (fEventId) << " with Prefix: " << prefix << std::endl;
     
     // Finishing
     fEventId++;
