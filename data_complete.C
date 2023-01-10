@@ -22,7 +22,7 @@ int data_complete(Int_t nEvents=10, TString prefix="", TString outputdir="", TSt
     fSrc->AddFriend(digiFile);
 
     // Add Friend File to FairFileSource
-    fSrc->AddFriend(skewFile);
+    // fSrc->AddFriend(skewFile);
 
     // Add Friend File to FairFileSource
     fSrc->AddFriend(recoFile);

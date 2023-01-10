@@ -106,8 +106,8 @@ root -l -b -q $nyx"/"sim_complete.C\($nevt,\"$outprefix\",\"$gen\",$pBeam,$seed\
 echo "Started Digitization..."
 root -l -b -q $nyx"/"digi_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_digi.log" 2>&1
 
-echo "Started Skewed Correction..."
-root -l -b -q $nyx"/"skew_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_skew.log" 2>&1
+# echo "Started Skewed Correction..."
+# root -l -b -q $nyx"/"skew_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_skew.log" 2>&1
 
 echo "Started Ideal Reconstruction..."
 root -l -b -q $nyx"/"recoideal_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_reco.log" 2>&1

@@ -260,8 +260,8 @@ void PndMLTracking::Exec(Option_t* /*opt*/) {
             << "volume_id" << ","       // e.g. STT (sub-detectors)
             << "layer_id"  << ","       // e.g. layer_id in STT
             << "module_id" << ","       // e.g. module_id==tube_id
-            << "tclone_id" << ","       // e.g. TCloneArray Index
-            << "fair_link"              // e.g. FairLinks= sttHitsLinks
+            << "tclone_id"              // e.g. TCloneArray Index
+            //<< "fair_link"            // e.g. FairLinks= sttHitsLinks
             << std::endl;
     
     /* ------------------------------------------------------------------------
@@ -366,12 +366,12 @@ void PndMLTracking::Exec(Option_t* /*opt*/) {
     *                       Add CSV Data according to Header
     *  ********************************************************************* */
     
-    GenerateMvdPixelData();
-    GenerateMvdStripData();
-    GenerateGemData();
+    //GenerateMvdPixelData();
+    //GenerateMvdStripData();
+    //GenerateGemData();
     
     GenerateSttData();
-    GenerateSttSkewData();
+    //GenerateSttSkewData();
     
     GenerateParticlesData();
     
@@ -489,7 +489,6 @@ void PndMLTracking::GenerateMvdPixelData() {
 }//GenerateMvdPixelData
 
 
-
 void PndMLTracking::GenerateMvdStripData() { 
     
     std::cout << "-I- PndMLTracking: Runing GenerateMvdStripData()" << std::endl;   
@@ -591,7 +590,6 @@ void PndMLTracking::GenerateMvdStripData() {
 }//GenerateMvdStripData
 
 
-
 /* GenerateGemData() */
 void PndMLTracking::GenerateGemData() { 
     
@@ -625,7 +623,7 @@ void PndMLTracking::GenerateGemData() {
         if (mctrack == 0) {continue;}
         
         // Terminate if not Primary
-        // if (!mctrack->IsGeneratorCreated())
+        //if (!mctrack->IsGeneratorCreated())
         //    continue;
         
         
@@ -725,8 +723,8 @@ void PndMLTracking::GenerateSttData() {
         if (mctrack == 0) {continue;}
         
         // Terminate if not Primary
-        // if (!mctrack->IsGeneratorCreated())
-        //    continue;
+        if (!mctrack->IsGeneratorCreated())
+            continue;
         
         // Hit Counter (very important in case number of tracks vary per event)
         fHitId++;
@@ -747,8 +745,8 @@ void PndMLTracking::GenerateSttData() {
               << stthit->GetDetectorID()   << ","   // volume_id
               << tube->GetLayerID()        << ","   // layer_id
               << stthit->GetTubeID()       << ","   // tube_id/module_id
-              << idx                       << ","   // TCloneArray Index
-              << sttHitsLinks                       // or sttHitsLinks
+              << idx                                // TCloneArray Index
+              //<< sttHitsLinks                       // or sttHitsLinks
               << std::endl;
         
         
@@ -846,6 +844,78 @@ void PndMLTracking::GenerateSttData() {
     
 }//end-GenerateSttData()
 
+
+/* GenerateParticlesData() */
+void PndMLTracking::GenerateParticlesData() {
+    
+    // Write to xxx-particles.csv (Using IdealTrackFinder)
+    // ---------------------------------------------------------------------------
+    
+    if (fAssistedByIdeal.Contains("WithIdeal")) {
+        
+        std::cout << "-I- PndMLTracking: Running GenerateParticlesData()" << std::endl;
+        std::cout << "-I- PndMLTracking: Running IdealTrackFinder for Particles" << std::endl;
+        
+        FairMultiLinkedData linksMC, linksMVDPixel,linksMVDStrip,linksGEM,linksSTT;
+        
+        // Get FairRootManager Instance
+        FairRootManager *ioman = FairRootManager::Instance();
+        
+        // Loop over ideal tracks i.e. BarrelTrackArray
+        for (Int_t idx = 0; idx < fBarrelTrackArray->GetEntries(); idx++) { //loop over trackarray
+                        
+            // Fetch a PndTrack from the fBarrelTrackArray
+            PndTrack *barrelTrack = (PndTrack *)fBarrelTrackArray->At(idx);
+            
+            // Create the links between the BarrelTrack and the MCTrack
+            linksMC = barrelTrack->GetLinksWithType(ioman->GetBranchId("MCTrack")); 
+            
+            // Here, linksMC.GetNLinks()==1 always.
+            if (linksMC.GetNLinks()>0) {
+                for (Int_t i=0; i<linksMC.GetNLinks(); i++) {
+                    if (linksMC.GetLink(i).GetIndex()==barrelTrack->GetTrackCand().getMcTrackId()) {
+                        PndMCTrack *mcTrack = (PndMCTrack *)ioman->GetCloneOfLinkData(linksMC.GetLink(i));
+                        
+                        // Get Only Primary Tracks
+                        if (mcTrack->IsGeneratorCreated()) {
+
+                            // Links of Primary Tracks
+                            linksMVDPixel = barrelTrack->GetLinksWithType(ioman->GetBranchId("MVDHitsPixel"));
+                            linksMVDStrip = barrelTrack->GetLinksWithType(ioman->GetBranchId("MVDHitsPixel"));
+                            linksGEM = barrelTrack->GetLinksWithType(ioman->GetBranchId("GEMHit"));
+                            linksSTT = barrelTrack->GetLinksWithType(ioman->GetBranchId("STTHit"));
+                            
+                            Int_t Nhits = (linksMVDPixel.GetNLinks()+linksMVDStrip.GetNLinks()+linksGEM.GetNLinks()+linksSTT.GetNLinks());
+                            // If the number of STT hits greater than 0, write MC track to file!! if linksSTT.GetNLinks() > 0
+
+                            // CSV:: Writting Info to CSV File.
+                            fParticles  << (std::to_string(linksMC.GetLink(i).GetIndex() + 1)) << "," // track_id > 0
+                                        << (mcTrack->GetStartVertex()).X() << ","   // vx = start x [cm, ns]
+                                        << (mcTrack->GetStartVertex()).Y() << ","   // vy = start y [cm, ns]
+                                        << (mcTrack->GetStartVertex()).Z() << ","   // vz = start z [cm, ns]
+                                        << (mcTrack->GetMomentum()).X()    << ","   // px = x-component of track momentum
+                                        << (mcTrack->GetMomentum()).Y()    << ","   // py = y-component of track momentum
+                                        << (mcTrack->GetMomentum()).Z()    << ","   // pz = z-component of track momentum
+                                        << ((mcTrack->GetPdgCode()>0)?1:-1)<< ","   // q = charge of mu-/mu+
+                                        << Nhits                           << ","   // nhits in MVD+GEM+STT
+                                        << mcTrack->GetPdgCode()           << ","   // pdgcode e.g. mu- has pdgcode=-13
+                                        << mcTrack->GetStartTime()         << ","   // start_time = start time of particle track
+                                        << mcTrack->IsGeneratorCreated()            // If a particle is primary or not
+                                        << std::endl;
+                                        
+                           }//end-IsGeneratorCreated()
+                            
+                        }//end-if(GetLink(i))
+                        
+                    }//end-for(GetNLinks)
+                }//end-if(GetNLinks)
+        }//end-for (barrelTrack)        
+    }//particles by IdealTrackFinder
+    
+    else
+        std::cout << "-I- PndMLTracking: Skipping IdealTrackFinder for Particles" << std::endl;
+
+}//GenerateParticlesData
 
 
 /* GenerateSttSkewedData() */
@@ -998,79 +1068,6 @@ void PndMLTracking::GenerateSttSkewData() {
     }//SttHitArray
     
 }//end-GenerateSttSkewedData()
-
-
-/* GenerateParticlesData() */
-void PndMLTracking::GenerateParticlesData() {
-    
-    // Write to xxx-particles.csv (Using IdealTrackFinder)
-    // ---------------------------------------------------------------------------
-    
-    if (fAssistedByIdeal.Contains("WithIdeal")) {
-        
-        std::cout << "-I- PndMLTracking: Running GenerateParticlesData()" << std::endl;
-        std::cout << "-I- PndMLTracking: Running IdealTrackFinder for Particles" << std::endl;
-        
-        FairMultiLinkedData linksMC, linksMVDPixel,linksMVDStrip,linksGEM,linksSTT;
-        
-        // Get FairRootManager Instance
-        FairRootManager *ioman = FairRootManager::Instance();
-        
-        // Loop over ideal tracks i.e. BarrelTrackArray
-        for (Int_t idx = 0; idx < fBarrelTrackArray->GetEntries(); idx++) { //loop over trackarray
-                        
-            // Fetch a PndTrack from the fBarrelTrackArray
-            PndTrack *barrelTrack = (PndTrack *)fBarrelTrackArray->At(idx);
-            
-            // Create the links between the BarrelTrack and the MCTrack
-            linksMC = barrelTrack->GetLinksWithType(ioman->GetBranchId("MCTrack")); 
-            
-            // Here, linksMC.GetNLinks()==1 always.
-            if (linksMC.GetNLinks()>0) {
-                for (Int_t i=0; i<linksMC.GetNLinks(); i++) {
-                    if (linksMC.GetLink(i).GetIndex()==barrelTrack->GetTrackCand().getMcTrackId()) {
-                        PndMCTrack *mcTrack = (PndMCTrack *)ioman->GetCloneOfLinkData(linksMC.GetLink(i));
-                        
-                        // Get Only Primary Tracks
-                        //if (mcTrack->IsGeneratorCreated()) {
-
-                            // Links of Primary Tracks
-                            linksMVDPixel = barrelTrack->GetLinksWithType(ioman->GetBranchId("MVDHitsPixel"));
-                            linksMVDStrip = barrelTrack->GetLinksWithType(ioman->GetBranchId("MVDHitsPixel"));
-                            linksGEM = barrelTrack->GetLinksWithType(ioman->GetBranchId("GEMHit"));
-                            linksSTT = barrelTrack->GetLinksWithType(ioman->GetBranchId("STTHit"));
-                            
-                            Int_t Nhits = (linksMVDPixel.GetNLinks()+linksMVDStrip.GetNLinks()+linksGEM.GetNLinks()+linksSTT.GetNLinks());
-                            // If the number of STT hits greater than 0, write MC track to file!! if linksSTT.GetNLinks() > 0
-
-                            // CSV:: Writting Info to CSV File.
-                            fParticles  << (std::to_string(linksMC.GetLink(i).GetIndex() + 1)) << "," // track_id > 0
-                                        << (mcTrack->GetStartVertex()).X() << ","   // vx = start x [cm, ns]
-                                        << (mcTrack->GetStartVertex()).Y() << ","   // vy = start y [cm, ns]
-                                        << (mcTrack->GetStartVertex()).Z() << ","   // vz = start z [cm, ns]
-                                        << (mcTrack->GetMomentum()).X()    << ","   // px = x-component of track momentum
-                                        << (mcTrack->GetMomentum()).Y()    << ","   // py = y-component of track momentum
-                                        << (mcTrack->GetMomentum()).Z()    << ","   // pz = z-component of track momentum
-                                        << ((mcTrack->GetPdgCode()>0)?1:-1)<< ","   // q = charge of mu-/mu+
-                                        << Nhits                           << ","   // nhits in MVD+GEM+STT
-                                        << mcTrack->GetPdgCode()           << ","   // pdgcode e.g. mu- has pdgcode=-13
-                                        << mcTrack->GetStartTime()         << ","   // start_time = start time of particle track
-                                        << mcTrack->IsGeneratorCreated()            // If a particle is primary or not
-                                        << std::endl;
-                                        
-                           // }//end-IsGeneratorCreated()
-                            
-                        }//end-if(GetLink(i))
-                        
-                    }//end-for(GetNLinks)
-                }//end-if(GetNLinks)
-        }//end-for (barrelTrack)        
-    }//particles by IdealTrackFinder
-    
-    else
-        std::cout << "-I- PndMLTracking: Skipping IdealTrackFinder for Particles" << std::endl;
-
-}//GenerateParticlesData
 
 
 /* FinishTask() */
