@@ -225,7 +225,7 @@ void PndMLTracking::Exec(Option_t* /*opt*/) {
     fParticles.open(csv_path+"-particles.csv");
     fCells.open(csv_path+"-cells.csv");
     
-    std::cout << "\nProcessing Event: " << csv_path << std::endl;
+    std::cout << "\n-I- Processing Event: " << fEventId << std::endl;
     
     /* ***********************************************************************
     *                          Add CSV Header
@@ -381,13 +381,412 @@ void PndMLTracking::Exec(Option_t* /*opt*/) {
     fParticles.close();
     fCells.close();
     
-    std::cout << "Finishing Event: " << (fEventId) << " with Prefix: " << "event"+fidx << std::endl;
+    std::cout << "-I- Finishing Event: " << (fEventId) << " with Hits: " << fHitId << std::endl;
     
     //Reset Counters
     fHitId = 0;
     fEventId++;
 
 }//end-Exec()
+
+
+/* GenerateSttData() */
+void PndMLTracking::GenerateSttData() {
+    
+    std::cout << "-I- Runing GenerateSttData()" << std::endl;
+    std::cout << "-I- The Size of SttHitArray: " << fSttHitArray->GetEntries() << std::endl;
+    
+    // SttHitArray
+    if (fSttHitArray->GetEntries()==0)
+         std::cout << "Warning! SttHitArray is Empty." << std::endl;
+    
+    for (int idx=0; idx < fSttHitArray->GetEntries(); idx++) {
+            
+        // Get FairRootManager Instance
+        FairRootManager *ioman = FairRootManager::Instance();
+
+        // Get sttHitsLinks from STTHit
+        FairMultiLinkedData_Interface *sttHitsLinks = (FairMultiLinkedData_Interface*)fSttHitArray->At(idx);
+
+        // Get sttPointLinks & Data (TCloneArray) from sttHitsLinks
+        FairMultiLinkedData sttPointLinks = sttHitsLinks->GetLinksWithType(fSttPointBranchID);
+        FairMCPoint *sttpoint = (FairMCPoint*)ioman->GetCloneOfLinkData(sttPointLinks.GetLink(0));
+        
+        // Terminate if sttpoint=NULL
+        if (sttpoint == 0) {continue;}
+        
+        // Get mcTrackLinks & Data (TCloneArray) from sttpoint (OR sttPointLinks?)
+        FairMultiLinkedData mcTrackLinks = sttpoint->GetLinksWithType(fMCTrackBranchID); 
+        PndMCTrack *mctrack = (PndMCTrack*)ioman->GetCloneOfLinkData(mcTrackLinks.GetLink(0));
+        
+        // Terminate if mcTrack=NULL
+        if (mctrack == 0) {continue;}
+        
+        // Terminate if not Primary
+        if (!mctrack->IsGeneratorCreated())
+            continue;
+        
+        // Get STTHit
+        PndSttHit* stthit = (PndSttHit*)fSttHitArray->At(idx);
+        PndSttTube *tube = (PndSttTube*) fTubeArray->At(stthit->GetTubeID());
+        
+        // Remove Skewed Hits
+        // if (tube->IsSkew()) {continue;}
+        
+        
+        // Hit Counter (Always Start from 1 to N)
+        fHitId++;
+        
+        // See if HitId, SttHitArray Id
+        // std::cout << "SttHitArray Id: " << idx << " fHitId: " << fHitId << std::endl;
+        
+        // Write to xxx-hits.csv
+        // ---------------------------------------------------------------------------        
+        fHits << fHitId                    << ","   // hit_id
+              << stthit->GetX()            << ","   // x-position
+              << stthit->GetY()            << ","   // y-position
+              << stthit->GetZ()            << ","   // z-position
+              << stthit->GetDetectorID()   << ","   // volume_id
+              << tube->GetLayerID()        << ","   // layer_id
+              << stthit->GetTubeID()       << ","   // tube_id/module_id
+              << idx                                // TCloneArray Index
+              //<< sttHitsLinks                       // or sttHitsLinks
+              << std::endl;
+        
+        
+        // Write to xxx-truth.csv
+        // ---------------------------------------------------------------------------
+        
+        // Get Particle Id
+        TString particle_id = "";
+        std::vector<FairLink> mcTrackLinks_sorted = sttHitsLinks->GetSortedMCTracks();
+         
+        for (unsigned int trackIndex = 0; trackIndex < mcTrackLinks_sorted.size(); trackIndex++) {
+            
+            // Append "particle_id" to xxx-truth.csv
+            particle_id = std::to_string(mcTrackLinks_sorted[trackIndex].GetIndex() + 1);
+        }
+        
+         fTruths << fHitId                 << ","   // hit_id  
+                << sttpoint->GetX()        << ","   // tx = true x
+                << sttpoint->GetY()        << ","   // ty = true y
+                << sttpoint->GetZ()        << ","   // tz = true z
+                << sttpoint->GetPx()       << ","   // tpx = true px
+                << sttpoint->GetPy()       << ","   // tpy = true py
+                << sttpoint->GetPz()       << ","   // tpz = true pz
+                << (1.0)                   << ","   // Weight placeholder (sum of weights of hits in track == 1)
+                << particle_id                      // Particle_id from above   
+                << std::endl;    
+
+
+        // Write to xxx-cells.csv
+        // ---------------------------------------------------------------------------
+        fCells  << fHitId                  << ","   // hit_id
+                << stthit->GetDepCharge()  << ","   // deposited charge 
+                << stthit->GetEnergyLoss() << ","   // energy loss (silicon)
+                << stthit->GetDetectorID() << ","   // volume_id
+                << tube->GetLayerID()      << ","   // layer_id
+                << stthit->GetTubeID()     << ","   // module_id
+                << tube->GetSectorID()     << ","   // sector_id
+                << stthit->GetIsochrone()  << ","   // isochrone
+                << tube->IsSkew()                   // skewed
+                << std::endl;
+
+
+
+        // Write to xxx-particles.csv
+        // ---------------------------------------------------------------------------
+        
+        /** -----------------------------------------------------------------------
+        * FIXME: The issue is fParticles should contain unique particle_ids (tracks)
+        * e.g. if there are 10 particles/event then it should contain only 10 records.
+        * But right now fParticles contain a particle records which are equal to the
+        * size of fSttHitArray. Which mean there will be repition of data in the file.
+        * One solution might be to write the fParticles outside of fSttHitArray. So I
+        * shifted the this piece of code outside of fSttHitArray loop. Note, however, 
+        * that if MVD and GEM are also included then fParticles should be generated in 
+        * Exec() rather than GenerateMvdData()/GenerateGemData() or GenerateSttData()
+        * ---------------------------------------------------------------------- */
+        
+        // NOTE: In particle.csv dataframe, count duplicate particle_ids and add this 
+        // number as nhits. After that one can drop_duplicates from particle dataframe.
+        
+
+        //std::cout << "Number of MCTracks (fParticles): " << mcTrackLinks_sorted.size() << std::endl;
+        //std::vector<FairLink> mcTrackLinks_sorted = sttHitsLinks->GetSortedMCTracks();
+        
+        if (fAssistedByIdeal.Contains("WithoutIdeal")) {
+            for (unsigned int trackIndex=0; trackIndex < mcTrackLinks_sorted.size(); trackIndex++) {
+            
+                // Fetch mcTrack associated with SttHit
+                PndMCTrack *mcTrack = (PndMCTrack*)ioman->GetCloneOfLinkData(mcTrackLinks_sorted[trackIndex]);
+                
+                // std::cout << "No. of MCPoints in STT: " << mcTrack->GetNPoints(DetectorID::kSTT) << std::endl;
+                
+                // CSV:: Writting Info to CSV File. 
+                fParticles  << std::to_string(mcTrackLinks_sorted[trackIndex].GetIndex() + 1)   
+                                                                       << ","   // track_id > 0
+                            << (mcTrack->GetStartVertex()).X()         << ","   // vx = start x
+                            << (mcTrack->GetStartVertex()).Y()         << ","   // vy = start y
+                            << (mcTrack->GetStartVertex()).Z()         << ","   // vz = start z
+                            << (mcTrack->GetMomentum()).X()            << ","   // px = x-component of track momentum
+                            << (mcTrack->GetMomentum()).Y()            << ","   // py = y-component of track momentum
+                            << (mcTrack->GetMomentum()).Z()            << ","   // pz = z-component of track momentum
+                            << ((mcTrack->GetPdgCode()>0)?1:-1)        << ","   // q = charge of mu-/mu+
+                            // <<mcTrack->GetNPoints(DetectorId::kSTT) << ","   // FIXME: nhits in STT (Not tested yet).
+                            << 1                                       << ","   // FIXME: nhits==1 (just a placeholder)
+                            << mcTrack->GetPdgCode()                   << ","   // pdgcode e.g. mu- has pdgcode=-13
+                            << mcTrack->GetStartTime()                 << ","   // start_time = start time of particle track
+                            << mcTrack->IsGeneratorCreated()                    // flag 'primary' particle
+                            << std::endl;
+                  
+                delete (mcTrack);
+                
+            }//McTracks
+        }//fAssistedByIdeal
+    }//SttHitArray
+    
+}//end-GenerateSttData()
+
+
+/* GenerateParticlesData() */
+void PndMLTracking::GenerateParticlesData() {
+    
+    // Write to xxx-particles.csv (Using IdealTrackFinder)
+    // ---------------------------------------------------------------------------
+    
+    if (fAssistedByIdeal.Contains("WithIdeal")) {
+        
+        std::cout << "-I- Running GenerateParticlesData()" << std::endl;
+        //std::cout << "-I- Running IdealTrackFinder for fParticles" << std::endl;
+        
+        FairMultiLinkedData linksMC, linksMVDPixel,linksMVDStrip,linksGEM,linksSTT;
+        
+        // Get FairRootManager Instance
+        FairRootManager *ioman = FairRootManager::Instance();
+        
+        // Loop over ideal tracks i.e. BarrelTrackArray
+        for (Int_t idx = 0; idx < fBarrelTrackArray->GetEntries(); idx++) { //loop over trackarray
+                        
+            // Fetch a PndTrack from the fBarrelTrackArray
+            PndTrack *barrelTrack = (PndTrack *)fBarrelTrackArray->At(idx);
+            
+            // Create the links between the BarrelTrack and the MCTrack
+            linksMC = barrelTrack->GetLinksWithType(ioman->GetBranchId("MCTrack")); 
+            
+            // Here, linksMC.GetNLinks()==1 always.
+            if (linksMC.GetNLinks()>0) {
+                for (Int_t i=0; i<linksMC.GetNLinks(); i++) {
+                    if (linksMC.GetLink(i).GetIndex()==barrelTrack->GetTrackCand().getMcTrackId()) {
+                        PndMCTrack *mcTrack = (PndMCTrack *)ioman->GetCloneOfLinkData(linksMC.GetLink(i));
+                        
+                        // Get Only Primary Tracks
+                        if (mcTrack->IsGeneratorCreated()) {
+
+                            // Links of Primary Tracks
+                            linksMVDPixel = barrelTrack->GetLinksWithType(ioman->GetBranchId("MVDHitsPixel"));
+                            linksMVDStrip = barrelTrack->GetLinksWithType(ioman->GetBranchId("MVDHitsPixel"));
+                            linksGEM = barrelTrack->GetLinksWithType(ioman->GetBranchId("GEMHit"));
+                            linksSTT = barrelTrack->GetLinksWithType(ioman->GetBranchId("STTHit"));
+                            
+                            Int_t Nhits = (linksMVDPixel.GetNLinks()+linksMVDStrip.GetNLinks()+linksGEM.GetNLinks()+linksSTT.GetNLinks());
+                            // If the number of STT hits greater than 0, write MC track to file!! if linksSTT.GetNLinks() > 0
+
+                            // CSV:: Writting Info to CSV File.
+                            fParticles  << (std::to_string(linksMC.GetLink(i).GetIndex() + 1)) << "," // track_id > 0
+                                        << (mcTrack->GetStartVertex()).X() << ","   // vx = start x [cm, ns]
+                                        << (mcTrack->GetStartVertex()).Y() << ","   // vy = start y [cm, ns]
+                                        << (mcTrack->GetStartVertex()).Z() << ","   // vz = start z [cm, ns]
+                                        << (mcTrack->GetMomentum()).X()    << ","   // px = x-component of track momentum
+                                        << (mcTrack->GetMomentum()).Y()    << ","   // py = y-component of track momentum
+                                        << (mcTrack->GetMomentum()).Z()    << ","   // pz = z-component of track momentum
+                                        << ((mcTrack->GetPdgCode()>0)?1:-1)<< ","   // q = charge of mu-/mu+
+                                        << Nhits                           << ","   // nhits in MVD+GEM+STT
+                                        << mcTrack->GetPdgCode()           << ","   // pdgcode e.g. mu- has pdgcode=-13
+                                        << mcTrack->GetStartTime()         << ","   // start_time = start time of particle track
+                                        << mcTrack->IsGeneratorCreated()            // If a particle is primary or not
+                                        << std::endl;
+                                        
+                           }//end-IsGeneratorCreated()
+                            
+                        }//end-if(GetLink(i))
+                        
+                    }//end-for(GetNLinks)
+                }//end-if(GetNLinks)
+        }//end-for (barrelTrack)        
+    }//particles by IdealTrackFinder
+    
+    else
+        std::cout << "-I- Skipping IdealTrackFinder for Particles" << std::endl;
+
+}//GenerateParticlesData
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* GenerateSttSkewedData() */
+void PndMLTracking::GenerateSttSkewData() {
+    
+    std::cout << "-I- PndMLTracking: Runing GenerateSttSkewData()" << std::endl;
+    
+    // SttSkewHitArray
+    if (fSttSkewHitArray->GetEntries()==0)
+         std::cout << "Warning! SttSkewHitArray is Empty." << std::endl;
+         
+    for (int idx=0; idx < fSttSkewHitArray->GetEntries(); idx++) {
+
+        // Get FairRootManager Instance
+        FairRootManager *ioman = FairRootManager::Instance();
+
+        // Get sttHitsLinks from STTHit
+        FairMultiLinkedData_Interface *sttHitsLinks = (FairMultiLinkedData_Interface*)fSttSkewHitArray->At(idx);
+
+        // Get sttPointLinks & Data (TCloneArray) from sttHitsLinks
+        FairMultiLinkedData sttPointLinks = sttHitsLinks->GetLinksWithType(fSttPointBranchID);
+        FairMCPoint *sttpoint = (FairMCPoint*)ioman->GetCloneOfLinkData(sttPointLinks.GetLink(0));
+        
+        // Terminate if sttpoint=NULL
+        if (sttpoint == 0) {continue;}
+        
+        // Get mcTrackLinks & Data (TCloneArray) from sttpoint (OR sttPointLinks?)
+        FairMultiLinkedData mcTrackLinks = sttpoint->GetLinksWithType(fMCTrackBranchID); 
+        PndMCTrack *mctrack = (PndMCTrack*)ioman->GetCloneOfLinkData(mcTrackLinks.GetLink(0));
+        
+        // Terminate if mcTrack=NULL
+        if (mctrack == 0) {continue;}
+        
+        // Terminate if not Primary
+        // if (!mctrack->IsGeneratorCreated())
+        //    continue;
+        
+        // Hit Counter (very important in case number of tracks vary per event)
+        fHitId++;
+        
+        // Write to xxx-hits.csv
+        // ---------------------------------------------------------------------------
+        PndSttHit* stthit = (PndSttHit*)fSttSkewHitArray->At(idx);
+        PndSttTube *tube = (PndSttTube*) fTubeArray->At(stthit->GetTubeID());
+        
+        fHits << fHitId                    << ","   // hit_id
+              << stthit->GetX()            << ","   // x-position
+              << stthit->GetY()            << ","   // y-position
+              << stthit->GetZ()            << ","   // z-position
+              //<< stthit->GetDetectorID() << ","   // volume_id (-1 for stt skewed layers)
+              << (9)                       << ","   // volume_id (9 for stt)
+              << tube->GetLayerID()        << ","   // layer_id
+              << stthit->GetTubeID()       << ","   // tube_id/module_id
+              << idx                       << ","   // TCloneArray Index
+              << sttHitsLinks                       // or sttHitsLinks
+              << std::endl;
+        
+        
+        // Write to xxx-truth.csv
+        // ---------------------------------------------------------------------------
+        
+        // Get Particle Id
+        TString particle_id = "";
+        std::vector<FairLink> mcTrackLinks_sorted = sttHitsLinks->GetSortedMCTracks();
+         
+        for (unsigned int trackIndex = 0; trackIndex < mcTrackLinks_sorted.size(); trackIndex++) {
+            
+            // Append "particle_id" to xxx-truth.csv
+            particle_id = std::to_string(mcTrackLinks_sorted[trackIndex].GetIndex() + 1);
+        }
+        
+        fTruths << fHitId                  << ","   // hit_id  
+                << sttpoint->GetX()        << ","   // tx = true x
+                << sttpoint->GetY()        << ","   // ty = true y
+                << sttpoint->GetZ()        << ","   // tz = true z
+                << sttpoint->GetPx()       << ","   // tpx = true px
+                << sttpoint->GetPy()       << ","   // tpy = true py
+                << sttpoint->GetPz()       << ","   // tpz = true pz
+                << (1.0)                   << ","   // Weight placeholder (sum of weights of hits in track == 1)
+                << particle_id                      // Particle_id from above   
+                << std::endl;    
+
+
+        // Write to xxx-cells.csv
+        // ---------------------------------------------------------------------------
+        fCells  << fHitId                  << ","   // hit_id
+                << stthit->GetDepCharge()  << ","   // deposited charge 
+                << stthit->GetEnergyLoss() << ","   // energy loss (silicon)
+                //<< stthit->GetDetectorID()<< ","  // volume_id (-1 for stt skewed layers)
+                << (9)                     << ","   // volume_id (9 for stt)
+                << tube->GetLayerID()      << ","   // layer_id
+                << stthit->GetTubeID()     << ","   // module_id
+                << tube->GetSectorID()     << ","   // sector_id
+                << stthit->GetIsochrone()  << ","   // isochrone
+                << tube->IsSkew()                   // skewed
+                << std::endl;
+
+
+
+        // Write to xxx-particles.csv
+        // ---------------------------------------------------------------------------
+        
+        /** -----------------------------------------------------------------------
+        * FIXME: The issue is fParticles should contain unique particle_ids (tracks)
+        * e.g. if there are 10 particles/event then it should contain only 10 records.
+        * But right now fParticles contain a particle records which are equal to the
+        * size of fSttSkewHitArray. Which mean there will be repition of data in the file.
+        * One solution might be to write the fParticles outside of fSttSkewHitArray. So I
+        * shifted the this piece of code outside of fSttSkewHitArray loop. Note, however, 
+        * that if MVD and GEM are also included then fParticles should be generated in 
+        * Exec() rather than GenerateMvdData()/GenerateGemData() or GenerateSttData()
+        * ---------------------------------------------------------------------- */
+        
+        // NOTE: In particle.csv dataframe, count duplicate particle_ids and add this 
+        // number as nhits. After that one can drop_duplicates from particle dataframe.
+        
+
+        //std::cout << "Number of MCTracks (fParticles): " << mcTrackLinks_sorted.size() << std::endl;
+        //std::vector<FairLink> mcTrackLinks_sorted = sttHitsLinks->GetSortedMCTracks();
+        
+        if (fAssistedByIdeal.Contains("WithoutIdeal")) {
+            for (unsigned int trackIndex=0; trackIndex < mcTrackLinks_sorted.size(); trackIndex++) {
+            
+                // Fetch mcTrack associated with SttHit
+                PndMCTrack *mcTrack = (PndMCTrack*)ioman->GetCloneOfLinkData(mcTrackLinks_sorted[trackIndex]);
+                
+                // std::cout << "No. of MCPoints in STT: " << mcTrack->GetNPoints(DetectorID::kSTT) << std::endl;
+                
+                // CSV:: Writting Info to CSV File. 
+                fParticles  << std::to_string(mcTrackLinks_sorted[trackIndex].GetIndex() + 1)   
+                                                                       << ","   // track_id > 0
+                            << (mcTrack->GetStartVertex()).X()         << ","   // vx = start x
+                            << (mcTrack->GetStartVertex()).Y()         << ","   // vy = start y
+                            << (mcTrack->GetStartVertex()).Z()         << ","   // vz = start z
+                            << (mcTrack->GetMomentum()).X()            << ","   // px = x-component of track momentum
+                            << (mcTrack->GetMomentum()).Y()            << ","   // py = y-component of track momentum
+                            << (mcTrack->GetMomentum()).Z()            << ","   // pz = z-component of track momentum
+                            << ((mcTrack->GetPdgCode()>0)?1:-1)        << ","   // q = charge of mu-/mu+
+                            // <<mcTrack->GetNPoints(DetectorId::kSTT) << ","   // FIXME: nhits in STT (Not tested yet).
+                            << 1                                       << ","   // FIXME: nhits==1 (just a placeholder)
+                            << mcTrack->GetPdgCode()                   << ","   // pdgcode e.g. mu- has pdgcode=-13
+                            << mcTrack->GetStartTime()                 << ","   // start_time = start time of particle track
+                            << mcTrack->IsGeneratorCreated()                    // flag 'primary' particle
+                            << std::endl;
+                  
+                delete (mcTrack);
+                
+            }//McTracks
+        }//fAssistedByIdeal
+    }//SttHitArray
+    
+}//end-GenerateSttSkewedData()
 
 
 /* GenerateMvdPixelData() */
@@ -691,385 +1090,6 @@ void PndMLTracking::GenerateGemData() {
 }//GenerateGemData
 
 
-/* GenerateSttData() */
-void PndMLTracking::GenerateSttData() {
-    
-    std::cout << "-I- PndMLTracking: Runing GenerateSttData()" << std::endl;
-    
-    // SttHitArray
-    if (fSttHitArray->GetEntries()==0)
-         std::cout << "Warning! SttHitArray is Empty." << std::endl;
-         
-    for (int idx=0; idx < fSttHitArray->GetEntries(); idx++) {
-
-        // Get FairRootManager Instance
-        FairRootManager *ioman = FairRootManager::Instance();
-
-        // Get sttHitsLinks from STTHit
-        FairMultiLinkedData_Interface *sttHitsLinks = (FairMultiLinkedData_Interface*)fSttHitArray->At(idx);
-
-        // Get sttPointLinks & Data (TCloneArray) from sttHitsLinks
-        FairMultiLinkedData sttPointLinks = sttHitsLinks->GetLinksWithType(fSttPointBranchID);
-        FairMCPoint *sttpoint = (FairMCPoint*)ioman->GetCloneOfLinkData(sttPointLinks.GetLink(0));
-        
-        // Terminate if sttpoint=NULL
-        if (sttpoint == 0) {continue;}
-        
-        // Get mcTrackLinks & Data (TCloneArray) from sttpoint (OR sttPointLinks?)
-        FairMultiLinkedData mcTrackLinks = sttpoint->GetLinksWithType(fMCTrackBranchID); 
-        PndMCTrack *mctrack = (PndMCTrack*)ioman->GetCloneOfLinkData(mcTrackLinks.GetLink(0));
-        
-        // Terminate if mcTrack=NULL
-        if (mctrack == 0) {continue;}
-        
-        // Terminate if not Primary
-        if (!mctrack->IsGeneratorCreated())
-            continue;
-        
-        // Hit Counter (very important in case number of tracks vary per event)
-        fHitId++;
-        
-        // Write to xxx-hits.csv
-        // ---------------------------------------------------------------------------
-        PndSttHit* stthit = (PndSttHit*)fSttHitArray->At(idx);
-        PndSttTube *tube = (PndSttTube*) fTubeArray->At(stthit->GetTubeID());
-        
-        // TODO: Skewed Hits Correction Separately.
-        // Skip Skewed Tubes, Will handle them in GenerateSttSkewData()
-        if (tube->IsSkew()) {continue;}
-        
-        fHits << fHitId                    << ","   // hit_id
-              << stthit->GetX()            << ","   // x-position
-              << stthit->GetY()            << ","   // y-position
-              << stthit->GetZ()            << ","   // z-position
-              << stthit->GetDetectorID()   << ","   // volume_id
-              << tube->GetLayerID()        << ","   // layer_id
-              << stthit->GetTubeID()       << ","   // tube_id/module_id
-              << idx                                // TCloneArray Index
-              //<< sttHitsLinks                       // or sttHitsLinks
-              << std::endl;
-        
-        
-        // Write to xxx-truth.csv
-        // ---------------------------------------------------------------------------
-        
-        // Get Particle Id
-        TString particle_id = "";
-        std::vector<FairLink> mcTrackLinks_sorted = sttHitsLinks->GetSortedMCTracks();
-         
-        for (unsigned int trackIndex = 0; trackIndex < mcTrackLinks_sorted.size(); trackIndex++) {
-            
-            // Append "particle_id" to xxx-truth.csv
-            particle_id = std::to_string(mcTrackLinks_sorted[trackIndex].GetIndex() + 1);
-        }
-        
-         fTruths << fHitId                 << ","   // hit_id  
-                << sttpoint->GetX()        << ","   // tx = true x
-                << sttpoint->GetY()        << ","   // ty = true y
-                << sttpoint->GetZ()        << ","   // tz = true z
-                << sttpoint->GetPx()       << ","   // tpx = true px
-                << sttpoint->GetPy()       << ","   // tpy = true py
-                << sttpoint->GetPz()       << ","   // tpz = true pz
-                << (1.0)                   << ","   // Weight placeholder (sum of weights of hits in track == 1)
-                << particle_id                      // Particle_id from above   
-                << std::endl;    
-
-
-        // Write to xxx-cells.csv
-        // ---------------------------------------------------------------------------
-        fCells  << fHitId                  << ","   // hit_id
-                << stthit->GetDepCharge()  << ","   // deposited charge 
-                << stthit->GetEnergyLoss() << ","   // energy loss (silicon)
-                << stthit->GetDetectorID() << ","   // volume_id
-                << tube->GetLayerID()      << ","   // layer_id
-                << stthit->GetTubeID()     << ","   // module_id
-                << tube->GetSectorID()     << ","   // sector_id
-                << stthit->GetIsochrone()  << ","   // isochrone
-                << tube->IsSkew()                   // skewed
-                << std::endl;
-
-
-
-        // Write to xxx-particles.csv
-        // ---------------------------------------------------------------------------
-        
-        /** -----------------------------------------------------------------------
-        * FIXME: The issue is fParticles should contain unique particle_ids (tracks)
-        * e.g. if there are 10 particles/event then it should contain only 10 records.
-        * But right now fParticles contain a particle records which are equal to the
-        * size of fSttHitArray. Which mean there will be repition of data in the file.
-        * One solution might be to write the fParticles outside of fSttHitArray. So I
-        * shifted the this piece of code outside of fSttHitArray loop. Note, however, 
-        * that if MVD and GEM are also included then fParticles should be generated in 
-        * Exec() rather than GenerateMvdData()/GenerateGemData() or GenerateSttData()
-        * ---------------------------------------------------------------------- */
-        
-        // NOTE: In particle.csv dataframe, count duplicate particle_ids and add this 
-        // number as nhits. After that one can drop_duplicates from particle dataframe.
-        
-
-        //std::cout << "Number of MCTracks (fParticles): " << mcTrackLinks_sorted.size() << std::endl;
-        //std::vector<FairLink> mcTrackLinks_sorted = sttHitsLinks->GetSortedMCTracks();
-        
-        if (fAssistedByIdeal.Contains("WithoutIdeal")) {
-            for (unsigned int trackIndex=0; trackIndex < mcTrackLinks_sorted.size(); trackIndex++) {
-            
-                // Fetch mcTrack associated with SttHit
-                PndMCTrack *mcTrack = (PndMCTrack*)ioman->GetCloneOfLinkData(mcTrackLinks_sorted[trackIndex]);
-                
-                // std::cout << "No. of MCPoints in STT: " << mcTrack->GetNPoints(DetectorID::kSTT) << std::endl;
-                
-                // CSV:: Writting Info to CSV File. 
-                fParticles  << std::to_string(mcTrackLinks_sorted[trackIndex].GetIndex() + 1)   
-                                                                       << ","   // track_id > 0
-                            << (mcTrack->GetStartVertex()).X()         << ","   // vx = start x
-                            << (mcTrack->GetStartVertex()).Y()         << ","   // vy = start y
-                            << (mcTrack->GetStartVertex()).Z()         << ","   // vz = start z
-                            << (mcTrack->GetMomentum()).X()            << ","   // px = x-component of track momentum
-                            << (mcTrack->GetMomentum()).Y()            << ","   // py = y-component of track momentum
-                            << (mcTrack->GetMomentum()).Z()            << ","   // pz = z-component of track momentum
-                            << ((mcTrack->GetPdgCode()>0)?1:-1)        << ","   // q = charge of mu-/mu+
-                            // <<mcTrack->GetNPoints(DetectorId::kSTT) << ","   // FIXME: nhits in STT (Not tested yet).
-                            << 1                                       << ","   // FIXME: nhits==1 (just a placeholder)
-                            << mcTrack->GetPdgCode()                   << ","   // pdgcode e.g. mu- has pdgcode=-13
-                            << mcTrack->GetStartTime()                 << ","   // start_time = start time of particle track
-                            << mcTrack->IsGeneratorCreated()                    // flag 'primary' particle
-                            << std::endl;
-                  
-                delete (mcTrack);
-                
-            }//McTracks
-        }//fAssistedByIdeal
-    }//SttHitArray
-    
-}//end-GenerateSttData()
-
-
-/* GenerateParticlesData() */
-void PndMLTracking::GenerateParticlesData() {
-    
-    // Write to xxx-particles.csv (Using IdealTrackFinder)
-    // ---------------------------------------------------------------------------
-    
-    if (fAssistedByIdeal.Contains("WithIdeal")) {
-        
-        std::cout << "-I- PndMLTracking: Running GenerateParticlesData()" << std::endl;
-        std::cout << "-I- PndMLTracking: Running IdealTrackFinder for Particles" << std::endl;
-        
-        FairMultiLinkedData linksMC, linksMVDPixel,linksMVDStrip,linksGEM,linksSTT;
-        
-        // Get FairRootManager Instance
-        FairRootManager *ioman = FairRootManager::Instance();
-        
-        // Loop over ideal tracks i.e. BarrelTrackArray
-        for (Int_t idx = 0; idx < fBarrelTrackArray->GetEntries(); idx++) { //loop over trackarray
-                        
-            // Fetch a PndTrack from the fBarrelTrackArray
-            PndTrack *barrelTrack = (PndTrack *)fBarrelTrackArray->At(idx);
-            
-            // Create the links between the BarrelTrack and the MCTrack
-            linksMC = barrelTrack->GetLinksWithType(ioman->GetBranchId("MCTrack")); 
-            
-            // Here, linksMC.GetNLinks()==1 always.
-            if (linksMC.GetNLinks()>0) {
-                for (Int_t i=0; i<linksMC.GetNLinks(); i++) {
-                    if (linksMC.GetLink(i).GetIndex()==barrelTrack->GetTrackCand().getMcTrackId()) {
-                        PndMCTrack *mcTrack = (PndMCTrack *)ioman->GetCloneOfLinkData(linksMC.GetLink(i));
-                        
-                        // Get Only Primary Tracks
-                        if (mcTrack->IsGeneratorCreated()) {
-
-                            // Links of Primary Tracks
-                            linksMVDPixel = barrelTrack->GetLinksWithType(ioman->GetBranchId("MVDHitsPixel"));
-                            linksMVDStrip = barrelTrack->GetLinksWithType(ioman->GetBranchId("MVDHitsPixel"));
-                            linksGEM = barrelTrack->GetLinksWithType(ioman->GetBranchId("GEMHit"));
-                            linksSTT = barrelTrack->GetLinksWithType(ioman->GetBranchId("STTHit"));
-                            
-                            Int_t Nhits = (linksMVDPixel.GetNLinks()+linksMVDStrip.GetNLinks()+linksGEM.GetNLinks()+linksSTT.GetNLinks());
-                            // If the number of STT hits greater than 0, write MC track to file!! if linksSTT.GetNLinks() > 0
-
-                            // CSV:: Writting Info to CSV File.
-                            fParticles  << (std::to_string(linksMC.GetLink(i).GetIndex() + 1)) << "," // track_id > 0
-                                        << (mcTrack->GetStartVertex()).X() << ","   // vx = start x [cm, ns]
-                                        << (mcTrack->GetStartVertex()).Y() << ","   // vy = start y [cm, ns]
-                                        << (mcTrack->GetStartVertex()).Z() << ","   // vz = start z [cm, ns]
-                                        << (mcTrack->GetMomentum()).X()    << ","   // px = x-component of track momentum
-                                        << (mcTrack->GetMomentum()).Y()    << ","   // py = y-component of track momentum
-                                        << (mcTrack->GetMomentum()).Z()    << ","   // pz = z-component of track momentum
-                                        << ((mcTrack->GetPdgCode()>0)?1:-1)<< ","   // q = charge of mu-/mu+
-                                        << Nhits                           << ","   // nhits in MVD+GEM+STT
-                                        << mcTrack->GetPdgCode()           << ","   // pdgcode e.g. mu- has pdgcode=-13
-                                        << mcTrack->GetStartTime()         << ","   // start_time = start time of particle track
-                                        << mcTrack->IsGeneratorCreated()            // If a particle is primary or not
-                                        << std::endl;
-                                        
-                           }//end-IsGeneratorCreated()
-                            
-                        }//end-if(GetLink(i))
-                        
-                    }//end-for(GetNLinks)
-                }//end-if(GetNLinks)
-        }//end-for (barrelTrack)        
-    }//particles by IdealTrackFinder
-    
-    else
-        std::cout << "-I- PndMLTracking: Skipping IdealTrackFinder for Particles" << std::endl;
-
-}//GenerateParticlesData
-
-
-/* GenerateSttSkewedData() */
-void PndMLTracking::GenerateSttSkewData() {
-    
-    std::cout << "-I- PndMLTracking: Runing GenerateSttSkewData()" << std::endl;
-    
-    // SttSkewHitArray
-    if (fSttSkewHitArray->GetEntries()==0)
-         std::cout << "Warning! SttSkewHitArray is Empty." << std::endl;
-         
-    for (int idx=0; idx < fSttSkewHitArray->GetEntries(); idx++) {
-
-        // Get FairRootManager Instance
-        FairRootManager *ioman = FairRootManager::Instance();
-
-        // Get sttHitsLinks from STTHit
-        FairMultiLinkedData_Interface *sttHitsLinks = (FairMultiLinkedData_Interface*)fSttSkewHitArray->At(idx);
-
-        // Get sttPointLinks & Data (TCloneArray) from sttHitsLinks
-        FairMultiLinkedData sttPointLinks = sttHitsLinks->GetLinksWithType(fSttPointBranchID);
-        FairMCPoint *sttpoint = (FairMCPoint*)ioman->GetCloneOfLinkData(sttPointLinks.GetLink(0));
-        
-        // Terminate if sttpoint=NULL
-        if (sttpoint == 0) {continue;}
-        
-        // Get mcTrackLinks & Data (TCloneArray) from sttpoint (OR sttPointLinks?)
-        FairMultiLinkedData mcTrackLinks = sttpoint->GetLinksWithType(fMCTrackBranchID); 
-        PndMCTrack *mctrack = (PndMCTrack*)ioman->GetCloneOfLinkData(mcTrackLinks.GetLink(0));
-        
-        // Terminate if mcTrack=NULL
-        if (mctrack == 0) {continue;}
-        
-        // Terminate if not Primary
-        // if (!mctrack->IsGeneratorCreated())
-        //    continue;
-        
-        // Hit Counter (very important in case number of tracks vary per event)
-        fHitId++;
-        
-        // Write to xxx-hits.csv
-        // ---------------------------------------------------------------------------
-        PndSttHit* stthit = (PndSttHit*)fSttSkewHitArray->At(idx);
-        PndSttTube *tube = (PndSttTube*) fTubeArray->At(stthit->GetTubeID());
-        
-        fHits << fHitId                    << ","   // hit_id
-              << stthit->GetX()            << ","   // x-position
-              << stthit->GetY()            << ","   // y-position
-              << stthit->GetZ()            << ","   // z-position
-              //<< stthit->GetDetectorID() << ","   // volume_id (-1 for stt skewed layers)
-              << (9)                       << ","   // volume_id (9 for stt)
-              << tube->GetLayerID()        << ","   // layer_id
-              << stthit->GetTubeID()       << ","   // tube_id/module_id
-              << idx                       << ","   // TCloneArray Index
-              << sttHitsLinks                       // or sttHitsLinks
-              << std::endl;
-        
-        
-        // Write to xxx-truth.csv
-        // ---------------------------------------------------------------------------
-        
-        // Get Particle Id
-        TString particle_id = "";
-        std::vector<FairLink> mcTrackLinks_sorted = sttHitsLinks->GetSortedMCTracks();
-         
-        for (unsigned int trackIndex = 0; trackIndex < mcTrackLinks_sorted.size(); trackIndex++) {
-            
-            // Append "particle_id" to xxx-truth.csv
-            particle_id = std::to_string(mcTrackLinks_sorted[trackIndex].GetIndex() + 1);
-        }
-        
-        fTruths << fHitId                  << ","   // hit_id  
-                << sttpoint->GetX()        << ","   // tx = true x
-                << sttpoint->GetY()        << ","   // ty = true y
-                << sttpoint->GetZ()        << ","   // tz = true z
-                << sttpoint->GetPx()       << ","   // tpx = true px
-                << sttpoint->GetPy()       << ","   // tpy = true py
-                << sttpoint->GetPz()       << ","   // tpz = true pz
-                << (1.0)                   << ","   // Weight placeholder (sum of weights of hits in track == 1)
-                << particle_id                      // Particle_id from above   
-                << std::endl;    
-
-
-        // Write to xxx-cells.csv
-        // ---------------------------------------------------------------------------
-        fCells  << fHitId                  << ","   // hit_id
-                << stthit->GetDepCharge()  << ","   // deposited charge 
-                << stthit->GetEnergyLoss() << ","   // energy loss (silicon)
-                //<< stthit->GetDetectorID()<< ","  // volume_id (-1 for stt skewed layers)
-                << (9)                     << ","   // volume_id (9 for stt)
-                << tube->GetLayerID()      << ","   // layer_id
-                << stthit->GetTubeID()     << ","   // module_id
-                << tube->GetSectorID()     << ","   // sector_id
-                << stthit->GetIsochrone()  << ","   // isochrone
-                << tube->IsSkew()                   // skewed
-                << std::endl;
-
-
-
-        // Write to xxx-particles.csv
-        // ---------------------------------------------------------------------------
-        
-        /** -----------------------------------------------------------------------
-        * FIXME: The issue is fParticles should contain unique particle_ids (tracks)
-        * e.g. if there are 10 particles/event then it should contain only 10 records.
-        * But right now fParticles contain a particle records which are equal to the
-        * size of fSttSkewHitArray. Which mean there will be repition of data in the file.
-        * One solution might be to write the fParticles outside of fSttSkewHitArray. So I
-        * shifted the this piece of code outside of fSttSkewHitArray loop. Note, however, 
-        * that if MVD and GEM are also included then fParticles should be generated in 
-        * Exec() rather than GenerateMvdData()/GenerateGemData() or GenerateSttData()
-        * ---------------------------------------------------------------------- */
-        
-        // NOTE: In particle.csv dataframe, count duplicate particle_ids and add this 
-        // number as nhits. After that one can drop_duplicates from particle dataframe.
-        
-
-        //std::cout << "Number of MCTracks (fParticles): " << mcTrackLinks_sorted.size() << std::endl;
-        //std::vector<FairLink> mcTrackLinks_sorted = sttHitsLinks->GetSortedMCTracks();
-        
-        if (fAssistedByIdeal.Contains("WithoutIdeal")) {
-            for (unsigned int trackIndex=0; trackIndex < mcTrackLinks_sorted.size(); trackIndex++) {
-            
-                // Fetch mcTrack associated with SttHit
-                PndMCTrack *mcTrack = (PndMCTrack*)ioman->GetCloneOfLinkData(mcTrackLinks_sorted[trackIndex]);
-                
-                // std::cout << "No. of MCPoints in STT: " << mcTrack->GetNPoints(DetectorID::kSTT) << std::endl;
-                
-                // CSV:: Writting Info to CSV File. 
-                fParticles  << std::to_string(mcTrackLinks_sorted[trackIndex].GetIndex() + 1)   
-                                                                       << ","   // track_id > 0
-                            << (mcTrack->GetStartVertex()).X()         << ","   // vx = start x
-                            << (mcTrack->GetStartVertex()).Y()         << ","   // vy = start y
-                            << (mcTrack->GetStartVertex()).Z()         << ","   // vz = start z
-                            << (mcTrack->GetMomentum()).X()            << ","   // px = x-component of track momentum
-                            << (mcTrack->GetMomentum()).Y()            << ","   // py = y-component of track momentum
-                            << (mcTrack->GetMomentum()).Z()            << ","   // pz = z-component of track momentum
-                            << ((mcTrack->GetPdgCode()>0)?1:-1)        << ","   // q = charge of mu-/mu+
-                            // <<mcTrack->GetNPoints(DetectorId::kSTT) << ","   // FIXME: nhits in STT (Not tested yet).
-                            << 1                                       << ","   // FIXME: nhits==1 (just a placeholder)
-                            << mcTrack->GetPdgCode()                   << ","   // pdgcode e.g. mu- has pdgcode=-13
-                            << mcTrack->GetStartTime()                 << ","   // start_time = start time of particle track
-                            << mcTrack->IsGeneratorCreated()                    // flag 'primary' particle
-                            << std::endl;
-                  
-                delete (mcTrack);
-                
-            }//McTracks
-        }//fAssistedByIdeal
-    }//SttHitArray
-    
-}//end-GenerateSttSkewedData()
-
-
 /* FinishTask() */
 void PndMLTracking::FinishTask() {
     
@@ -1079,7 +1099,7 @@ void PndMLTracking::FinishTask() {
     fParticles.close();
     fCells.close();
         
-    std::cout << "-I- Task Generating CSVs has Finished." << std::endl;
+    std::cout << "\n-I- Task Generating CSVs has Finished." << std::endl;
 }
 
 
