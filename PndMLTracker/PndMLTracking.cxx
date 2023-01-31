@@ -393,8 +393,8 @@ void PndMLTracking::Exec(Option_t* /*opt*/) {
 /* GenerateSttData() */
 void PndMLTracking::GenerateSttData() {
     
-    std::cout << "-I- Runing GenerateSttData()" << std::endl;
-    std::cout << "-I- The Size of SttHitArray: " << fSttHitArray->GetEntries() << std::endl;
+    std::cout << "-I- Runing GenerateSttData() with SttHitArray Size: " 
+              << fSttHitArray->GetEntries() << std::endl;
     
     // SttHitArray
     if (fSttHitArray->GetEntries()==0)

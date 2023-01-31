@@ -48,11 +48,12 @@ ClassImp(PndTrackImport)
 
 
 /* PndTrackImport() */
-PndTrackImport::PndTrackImport() {
+PndTrackImport::PndTrackImport() : PndPersistencyTask("Barrel Track Finder", 1) {
 }
 
-PndTrackImport::PndTrackImport(int start_counter, TString csv_path)
-    : fEventId(start_counter)
+PndTrackImport::PndTrackImport(int start_counter, TString csv_path) 
+    : PndPersistencyTask("Barrel Track Finder", 1)
+    , fEventId(start_counter)
     , fCsvFilesPath(csv_path)
     , fMCTrackBranchID(-1)
     , fMCTrackArray(nullptr)
@@ -74,9 +75,12 @@ PndTrackImport::PndTrackImport(int start_counter, TString csv_path)
     , fSttHitArray(nullptr)         // SttHitArray
     , fSttParameters(nullptr)
     , fEventHeader(nullptr)
-    , fTubeArray(nullptr) 
-    , fBarrelTrackArray(nullptr) 
-    , fBarrelTrackCandArray(nullptr) {
+    , fTubeArray(nullptr)
+    , f(nullptr)
+    , t(nullptr)
+    , fSttTrackArray(nullptr)
+    , fSttTrackCandArray(nullptr)
+    {
 
     /* Constructor */
 }
@@ -150,12 +154,27 @@ InitStatus PndTrackImport::Init() {
     fSttHitArray = (TClonesArray*) ioman->GetObject("STTHit");
     fSttHitBranchID = ioman->GetBranchId("STTHit");
     
+    SetPersistency(kTRUE);
     
-    // TODO:  Adding PndTrack and PndTrackCand
-    // Create and register PndTrack and PndTrackCand arrays
-    //fBarrelTrackArray = new TClonesArray("PndTrack", 100);
-    //ioman->Register("BarrelTrack", "Barrel Track", fBarrelTrackArray, GetPersistency());
+    // Read TrackML Tree
+    TString filename = fCsvFilesPath+"/trackml.root";
+    f = TFile::Open(filename);
+    t = f->Get<TTree>("TrackML");
+    max_size = dynamic_cast<TLeaf*>(t->GetBranch("nml")->GetListOfLeaves()->First())->GetMaximum();
+    t->SetBranchAddress("ml_hit_id", &hit_id);
+    t->SetBranchAddress("ml_track_id", &track_id);
+    t->SetBranchAddress("nml", &n);
+    
+    // trackML->SetBranchAddress("nTrackCand", &hit_id);
+    // trackML->SetBranchAddress("TrackCand", &track_id);
 
+    // Create and register PndTrack and PndTrackCand arrays
+    fSttTrackArray = new TClonesArray("PndTrack", 100);
+    ioman->Register("SttTrack", "STT Track", fSttTrackArray, GetPersistency());
+    
+    fSttTrackCandArray = new TClonesArray("PndTrackCand", 100);
+    ioman->Register("SttTrackCand", "STT TrackCand", fSttTrackCandArray, GetPersistency());
+    
     std::cout << "-I- PndTrackImport: Initialisation successful" << std::endl;
     return kSUCCESS;
 
@@ -164,16 +183,20 @@ InitStatus PndTrackImport::Init() {
 /* Exec() */
 void PndTrackImport::Exec(Option_t* /*opt*/) {
     
+    fSttTrackCandArray->Delete();
+    
     // Filename of CSV
+    /*
     std::stringstream ss;
     ss << std::setw(4) << std::setfill('0') << fEventId;
     std::string fidx = ss.str();   
-    TString prefix = fCsvFilesPath+"/"+fidx;
-    TString filename = prefix+".root";
+    TString prefix = fCsvFilesPath+"/TrackML/"+fidx;
+    TString filename = fCsvFilesPath+"/trackml.root";
+    std::cout << "\nPrefix: " << (prefix) << std::endl;
+    std::cout << "Filename: " << (filename) << std::endl;
+    std::cout << "Processing Event: " << (fEventId) << std::endl;
     
-    std::cout << "\nProcessing Event: " << (fEventId) << " with Prefix: " << prefix << std::endl;
-
-    // RDataFrame from CSVs
+    // RDF from CSVs
     // auto rdf = ROOT::RDF::FromCSV(filename);             // Root v6.26    
     // auto rdf = ROOT::RDF::MakeCsvDataFrame(filename);    // Root v6.22
     
@@ -181,130 +204,91 @@ void PndTrackImport::Exec(Option_t* /*opt*/) {
     // TTree *t = new TTree("t", "Track Cand");
     // t->ReadFile(filename, "hit_id/I:track_id");
     
-    
-    // Reading TTree from ROOT
-    TFile *f = TFile::Open(filename);
-    
-    // Get TTree from TFile (It already has a TTree)
-    TTree *t = (TTree*)f->Get("TrackML");
-    
-    // Or, TTreeReader to get an iterator over TTree
-    TTreeReader myReader("TrackML", f);
-    TTreeReaderValue<int> hit_id(myReader, "hit_id");           // or cids
-    TTreeReaderValue<long long> track_id(myReader, "track_id");
-    
-    // Set to Unique Track Ids
-    std::set<int> unique_tracks;
-    
-    // Multimap for TrackCand
-	std::unordered_multimap<int, int> umap_track_cands;
-	
-	// Map for TrackCand
-    std::map<int, std::vector<int> > map_track_cands;
-	
-	// PndTrackCand
-	std::map<int, PndTrackCand*> mycands;
-    
-    // Fill Up
-    while (myReader.Next()) {
-        
-        int tid = int(*track_id);
-        int hid = *hit_id;
-        
-        // Unique Tracks
-        unique_tracks.insert(tid);
-        
-        // UMap: TrackCands
-        umap_track_cands.insert({tid, hid});
-        
-        // Map: TrackCands
-        map_track_cands[tid].push_back(hid);
-        
-        // Map: PndTrackCands
-        //if(mycands[tid]==nullptr) {
-        //    mycands[tid] = new PndTrackCand(); 
-        //}
-        
-        
-        //PndTrackCand* myT = mycands[tid];
-
-        //... get hit pointer from hitID & Pandaroot
-        //myT->AddHit(...);
-      
-    }  
-    
-     
-     
-     
-    cout << "TrackML TTree Size: " << t->GetEntries() << endl;
-    cout << "fSttHitArray Size : " << fSttHitArray->GetEntries() << endl;
-    
-    // Display Unique Tracks
-    std::cout << "\nUnique Track IDs:" << std::endl;
-	for (auto const& iter : unique_tracks) {  // c++11 
-    	std::cout << ' ' << iter; 
-    }
-    
-        
-    // Filter UMap
-    /*
-	std::cout << "\nFilter Values for a Key:" << std::endl;
-    auto range = umap_track_cands.equal_range(0);
-    for (auto it = range.first; it != range.second; ++it) {
-        std::cout << it->first << ' ' << it->second << '\n';
-    }
+    // TTree from ROOT
+    // TFile *myfile = TFile::Open(filename);
+    // TTree *t = myfile->Get<TTree>("TrackML");
     */
     
-    /* RALF:
+    // We start from fEventId=0, as Event Counter. Then we 
+    // get the entries of event 'fEventId' for all branches
+    t->GetEntry(fEventId);
+    
+    // hit_id, track_id are jagged array, with size 'n'. We need
+    // to loop over to read hits and tracks for a particular event.
+    
+    
     
     std::map<int, std::vector<int> > map_track_cands;
-    while(){
-      map_track_cands[*trID].push_pack(*hitID):
-    }
-    ... loop map and create track Cands
+    std::map<int, PndTrackCand*> mycands;
+    
+     
+    for (int i = 0; i < n; i++) {
+    
+        // cout << setw(3) << hit_id[i] << ", "  << setw(3) << track_id[i] << endl;
+        map_track_cands[track_id[i]].push_back(hit_id[i]);
+        
+        // OR, PndTrackCands Map
+        if (mycands[track_id[i]]==nullptr) {
+            mycands[track_id[i]] = new PndTrackCand();
+            
+            // Issue here is somewhere -1 is fed in that gives seg-fault
+            // mycands[track_id[i]] = new ((*fSttTrackCandArray)[i]) PndTrackCand();
+        }
+        
+        PndTrackCand* myTCand = mycands[track_id[i]];
 
-
-      ----- OR
-
-
-    std::map<PndTrackCand*> mycands;
-    while(){
-
-      if(mycands[*trID]==nullptr) {
-        mycands[*trID] = new PndTrackCand(...); 
-      }
-
-      PndTrackCand* myT = mycands[*trID];
-
-      ... get hit pointer from hitID & Pandaroot
-      myT->AddHit(...);
+        // // get hit pointer from hitID & Pandaroot 
+        int idx = hit_id[i] - 1;                       // idx =  hit_id - 1
+        
+        // PndSttHit* stthit = (PndSttHit*)fSttHitArray->At(idx);
+        
+        // Hit id is increasing number, remain valid if a track curls back to IP.
+        // It seemed to be fair choice for the rho parameter.
+        myTCand->AddHit(FairRootManager::Instance()->GetBranchId("STTHit"), idx, hit_id[i]);  
+    
     }
     
-    */
-    
-    // Track Candidates
-	std::cout << "\nTrack Cands:" << std::endl;
+    // Display Map
+	std::cout << "\nTotal TrackML Track Cands:" << map_track_cands.size() << std::endl;
 	for (auto const &iter : map_track_cands) {  // c++11
-	 
-    	std::cout << iter.first << ':' ;
-    	
+    	std::cout << iter.first << ':' /*<< iter.second.size() << endl*/ ;
     	for(auto const& iter1: iter.second) 
         	std::cout << ' ' << iter1;
-        	
         cout << endl;
     }
     
     
+    // Write PndTrackCand to fSttTrackCandArray
+    std::cout << "\nTotal PndTrackCand Per Event:" << mycands.size() << std::endl;
+    int index =0;
+	for (auto const &iter : mycands) {  // c++11
+    	
+    	// std::cout << iter.first << ":" << iter.second->GetNHits() << endl;
+    	
+    	PndTrackCand* tcand = (PndTrackCand*)iter.second;
+        //std::cout << iter.first << ":"<< tcand->GetNHits() << endl;
+    	//iter.second->Print();
+    	
+        if (iter.first >= 0) // -1: unassigned hits.
+            new ((*fSttTrackCandArray)[index]) PndTrackCand(*tcand); 
+    }
     
-    std::cout << "Finishing Event: " << (fEventId) << " with Prefix: " << prefix << std::endl;
-    
-    // Finishing
+    // Clear Objects
+    map_track_cands.clear();
+    mycands.clear();
+    std::cout << "\nCleard Maps:" << mycands.size() << std::endl;
+    cout << "\nfSttHitArray Size : " << fSttHitArray->GetEntries() << endl;
+    cout << "Number of Reco Hit: " << n << endl;
     fEventId++;
 
 }//end-Exec()
 
+
 /* FinishTask() */
 void PndTrackImport::FinishTask() {
+    
+    fSttTrackArray->Clear();
+    fSttTrackCandArray->Clear();
     
     // Finishing FairTask        
     std::cout << "\n-I- PndTrackImport Task Has Finished." << std::endl;
@@ -322,47 +306,4 @@ FairMCPoint* PndTrackImport::GetFairMCPoint(TString fBranchName, FairMultiLinked
     }
     return (FairMCPoint*) FairRootManager::Instance()->GetCloneOfLinkData(array.GetLink(0));
 }
-
-
-void PndTrackImport::SttTrackCand() { 
-
-    std::cout << "-I- PndTrackImport: Runing SttTrackCand()" << std::endl;
-    
-    // SttHitArray
-    if (fSttHitArray->GetEntries()==0)
-         std::cout << "Warning! SttHitArray is Empty." << std::endl;
-         
-    for (int idx=0; idx < fSttHitArray->GetEntries(); idx++) {
-
-        // Get FairRootManager Instance
-        FairRootManager *ioman = FairRootManager::Instance();
-
-        // Get sttHitsLinks from STTHit
-        FairMultiLinkedData_Interface *sttHitsLinks = (FairMultiLinkedData_Interface*)fSttHitArray->At(idx);
-
-        // Get sttPointLinks & Data (TCloneArray) from sttHitsLinks
-        FairMultiLinkedData sttPointLinks = sttHitsLinks->GetLinksWithType(fSttPointBranchID);
-        FairMCPoint *sttpoint = (FairMCPoint*)ioman->GetCloneOfLinkData(sttPointLinks.GetLink(0));
-        
-        // Terminate if sttpoint=NULL
-        if (sttpoint == 0) {continue;}
-        
-        // Get mcTrackLinks & Data (TCloneArray) from sttpoint (OR sttPointLinks?)
-        FairMultiLinkedData mcTrackLinks = sttpoint->GetLinksWithType(fMCTrackBranchID); 
-        PndMCTrack *mctrack = (PndMCTrack*)ioman->GetCloneOfLinkData(mcTrackLinks.GetLink(0));
-        
-        // Terminate if mcTrack=NULL
-        if (mctrack == 0) {continue;}
-        
-        // Terminate if not Primary
-        // if (!mctrack->IsGeneratorCreated())
-        //    continue;
-        
-    
-    
-    
-        
-    }//fSttHitArray
-    
-}//SttTrackCand
 

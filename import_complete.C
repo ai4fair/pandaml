@@ -8,25 +8,29 @@ int import_complete(Int_t nEvents=10, TString prefix="", TString inputdir="", In
     TString digiFile    = prefix+"_digi.root";
     TString skewFile    = prefix+"_skew.root";  // For Skewed Hit Correction
     TString recoFile    = prefix+"_reco.root";
+    TString recoFile    = prefix+"_reco.root";
     TString outFile     = prefix+"_data.root"; // its dummy file, usually out.root
 
     // Initialization
     FairLogger::GetLogger()->SetLogToFile(kFALSE);
     FairRunAna *fRun = new FairRunAna();
 
-    // Add Input File to FairFileSource
+    // Add Sim
     FairFileSource *fSrc = new FairFileSource(simFile);
     fRun->SetSource(fSrc);
 
-    // Add Friend File to FairFileSource
+    // Add Digi
     fSrc->AddFriend(digiFile);
 
-    // Add Friend File to FairFileSource
-    fSrc->AddFriend(skewFile);
+    // Add Skew
+    //fSrc->AddFriend(skewFile);
 
-    // Add Friend File to FairFileSource
+    // Add Reco
     fSrc->AddFriend(recoFile);
-
+    
+    // Add TrackML
+    fSrc->AddFriend(trackMLFile);
+    
     // Add Output File to FairRootFileSink
     FairRootFileSink *fSink = new FairRootFileSink(outFile);
     fRun->SetSink(fSink);

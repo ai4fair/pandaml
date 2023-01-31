@@ -18,11 +18,12 @@
 #include <fstream>
 #include <sstream>
 #include <iomanip>
+#include "PndPersistencyTask.h"
 #include "PndGeoHandling.h"
 
 using namespace std;
 
-class PndTrackImport: public FairTask {
+class PndTrackImport: public PndPersistencyTask {
 
 public:
 
@@ -92,16 +93,17 @@ private:
     /* STTMapCreater */
     TClonesArray *fTubeArray;
     
+    TClonesArray *fSttTrackArray;
+    TClonesArray *fSttTrackCandArray;
     
-    // TODO: PndTrack and PndTrackCand
-    /** Output array of global tracks **/
-    TClonesArray *fBarrelTrackArray; ///< Output array of PndTrackCands
-    TClonesArray *fBarrelTrackCandArray;
+    TFile *f;                          // TFile of TrackML
+    TTree *t;                          // TTree of TrackML
+    int max_size;
+    int hit_id[1000];                  // To Read a Jagged/Ragged Array
+    int track_id[1000];                // To Read a Jagged/Ragged Array
+    int n;                             // Size of Jagged/Ragged Array
     
     
-    
-    std::ofstream fInfile;               // Reading a CSV
-    void SttTrackCand();
     
     ClassDef(PndTrackImport,1)
 };

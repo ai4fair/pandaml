@@ -7,12 +7,13 @@ int import_prod(Int_t nEvents=10, TString prefix="", TString inputdir="", Int_t 
     std::cout << "\nFLAGS: " << nEvents << "," << prefix << "," << inputdir << "," << start_counter << std::endl;
 
     // Cluster ROOTs
-    int from = 95, to = 95;    
+    int from = 110, to = 110;    
     TString parFile  = TString::Format("%s_%d_par.root", prefix.Data(), from);
     TString simFile  = TString::Format("%s_%d_sim.root", prefix.Data(), from);
     TString digiFile = TString::Format("%s_%d_digi.root", prefix.Data(), from);
     TString recoFile = TString::Format("%s_%d_reco.root", prefix.Data(), from);
-    TString outFile  = "out.root";  // SetOutputFile() of the FairRunAna
+    TString trkxFile = TString::Format("%s_%d_trkx.root", prefix.Data(), from); // Python TrackCands
+    TString outFile  = TString::Format("%s_%d_mltrkx.root", prefix.Data(), from);  // SetOutputFile() of the FairRunAna
 
     cout << "simFile: " <<  simFile << endl;
 
@@ -34,15 +35,18 @@ int import_prod(Int_t nEvents=10, TString prefix="", TString inputdir="", Int_t 
     fSrc->AddFriend(digiFile);
     for (int i=from+1; i<=to; ++i) {
         TString digiFile = TString::Format("%s_%d_digi.root", prefix.Data(), i);
-        if (CheckFile(digiFile)) {fSrc->AddFriend(digiFile); cout << "digiFile: " <<  simFile << endl;}
+        if (CheckFile(digiFile)) {fSrc->AddFriend(digiFile); cout << "digiFile: " <<  digiFile << endl;}
     }
 
     fSrc->AddFriend(recoFile);
     for (int i=from+1; i<=to; ++i) {
         TString recoFile = TString::Format("%s_%d_reco.root", prefix.Data(), i);
-        if (CheckFile(recoFile)) {fSrc->AddFriend(recoFile); cout << "recoFile: " <<  simFile << endl;}
+        if (CheckFile(recoFile)) {fSrc->AddFriend(recoFile); cout << "recoFile: " <<  recoFile << endl;}
     }
-
+    
+    // Python TrackCands
+    //fSrc->AddFriend(trkxFile);
+    
     fRun->SetSource(fSrc);
 
     // Add Output File to FairRootFileSink

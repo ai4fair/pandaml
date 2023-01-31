@@ -6,18 +6,17 @@
 # ./run 10 ftf ftf 7.1
 
 tmpdir="/tmp/"$USER
-_target="data_sets/ctd2022/qa/event_test"
-inputdir="data_sets/ctd2022/qa/root_cand"
+_target="/shared/adeel/data_sets/ctd2022/run_100k/qa"
 
 # PandaRoot
 . "/home/"$USER"/gsi/pandaroot/install-v13.0.0/bin/config.sh" -p
 
 
 # Default Inputs
-nevt=3
+nevt=5000
 prefix=mumu
-start=5000                 # Starting of CSV/ROOT Track Cands (TrackML)
-flag="WithoutIdeal" # Options: WithIdeal, WithoutIdeal
+start=0  # Starting of CSV/ROOT Track Cands (TrackML)
+flag="WithIdeal"  # Options: WithIdeal, WithoutIdeal
 
 
 # User Inputs
@@ -56,11 +55,11 @@ echo "Prefix       : $outprefix"
 #                            Initiate Simulaton
 # ---------------------------------------------------------------
 
-# echo "\n...Started Data Generation..."
+# echo "\nStarted Data Generation..."
 # root -l -b -q data_prod.C\($nevt,\"$outprefix\",\"$_target\",\"$flag\"\) > $outprefix"_data.log" 2>&1
 
 
-echo "\n...Started Track Import..."
-root -l -b -q import_prod.C\($nevt,\"$outprefix\",\"$inputdir\",$start\) # > $outprefix"_import.log" 2>&1
+echo "Started Track Import"
+root -l -b -q import_prod.C\($nevt,\"$outprefix\",\"$_target\",$start\) # > $outprefix"_import.log" 2>&1
 
 echo ""
