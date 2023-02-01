@@ -12,8 +12,8 @@ int qa_complete(Int_t nEvents=10, TString prefix="") {
     TString input        = "";                 // "dpm", "llbar_fwp.DEC";
     TString friend1      = "sim";
     TString friend2      = "digi";
-    TString friend3      = "recoideal";        // IdealTrackFinder (Full or Barrell)
-    TString friend4      = "recobarrel";       // TrackFinder to Compare
+    TString friend3      = "recobarrel";       // IdealTrackFinder (Full or Barrell)
+    TString friend4      = "mltrkx";           // TrackFinder to Compare
     TString output       = "qa";               // Output filename
     
 
@@ -31,8 +31,8 @@ int qa_complete(Int_t nEvents=10, TString prefix="") {
 
     //----- TrackingQATask
     // PndTrackingQA::PndTrackingQA(trackBranchName, idealTrackName, pndTrackData)
-    PndTrackingQATask* qa = new PndTrackingQATask("SttTrackCand", "BarrelTrackCand", false);
-    trackingQA->SetFunctorName("OnlySttHitFunctor");
+    PndTrackingQATask* qa = new PndTrackingQATask("SttTrackCand", "BarrelIdealTrackCand", false);
+    qa->SetFunctorName("OnlySttHitFunctor");
     qa->SetVerbose(0);
     fRun->AddTask(qa);
 

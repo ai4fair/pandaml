@@ -1,6 +1,6 @@
 // Macro for running Panda digitization tasks
 // to run the macro:
-// root  reco_complete.C  or in root session root>.x  reco_complete.C
+// root  recoideal_barrel.C  or in root session root>.x  recoideal_barrel.C
 int recoideal_barrel(Int_t nEvents=10, TString prefix="") {
     
     std::cout << "FLAGS: " << nEvents << "," << prefix << std::endl;
@@ -28,18 +28,18 @@ int recoideal_barrel(Int_t nEvents=10, TString prefix="") {
     fRun->Setup(prefix);
     
     //----- AddRecoIdealTasks (Only Barrel Part)
-    PndIdealTrackFinder *trkx = new PndIdealTrackFinder();
-    fRun->AddTask(trkx);
-    trkx->SetTrackSelector("NoFtsTrackFunctor");
-    trkx->AddBranchName("STTHit");
-    trkx->AddBranchName("MVDHitsPixel");
-    trkx->AddBranchName("MVDHitsStrip");
-    trkx->AddBranchName("GEMHit");
-    // trkx->SetRelativeMomentumSmearing(0.05);
-    // trkx->SetVertexSmearing(0.05, 0.05, 0.05);
-    trkx->SetTrackingEfficiency(1.);
-    trkx->SetOutputBranchName("BarrelIdealTrack");  // Whatever name we choose.
-    trkx->SetPersistence(kTRUE);
+    PndIdealTrackFinder *recoideal = new PndIdealTrackFinder();
+    fRun->AddTask(recoideal);
+    recoideal->SetTrackSelector("NoFtsTrackFunctor");
+    recoideal->AddBranchName("STTHit");
+    recoideal->AddBranchName("MVDHitsPixel");
+    recoideal->AddBranchName("MVDHitsStrip");
+    recoideal->AddBranchName("GEMHit");
+    // recoideal->SetRelativeMomentumSmearing(0.05);
+    // recoideal->SetVertexSmearing(0.05, 0.05, 0.05);
+    recoideal->SetTrackingEfficiency(1.);
+    recoideal->SetOutputBranchName("BarrelIdealTrack");  // Whatever name we choose.
+    recoideal->SetPersistence(kTRUE);
 
     //----- Init & Run
     fRun->Init();

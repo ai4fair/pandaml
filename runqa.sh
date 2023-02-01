@@ -14,7 +14,7 @@ _target="/shared/adeel/data_sets/ctd2022/run_100k/qa"
 
 # Default Inputs
 nevt=5000
-prefix=mumu
+prefix=mumu_110
 start=0  # Starting of CSV/ROOT Track Cands (TrackML)
 flag="WithIdeal"  # Options: WithIdeal, WithoutIdeal
 
@@ -42,11 +42,11 @@ outprefix=$_target"/"$prefix
 # ---------------------------------------------------------------
 #                              Print Flags
 # ---------------------------------------------------------------
-echo "\nStorage Dir. : $tmpdir"
-echo "Sim Dir.  : $_target"
-echo "Trkx Dir.  : $inputdir"
+echo "Storage Dir. : $tmpdir"
+echo "Sim Dir.     : $_target"
+echo "Trkx Dir.    : $_target"
 echo "Events       : $nevt"
-echo "Prefix       : $outprefix"
+echo "Prefix       : $outprefix\n"
 
 # Terminate Script for Testing.
 # exit 0;
@@ -58,8 +58,21 @@ echo "Prefix       : $outprefix"
 # echo "\nStarted Data Generation..."
 # root -l -b -q data_prod.C\($nevt,\"$outprefix\",\"$_target\",\"$flag\"\) > $outprefix"_data.log" 2>&1
 
+# echo "Started Track Import"
+# root -l -b -q import_prod.C\($nevt,\"$outprefix\",\"$_target\",$start\) # > $outprefix"_import.log" 2>&1
 
-echo "Started Track Import"
-root -l -b -q import_prod.C\($nevt,\"$outprefix\",\"$_target\",$start\) # > $outprefix"_import.log" 2>&1
+echo "Started Track QA"
+root -l -b -q qa_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_qa.log" 2>&1
 
-echo ""
+
+
+
+
+
+
+
+
+
+
+
+
