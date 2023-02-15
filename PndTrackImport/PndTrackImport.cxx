@@ -78,7 +78,7 @@ PndTrackImport::PndTrackImport(int start_counter, TString csv_path)
     , fTubeArray(nullptr)
     , f(nullptr)
     , t(nullptr)
-    , fSttTrackArray(nullptr)
+    //, fSttTrackArray(nullptr)
     , fSttTrackCandArray(nullptr)
     {
 
@@ -169,8 +169,8 @@ InitStatus PndTrackImport::Init() {
     // trackML->SetBranchAddress("TrackCand", &track_id);
 
     // Create and register PndTrack and PndTrackCand arrays
-    fSttTrackArray = new TClonesArray("PndTrack", 100);
-    ioman->Register("SttTrack", "STT Track", fSttTrackArray, GetPersistency());
+    //fSttTrackArray = new TClonesArray("PndTrack", 100);
+    //ioman->Register("SttTrack", "STT Track", fSttTrackArray, GetPersistency());
     
     fSttTrackCandArray = new TClonesArray("PndTrackCand", 100);
     ioman->Register("SttTrackCand", "STT TrackCand", fSttTrackCandArray, GetPersistency());
@@ -185,17 +185,13 @@ void PndTrackImport::Exec(Option_t* /*opt*/) {
     
     fSttTrackCandArray->Delete();
     
-    // Filename of CSV
-    /*
+    // Event Number
     std::stringstream ss;
     ss << std::setw(4) << std::setfill('0') << fEventId;
-    std::string fidx = ss.str();   
-    TString prefix = fCsvFilesPath+"/TrackML/"+fidx;
-    TString filename = fCsvFilesPath+"/trackml.root";
-    std::cout << "\nPrefix: " << (prefix) << std::endl;
-    std::cout << "Filename: " << (filename) << std::endl;
-    std::cout << "Processing Event: " << (fEventId) << std::endl;
+    std::string fidx = ss.str();
+    std::cout << "\nProcessing Event: " << (fEventId) << std::endl;
     
+    /*
     // RDF from CSVs
     // auto rdf = ROOT::RDF::FromCSV(filename);             // Root v6.26    
     // auto rdf = ROOT::RDF::MakeCsvDataFrame(filename);    // Root v6.22
@@ -215,12 +211,8 @@ void PndTrackImport::Exec(Option_t* /*opt*/) {
     
     // hit_id, track_id are jagged array, with size 'n'. We need
     // to loop over to read hits and tracks for a particular event.
-    
-    
-    
     std::map<int, std::vector<int> > map_track_cands;
     std::map<int, PndTrackCand*> mycands;
-    
      
     for (int i = 0; i < n; i++) {
     
@@ -238,18 +230,33 @@ void PndTrackImport::Exec(Option_t* /*opt*/) {
         PndTrackCand* myTCand = mycands[track_id[i]];
 
         // // get hit pointer from hitID & Pandaroot 
-        int idx = hit_id[i] - 1;                       // idx =  hit_id - 1
+        int idx = hit_id[i] - 1;                                 // idx =  hit_id - 1
+        Double_t rho = (double)hit_id[i];
         
-        // PndSttHit* stthit = (PndSttHit*)fSttHitArray->At(idx);
         
         // Hit id is increasing number, remain valid if a track curls back to IP.
         // It seemed to be fair choice for the rho parameter.
-        myTCand->AddHit(FairRootManager::Instance()->GetBranchId("STTHit"), idx, hit_id[i]);  
-    
+        
+        
+        //FIXME: Issue with Adding FairLink to PndTrackCand
+        
+        // OLD Code to AddHit()
+        // myTCand->AddHit(FairRootManager::Instance()->GetBranchId("STTHit"), idx, rho); 
+        
+        // OR,
+        PndSttHit* stthit = (PndSttHit*)fSttHitArray->At(idx);
+        
+        //std::cout << "FairLink to TrackCand (1):" << stthit->GetEntryNr() << std::endl;
+        //myTCand->AddHit(stthit->GetEntryNr(), rho); 
+        
+        // OR,
+        //std::cout << "FairLink to TrackCand (2):" << FairLink(-1, -1, fSttHitBranchID, idx) << std::endl;
+        myTCand->AddHit(FairLink(-1, -1, fSttHitBranchID, idx), rho); 
+        
     }
     
     // Display Map
-	std::cout << "\nTotal TrackML Track Cands:" << map_track_cands.size() << std::endl;
+	std::cout << "Total TrackML Track Cands:" << map_track_cands.size() << std::endl;
 	for (auto const &iter : map_track_cands) {  // c++11
     	std::cout << iter.first << ':' /*<< iter.second.size() << endl*/ ;
     	for(auto const& iter1: iter.second) 
@@ -259,16 +266,26 @@ void PndTrackImport::Exec(Option_t* /*opt*/) {
     
     
     // Write PndTrackCand to fSttTrackCandArray
-    std::cout << "\nTotal PndTrackCand Per Event:" << mycands.size() << std::endl;
+    std::cout << "Total PndTrackCand Per Event:" << mycands.size() << std::endl;
     int index =0;
 	for (auto const &iter : mycands) {  // c++11
-    	
-    	// std::cout << iter.first << ":" << iter.second->GetNHits() << endl;
-    	
+   	
     	PndTrackCand* tcand = (PndTrackCand*)iter.second;
         //std::cout << iter.first << ":"<< tcand->GetNHits() << endl;
-    	//iter.second->Print();
+    	//tcand->Print();
     	
+    	//FIXME: Debugging
+    	/*
+    	std::vector<PndTrackCandHit> tcandhits = tcand->GetSortedHits();
+    	for (unsigned int i = 0; i < tcandhits.size(); ++i)
+            cout << "FairLink from tcand : " << tcandhits.at(i).GetFile() << ","
+                                  << tcandhits.at(i).GetEntry() << ","
+                                  << tcandhits.at(i).GetType()  << ","
+                                  << tcandhits.at(i).GetIndex()  << ","
+                                  << tcandhits.at(i).GetWeight()
+                                  << endl;
+        */
+        // Writing TClonesArray
         if (iter.first >= 0) // -1: unassigned hits.
             new ((*fSttTrackCandArray)[index]) PndTrackCand(*tcand); 
     }
@@ -276,8 +293,8 @@ void PndTrackImport::Exec(Option_t* /*opt*/) {
     // Clear Objects
     map_track_cands.clear();
     mycands.clear();
-    std::cout << "\nCleard Maps:" << mycands.size() << std::endl;
-    cout << "\nfSttHitArray Size : " << fSttHitArray->GetEntries() << endl;
+
+    cout << "fSttHitArray Size : " << fSttHitArray->GetEntries() << endl;
     cout << "Number of Reco Hit: " << n << endl;
     fEventId++;
 
@@ -287,10 +304,8 @@ void PndTrackImport::Exec(Option_t* /*opt*/) {
 /* FinishTask() */
 void PndTrackImport::FinishTask() {
     
-    fSttTrackArray->Clear();
-    fSttTrackCandArray->Clear();
-    
-    // Finishing FairTask        
+    // Finishing FairTask   
+    std::cout << "\n-I- Total Number of Events Processed:" << fEventId << std::endl;
     std::cout << "\n-I- PndTrackImport Task Has Finished." << std::endl;
 }
 

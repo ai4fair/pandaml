@@ -58,11 +58,11 @@ echo "Prefix       : $outprefix\n"
 # echo "\nStarted Data Generation..."
 # root -l -b -q data_prod.C\($nevt,\"$outprefix\",\"$_target\",\"$flag\"\) > $outprefix"_data.log" 2>&1
 
-# echo "Started Track Import"
-# root -l -b -q import_prod.C\($nevt,\"$outprefix\",\"$_target\",$start\) # > $outprefix"_import.log" 2>&1
+echo "Creating TracMLCand to PndTrackCands"
+root -l -b -q import_complete.C\($nevt,\"$outprefix\",\"$_target\",$start\) # > $outprefix"_import.log" 2>&1
 
-echo "Started Track QA"
-root -l -b -q qa_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_qa.log" 2>&1
+echo "Running Tracking QA"
+root -l -b -q qa_complete.C\($nevt,\"$outprefix\"\) # > $outprefix"_qa.log" 2>&1
 
 
 

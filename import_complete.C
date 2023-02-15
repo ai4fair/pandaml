@@ -6,10 +6,9 @@ int import_complete(Int_t nEvents=10, TString prefix="", TString inputdir="", In
     TString parFile     = prefix+"_par.root";
     TString simFile     = prefix+"_sim.root";
     TString digiFile    = prefix+"_digi.root";
-    TString skewFile    = prefix+"_skew.root";  // For Skewed Hit Correction
-    TString recoFile    = prefix+"_reco.root";
-    TString recoFile    = prefix+"_reco.root";
-    TString outFile     = prefix+"_data.root"; // its dummy file, usually out.root
+    TString skewFile    = prefix+"_skew.root";          // For Skewed Hit Correction
+    TString recoFile    = prefix+"_recobarrel.root";    // Reco (TS+FS), RecoBarrel (TS)
+    TString outFile     = prefix+"_mltrkx.root";        // TrackML to PndTrackCand
 
     // Initialization
     FairLogger::GetLogger()->SetLogToFile(kFALSE);
@@ -27,10 +26,7 @@ int import_complete(Int_t nEvents=10, TString prefix="", TString inputdir="", In
 
     // Add Reco
     fSrc->AddFriend(recoFile);
-    
-    // Add TrackML
-    fSrc->AddFriend(trackMLFile);
-    
+        
     // Add Output File to FairRootFileSink
     FairRootFileSink *fSink = new FairRootFileSink(outFile);
     fRun->SetSink(fSink);

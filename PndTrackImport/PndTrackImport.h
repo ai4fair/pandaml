@@ -93,7 +93,7 @@ private:
     /* STTMapCreater */
     TClonesArray *fTubeArray;
     
-    TClonesArray *fSttTrackArray;
+    //TClonesArray *fSttTrackArray;
     TClonesArray *fSttTrackCandArray;
     
     TFile *f;                          // TFile of TrackML
