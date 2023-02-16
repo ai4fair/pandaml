@@ -16,14 +16,38 @@
 #include <PndTrackCand.h>
 #include <TClonesArray.h>
 
+// ROOT::RDataFrame & ROOT::RCsvDS
 #include <ROOT/RDataFrame.hxx>
 #include <ROOT/RCsvDS.hxx>
 
+// My FairTask
 #include "PndTrackImport.h"
 
 
 ClassImp(PndTrackImport)
 
+
+/*
+* (1) Constructor Initialization by Assignment:
+* Avoid this method as it is a two step process. In this method, first
+* default constructor is called (step 1) and then assignment operation
+* is performed to intialize the data memebers.
+*
+* (2) Constructor Initialization by Inline Assignment:
+* In this case, an object is instantiated with default values of data 
+* members. Its a one step process, assignment is done in "*.h" files.
+* NOTE: Inline assignment is only available in C++11 and beyond.
+*
+* (3) Constructor Initialization by Initializer List:
+* In this case, an object is instantiated with default values of data 
+* members. Its a one step process, default values are provided using
+* and initializer list to the constructor. It is considered the BEST
+* way for instantiating a statefull class object.
+* NOTE: Initializer list depends on order of declaration of data members.
+*/
+
+
+/* PndTrackImport() */
 PndTrackImport::PndTrackImport() : PndPersistencyTask("Barrel Track Finder", 1) {
 }
 
@@ -33,6 +57,8 @@ PndTrackImport::PndTrackImport(int start_counter, TString csv_path)
     , fCsvFilesPath(csv_path)
     , fMCTrackBranchID(-1)
     , fMCTrackArray(nullptr)
+    //, fBarrelTrackBranchID(-1)      // formerly SttMvdGemTrack
+    //, fBarrelTrackArray(nullptr)    // formerly SttMvdGemTrack
     , fMvdPointBranchID(-1)
     , fMvdPointArray(nullptr)
     , fMvdHitsPixelBranchID(-1)
@@ -101,6 +127,26 @@ InitStatus PndTrackImport::Init() {
         return kERROR;
     } 
     
+    // Access BarrelTrack (formerly SttMvdGemTrack) Branch and its ID
+    //fBarrelTrackArray = (TClonesArray*) ioman->GetObject("BarrelTrack");
+    //fBarrelTrackBranchID = ioman->GetBranchId("BarrelTrack");
+    
+    //Access MVDPoint, MVDHitsPixel, MvdHitsStrip Branches and their Ids
+    fMvdPointArray = (TClonesArray*) ioman->GetObject("MVDPoint");
+    fMvdPointBranchID = ioman->GetBranchId("MVDPoint");
+    
+    fMvdHitsPixelArray = (TClonesArray*) ioman->GetObject("MVDHitsPixel");
+    fMvdHitsPixelBranchID = ioman->GetBranchId("MVDHitsPixel");
+    
+    fMvdHitsStripArray = (TClonesArray*) ioman->GetObject("MVDHitsStrip");
+    fMvdHitsStripBranchID = ioman->GetBranchId("MVDHitsStrip");
+    
+    //Access GEMPoint, GEMHit Branches and their Ids
+    fGemPointArray = (TClonesArray*) ioman->GetObject("GEMPoint");
+    fGemPointBranchID = ioman->GetBranchId("GEMPoint");
+    fGemHitArray = (TClonesArray*) ioman->GetObject("GEMHit");
+    fGemHitBranchID = ioman->GetBranchId("GEMHit");
+    
     //Access STTPoint, STTHit Branches and their Ids
     fSttPointArray = (TClonesArray*) ioman->GetObject("STTPoint");
     fSttPointBranchID = ioman->GetBranchId("STTPoint");
@@ -108,7 +154,6 @@ InitStatus PndTrackImport::Init() {
     fSttHitArray = (TClonesArray*) ioman->GetObject("STTHit");
     fSttHitBranchID = ioman->GetBranchId("STTHit");
     
-    // Set Persistency
     SetPersistency(kTRUE);
     
     // Read TrackML Tree
@@ -119,7 +164,14 @@ InitStatus PndTrackImport::Init() {
     t->SetBranchAddress("ml_hit_id", &hit_id);
     t->SetBranchAddress("ml_track_id", &track_id);
     t->SetBranchAddress("nml", &n);
-       
+    
+    // trackML->SetBranchAddress("nTrackCand", &hit_id);
+    // trackML->SetBranchAddress("TrackCand", &track_id);
+
+    // Create and register PndTrack and PndTrackCand arrays
+    //fSttTrackArray = new TClonesArray("PndTrack", 100);
+    //ioman->Register("SttTrack", "STT Track", fSttTrackArray, GetPersistency());
+    
     fSttTrackCandArray = new TClonesArray("PndTrackCand", 100);
     ioman->Register("SttTrackCand", "STT TrackCand", fSttTrackCandArray, GetPersistency());
     
@@ -139,48 +191,76 @@ void PndTrackImport::Exec(Option_t* /*opt*/) {
     std::string fidx = ss.str();
     std::cout << "\nProcessing Event: " << (fEventId) << std::endl;
     
-    t->GetEntry(fEventId);
-    std::map<int, std::vector<int> > map_track_cands;
-    std::map<int, PndTrackCand*> map_tcands;
+    /*
+    // RDF from CSVs
+    // auto rdf = ROOT::RDF::FromCSV(filename);             // Root v6.26    
+    // auto rdf = ROOT::RDF::MakeCsvDataFrame(filename);    // Root v6.22
     
-    // Create PndTrackCand Map
+    // TTree from CSVs
+    // TTree *t = new TTree("t", "Track Cand");
+    // t->ReadFile(filename, "hit_id/I:track_id");
+    
+    // TTree from ROOT
+    // TFile *myfile = TFile::Open(filename);
+    // TTree *t = myfile->Get<TTree>("TrackML");
+    */
+    
+    // We start from fEventId=0, as Event Counter. Then we 
+    // get the entries of event 'fEventId' for all branches
+    t->GetEntry(fEventId);
+    
+    // hit_id, track_id are jagged array, with size 'n'. We need
+    // to loop over to read hits and tracks for a particular event.
+    std::map<int, std::vector<int> > map_track_cands;
+    std::map<int, PndTrackCand*> mycands;
+     
     for (int i = 0; i < n; i++) {
     
         // cout << setw(3) << hit_id[i] << ", "  << setw(3) << track_id[i] << endl;
         map_track_cands[track_id[i]].push_back(hit_id[i]);
         
         // OR, PndTrackCands Map
-        if (map_tcands[track_id[i]]==nullptr) {
-            map_tcands[track_id[i]] = new PndTrackCand();
+        if (mycands[track_id[i]]==nullptr) {
+            mycands[track_id[i]] = new PndTrackCand();
             
             // Issue here is somewhere -1 is fed in that gives seg-fault
-            // map_tcands[track_id[i]] = new ((*fSttTrackCandArray)[i]) PndTrackCand();
+            // mycands[track_id[i]] = new ((*fSttTrackCandArray)[i]) PndTrackCand();
         }
         
-        PndTrackCand* myTCand = map_tcands[track_id[i]];
+        PndTrackCand* myTCand = mycands[track_id[i]];
 
-        // get hit pointer from hitID & Pandaroot 
-        int idx = hit_id[i] - 1;
-        Double_t rho = (double)hit_id[i];       
+        // // get hit pointer from hitID & Pandaroot 
+        int idx = hit_id[i] - 1;                                 // idx =  hit_id - 1
+        Double_t rho = (double)hit_id[i];
         
-        //FIXME: issue with adding FairLink to PndTrackCand
+        
+        // Hit id is increasing number, remain valid if a track curls back to IP.
+        // It seemed to be fair choice for the rho parameter.
+        
+        
+        //FIXME: Issue with Adding FairLink to PndTrackCand
+        
+        // OLD Code to AddHit()
+        // myTCand->AddHit(FairRootManager::Instance()->GetBranchId("STTHit"), idx, rho); 
+        
+        // OR,
         PndSttHit* stthit = (PndSttHit*)fSttHitArray->At(idx);
         
-
-        std::cout << "FairLink to TrackCand (2):" << FairLink(-1, -1, fSttHitBranchID, idx) << std::endl;
-        std::cout << "FairLink to TrackCand (2):" << FairLink(-1, FairRootManager::Instance()->GetEntryNr(), fSttHitBranchID, idx) << std::endl;
+        //std::cout << "FairLink to TrackCand (1):" << stthit->GetEntryNr() << std::endl;
+        //myTCand->AddHit(stthit->GetEntryNr(), rho); 
         
+        // OR,
+        //std::cout << "FairLink to TrackCand (2):" << FairLink(-1, -1, fSttHitBranchID, idx) << std::endl;
         FairLink link(-1, FairRootManager::Instance()->GetEntryNr(), fSttHitBranchID, idx);
-        myTCand->SetInsertHistory(kTRUE);
+        //myTCand->SetInsertHistory(kTRUE);
         myTCand->AddHit(link, rho); 
         
-    }//end
-    
+    }
     
     // Display Map
-	std::cout << "\nTotal TrackML Track Cands: " << map_track_cands.size() << std::endl;
-	for (auto const &iter : map_track_cands) {
-    	std::cout << iter.first << ':';
+	std::cout << "Total TrackML Track Cands:" << map_track_cands.size() << std::endl;
+	for (auto const &iter : map_track_cands) {  // c++11
+    	std::cout << iter.first << ':' /*<< iter.second.size() << endl*/ ;
     	for(auto const& iter1: iter.second) 
         	std::cout << ' ' << iter1;
         cout << endl;
@@ -188,20 +268,33 @@ void PndTrackImport::Exec(Option_t* /*opt*/) {
     
     
     // Write PndTrackCand to fSttTrackCandArray
-    std::cout << "Total PndTrackCand Per Event: " << map_tcands.size() << std::endl;
+    std::cout << "Total PndTrackCand Per Event:" << mycands.size() << std::endl;
     int index =0;
-	for (auto const &iter : map_tcands) {
+	for (auto const &iter : mycands) {  // c++11
    	
     	PndTrackCand* tcand = (PndTrackCand*)iter.second;
+        //std::cout << iter.first << ":"<< tcand->GetNHits() << endl;
+    	//tcand->Print();
+    	
+    	//FIXME: Debugging
+    	/*
+    	std::vector<PndTrackCandHit> tcandhits = tcand->GetSortedHits();
+    	for (unsigned int i = 0; i < tcandhits.size(); ++i)
+            cout << "FairLink from tcand : " << tcandhits.at(i).GetFile() << ","
+                                  << tcandhits.at(i).GetEntry() << ","
+                                  << tcandhits.at(i).GetType()  << ","
+                                  << tcandhits.at(i).GetIndex()  << ","
+                                  << tcandhits.at(i).GetWeight()
+                                  << endl;
+        */
+        // Writing TClonesArray
         if (iter.first >= 0) // -1: unassigned hits.
-            new ((*fSttTrackCandArray)[index]) PndTrackCand(*tcand);
-    
-    }//end
-    
+            new ((*fSttTrackCandArray)[index]) PndTrackCand(*tcand); 
+    }
     
     // Clear Objects
     map_track_cands.clear();
-    map_tcands.clear();
+    mycands.clear();
 
     cout << "fSttHitArray Size : " << fSttHitArray->GetEntries() << endl;
     cout << "Number of Reco Hit: " << n << endl;

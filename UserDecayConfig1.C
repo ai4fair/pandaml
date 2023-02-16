@@ -1,4 +1,4 @@
-void UserDecayConfig(){
+void UserDecayConfig1(){
 
 cout << "Loading User Decay Config from macro" << endl;
 

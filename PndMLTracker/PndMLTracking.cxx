@@ -423,7 +423,9 @@ void PndMLTracking::GenerateSttData() {
         if (mctrack == 0) {continue;}
         
         // Terminate if not Primary
-        if (!mctrack->IsGeneratorCreated())
+        //if (!mctrack->IsGeneratorCreated())
+        //if (!mctrack->IsGeneratorDecayed())
+        if (!mctrack->IsGeneratorLast())
             continue;
         
         // Get STTHit
@@ -432,7 +434,6 @@ void PndMLTracking::GenerateSttData() {
         
         // Remove Skewed Hits
         // if (tube->IsSkew()) {continue;}
-        
         
         // Hit Counter (Always Start from 1 to N)
         fHitId++;
@@ -581,7 +582,9 @@ void PndMLTracking::GenerateParticlesData() {
                         PndMCTrack *mcTrack = (PndMCTrack *)ioman->GetCloneOfLinkData(linksMC.GetLink(i));
                         
                         // Get Only Primary Tracks
-                        if (mcTrack->IsGeneratorCreated()) {
+                        //if (mcTrack->IsGeneratorCreated()) {
+                        //if (mcTrack->IsGeneratorDecayed()) {
+                        if (mcTrack->IsGeneratorLast()) {
 
                             // Links of Primary Tracks
                             linksMVDPixel = barrelTrack->GetLinksWithType(ioman->GetBranchId("MVDHitsPixel"));
@@ -604,7 +607,7 @@ void PndMLTracking::GenerateParticlesData() {
                                         << Nhits                           << ","   // nhits in MVD+GEM+STT
                                         << mcTrack->GetPdgCode()           << ","   // pdgcode e.g. mu- has pdgcode=-13
                                         << mcTrack->GetStartTime()         << ","   // start_time = start time of particle track
-                                        << mcTrack->IsGeneratorCreated()            // If a particle is primary or not
+                                        << mcTrack->IsGeneratorDecayed()            // If a particle is primary or not
                                         << std::endl;
                                         
                            }//end-IsGeneratorCreated()

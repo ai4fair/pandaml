@@ -1,0 +1,13 @@
+noPhotos
+
+Decay pbarpSystem
+1.0 anti-Lambda0 Lambda0 LambdaLambdaBar 1.642;
+Enddecay
+ 
+Decay Lambda0
+Enddecay
+
+Decay anti-Lambda0 
+Enddecay
+
+End
