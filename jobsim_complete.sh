@@ -15,10 +15,16 @@ _target=$nyx"/data"
 # Default Inputs
 nevt=1000
 prefix=mumu
-gen=DBoxGEN                   # SBoxGEN, DBoxGEN or .DEC
+
+# SBoxGEN, DBoxGEN, FTF, PYTHIA, EvtGEN, etc.
+#gen=SBoxGEN
+#gen=DBoxGEN
+#gen=ftf
+#gen=pythia8
+gen=llbar_fwp.dec
 pBeam=1.642                   # llbar: 1.642, xibarxi1820: 4.6, J/Psi: 6.231552
-seed=$RANDOM
 flag="WithIdeal"              # With/Without IdealTrackFinder to Fill fParticles CSV
+seed=$RANDOM
 run=$SLURM_ARRAY_TASK_ID
 
 
