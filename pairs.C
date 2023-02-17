@@ -1,7 +1,7 @@
 #ifdef __CLING__
 #pragma cling optimize(0)
 #endif
-void pair()
+void pairs()
 {
 //=========Macro generated from canvas: can/Histograms
 //=========  (Sat Jan 28 11:24:37 2023) by ROOT version 6.26/08
