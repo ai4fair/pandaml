@@ -1,0 +1,11 @@
+
+# Muon Gun
+Set 'mctrack->IsGeneratorCreated()' in PndMLTracker.cxx
+
+
+# Lambda Gun
+
+Set 'mctrack->IsGeneratorCreated()' in PndMLTracker.cxx
+
+# LLbar FWP
+Set 'mctrack->IsGeneratorLast()' in PndMLTracker.cxx
