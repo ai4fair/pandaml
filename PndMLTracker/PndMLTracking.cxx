@@ -423,10 +423,9 @@ void PndMLTracking::GenerateSttData() {
         if (mctrack == 0) {continue;}
         
         // Terminate if not Primary
-        //if (!mctrack->IsGeneratorCreated())
-        //if (!mctrack->IsGeneratorDecayed())
-        if (!mctrack->IsGeneratorLast())
-            continue;
+        //if (!mctrack->IsGeneratorCreated())   // BoxGen: muons, doesn't work for Lambdas
+        //if (!mctrack->IsGeneratorLast())      // set for llbar_fwp.dec
+        //    continue;
         
         // Get STTHit
         PndSttHit* stthit = (PndSttHit*)fSttHitArray->At(idx);
@@ -582,9 +581,8 @@ void PndMLTracking::GenerateParticlesData() {
                         PndMCTrack *mcTrack = (PndMCTrack *)ioman->GetCloneOfLinkData(linksMC.GetLink(i));
                         
                         // Get Only Primary Tracks
-                        //if (mcTrack->IsGeneratorCreated()) {
-                        //if (mcTrack->IsGeneratorDecayed()) {
-                        if (mcTrack->IsGeneratorLast()) {
+                        if (mcTrack->IsGeneratorCreated()) {     // box generator: muons
+                        //if (mcTrack->IsGeneratorLast()) {      // llbar_fwp.dec
 
                             // Links of Primary Tracks
                             linksMVDPixel = barrelTrack->GetLinksWithType(ioman->GetBranchId("MVDHitsPixel"));

@@ -41,7 +41,8 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
     //TString inputGen   = "ftf";             // BkgGen: dpm, ftf, pythia8 set as fRun->SetInput(inputGen)
     //TString inputGen   = "box:type(13,10):p(1.0,3.0):tht(22,140):phi(0,360)";
     
-    TString decayMode = "UserDecayConfig.C";  // only for Xibar_Xi1820.dec
+    TString decayMode1 = "UserDecayConfig1.C";// only for Xibar_Xi1820.dec
+    TString decayMode2 = "UserDecayConfig2.C";// only for llbar_fwp_1_642GeV.dec
     
     //----- Init Settings
     PndMasterRunSim *fRun = new PndMasterRunSim();
@@ -87,8 +88,8 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
         FairBoxGenerator* boxGen = new FairBoxGenerator(13, 5);    // 13 = muon; 5 = multiplicity
         boxGen->SetPRange(1.0, 3.0);                               // GeV/c (1.0 to 3.0)
         boxGen->SetPhiRange(0., 360.);                             // Azimuth angle range [degree]
-        boxGen->SetThetaRange(22., 140.);                          // Polar angle in lab system range [degree]
-        boxGen->SetXYZ(0., 0., 0.);                                // mm or cm ??
+        boxGen->SetThetaRange(22., 140.);                          // Polar angle in lab system range [degree], STT
+        boxGen->SetXYZ(0., 0., 0.);                                // mm or cm ??  IP we can shift it in R and Z directions
         fRun->AddGenerator(boxGen);
     }
     
@@ -98,21 +99,21 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
         std::cout << "-I- Using Double BoxGenerator..." << std::endl;
         
         // 1st BoxGenerator
-        FairBoxGenerator* boxGen1 = new FairBoxGenerator(13, 5);    // 13 = muon; 5 = multiplicity
+        FairBoxGenerator* boxGen1 = new FairBoxGenerator(3122, 3);  // 13=muon; 3122=Lambda; 5=multiplicity
         boxGen1->SetPRange(0.1, 1.5);                               // GeV/c (1.0 to 3.0), 100 MeV to 1.5 GeV
         boxGen1->SetPhiRange(0., 360.);                             // Azimuth angle range [degree]
-        boxGen1->SetThetaRange(22., 140.);                          // Polar angle in lab system range [degree]
-        boxGen1->SetThetaRange(3., 150.);                           // Polar angle in lab system range [degree], CTS
-        boxGen1->SetXYZ(0., 0., 0.);                                // mm or cm ??
+        boxGen1->SetThetaRange(22., 140.);                          // Polar angle in lab system range [degree], STT
+        //boxGen1->SetThetaRange(3., 150.);                         // Polar angle in lab system range [degree], CTS
+        boxGen1->SetXYZ(0., 0., 0.);                                // mm or cm ??  IP we can shift it in R and Z directions
         fRun->AddGenerator(boxGen1);
 
         // 2nd BoxGenerator
-        FairBoxGenerator* boxGen2 = new FairBoxGenerator(-13, 5);   // -13 = antimuon; 5 = multiplicity
+        FairBoxGenerator* boxGen2 = new FairBoxGenerator(-3122, 3); // -13=antimuon; -3122=anti-Lambda; 5=multiplicity
         boxGen2->SetPRange(0.1, 1.5);                               // GeV/c (1.0 to 3.0), 100 MeV to 1.5 GeV
         boxGen2->SetPhiRange(0., 360.);                             // Azimuth angle range [degree]
-        //boxGen2->SetThetaRange(22., 140.);                        // Polar angle in lab system range [degree], STT
-        boxGen2->SetThetaRange(3., 150.);                           // Polar angle in lab system range [degree], CTS
-        boxGen2->SetXYZ(0., 0., 0.);                                // mm or cm ??
+        boxGen2->SetThetaRange(22., 140.);                          // Polar angle in lab system range [degree], STT
+        //boxGen2->SetThetaRange(3., 150.);                         // Polar angle in lab system range [degree], CTS
+        boxGen2->SetXYZ(0., 0., 0.);                                // mm or cm ?? IP we can shift it in R and Z directions
         fRun->AddGenerator(boxGen2);
      
     }
@@ -145,7 +146,7 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
     fRun->SetNumberOfEvents(nEvents);
     fRun->SetBeamMom(pBeam);
     fRun->SetStoreTraj(kTRUE);
-    //fRun->SetUserDecay(decayMode);              // Only for Xibar_Xi1820
+    //fRun->SetUserDecay(decayMode);                                // Force FairRoot for a certain decay chains
     
 	//----- Init
     fRun->Setup(prefix);
