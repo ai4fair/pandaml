@@ -1,6 +1,6 @@
-int data_complete(Int_t nEvents=10, TString prefix="", TString outputdir="", TString flag="", Int_t Job_Id=0) {
+int data_complete(Int_t nEvents=10, TString prefix="", TString outputdir="", TString assistIdeal="", Int_t Job_Id=0) {
     
-    std::cout << "\nFLAGS: " << nEvents << "," << prefix << "," << outputdir << "," << Job_Id << "," << flag << std::endl;
+    std::cout << "\nFLAGS: " << nEvents << "," << prefix << "," << outputdir << "," << Job_Id << "," << assistIdeal << std::endl;
     
     // ROOT Files
     TString parFile     = prefix+"_par.root";
@@ -22,7 +22,7 @@ int data_complete(Int_t nEvents=10, TString prefix="", TString outputdir="", TSt
     fSrc->AddFriend(digiFile);
 
     // Add Friend File to FairFileSource
-    fSrc->AddFriend(skewFile);
+    // fSrc->AddFriend(skewFile);
 
     // Add Friend File to FairFileSource
     fSrc->AddFriend(recoFile);
@@ -48,7 +48,7 @@ int data_complete(Int_t nEvents=10, TString prefix="", TString outputdir="", TSt
 
     // HERE OUR TASK GOES!
     Int_t start_counter = nEvents*Job_Id;
-    PndMLTracking *genDB = new PndMLTracking(start_counter, outputdir, flag);
+    PndMLTracking *genDB = new PndMLTracking(start_counter, outputdir, assistIdeal);
     fRun->AddTask(genDB);
 
     // FairRunAna Init
