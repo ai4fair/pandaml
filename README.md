@@ -1,58 +1,123 @@
-## _Mount Lustre_
+# PANDA Tracking Stuides
+
+This repository contains the code for the following tasks:
+
+1. **Simulate hits** in the PANDA tracking systems corresponding to different physical processes.
+2. **Reconstruct particle tracks** from these hits using ideal track reconstruction.
+3. **Export the hit (and ideal track) information** into .csv files so that they can be processed by a machine learning algorithm.
+4. **Visualize** the different steps of the simulation chain in combination with the detector geometries.
+
+## Dependencies
+
+The following software is required to run the code in this repository:
+
+- [Git](https://git-scm.com/downloads)
+- [PandaRoot](https://git.panda.gsi.de/PandaRootGroup/PandaRoot) (currently using v13.1.0)
+- [Anaconda](https://www.anaconda.com/download/success) / [Miniconda](https://docs.anaconda.com/free/miniconda/index.html)
+
+## Setup
+
+### 1. Download the Repository Using Git
 
 ```bash
-# mount lustre
-mnt=/tmp/lustre
-mkdir $mnt
-sshfs lxpool-lustre:/lustre/panda/aakram/ $mnt
-
-# unmount lustre
-fusermount -u $mnt
+git clone -b <branch> https://github.com/ai4fair/pandaml.git <path>/<name>
 ```
 
-## _Run Simulation_
-### _1. Virgo Cluster_
+You should replace `<branch>` with the branch you want to use, e.g. `main`, `<path>` with the path to the repository, and `<name>` with the name you want to give to the folder where the repository is located.
+
+### 2. Add Modules to PandaRoot
+
+Copy the two PandaRoot modules [`PndMLTracker/`](PandaRootModules/PndMLTracker/) and [`PndTrackImport/`](PandaRootModules/PndTrackImport/) into the PandaRoot source directory. To do so execute the following commands while in the root directory of this repository:
 
 ```bash
-# connect to virgo
-ssh lxpool-virgo-debian10
-```
-
-
-
-```bash
-# one job (single node)
-./jobsim_complete.sh 100 llbar llbar_fwp.dec
+cp -r PandaRootModules/PndMLTracker <path/to/PandaRoot/source>/tracking/
 ```
 
 ```bash
-# for job array
-./submit.jobs
+cp -r PandaRootModules/PndTrackImport/ <path/to/PandaRoot/source>/tracking/
 ```
 
-### _2. Local Machine_
+Replace `<path/to/PandaRoot/source>` with the path to your PandaRoot source directory, where a `tracking` folder should exist.
 
-To run simulation one needs to run either `runall.sh` (local) or `runsif.sh` (singularity) scripts _e.g._
+Now change add the new modules to the `CMakeLists.txt` file which should be located at `<path/to/PandaRoot/source>`. To do so open `CMakeLists.txt` with you prefered editor, e.g.
 
 ```bash
-# run on local machine
-./runall.sh 100 box DBGEN
+code <path/to/PandaRoot/source>/CMakeLists.txt
 ```
 
-Similary if one have singularity container for PandaRoot, then just run `runsif.sh`.
+and then add the lines
+
+```cmake
+add_subdirectory (tracking/PndMLTracker)
+add_subdirectory (tracking/PndTrackImport)
+```
+
+at the part of the code, where all other subdirectories are added.
+
+Then recompile PandaRoot by making a `build` directory in your PandaRoot path `<path/to/PandaRoot>`
 
 ```bash
-# run on container
-./runsif.sh 100 box DBGEN
+mkdir <path/to/PandaRoot>/build
 ```
 
-
-All bash scripts should run following simulation chain:
+and change into the `build` directory
 
 ```bash
-root -l -b -q sim_complete.C\($nevt,\"$outprefix\",\"$gen\",$pBeam,$seed\) > $outprefix"_sim.log" 2>&1
-root -l -b -q digi_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_digi.log" 2>&1
-root -l -b -q skew_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_skew.log" 2>&1
-root -l -b -q recoideal_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_reco.log" 2>&1
-root -l -b -q data_complete.C\($nevt,\"$outprefix\",\"$_target\",\"$flag\"\) > $outprefix"_data.log" 2>&1
+cd <path/to/PandaRoot>/build
 ```
+
+then prepare the compilation with CMake
+
+```bash
+cmake <OTHER_FLAGS> -DCMAKE_INSTALL_PREFIX=../install ../<source>
+```
+
+Here `<OTHER_FLAGS>` is a place holder for flags that you might want to use for the compilation, e.g. `-DBUILD_PANDA_WITHOUT_CUDA` to build PandaRoot without cuda, but it can also be left empty. `<source>` should be replaced with the name of the PandaRoot source directory that you downloaded from git.
+
+### 3. Create & Activate the Conda Environment
+
+To use the jupyter notebooks to plot the simulation results, the corresponding conda environment has to be created and activated. To do so, go to the [`condaEnvironments/`](condaEnvironments/) folder in the repository
+
+```bash
+cd condaEnvironments/
+```
+
+create the conda environment
+
+```bash
+conda env create --file visualization.yml
+```
+
+and activate the environment
+
+```bash
+conda activate vis
+```
+
+### 4. Set Bash Environment Variables
+
+Adjust and add the following paths to your bash environment e.g. your `.bashrc` most commenly located at you home direcotry.
+
+```bash
+export SIM_FILE_PATH=<output/path/to/your/simulation/files>
+```
+
+Path to the directory where you want to save the results of the simulation chain (`.root` and `.log` files).
+
+```bash
+export ML_FILE_PATH=<output/path/to/your/ML/files>
+```
+
+Path to the directory where the `.cvs` files are stored for the machine learning algorithm.
+
+```bash
+export VIS_PATH=<output/path/to/your/plots/and/images>
+```
+
+Path to the directory where the plots and images created in the visualization step are saved.
+
+## Usage
+
+A user guide for the PandaRoot simulation chain can be found in the [simulationChainMacros/simulationChainGuide.md](simulationChainMacros/simulationChainGuide.md).
+
+A user guide for the visualization macros and notebooks can be found in [visualization/visualizationGuide.md](visualization/visualizationGuide.md).
