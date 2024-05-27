@@ -1,0 +1,22 @@
+
+Decay pbarpSystem
+1.00	anti-Xi+ Xi-		PHSP;
+Enddecay
+
+Decay anti-Xi+
+1.00	anti-Lambda0 pi+	PHSP;
+Enddecay
+
+Decay Xi-
+1.00	Lambda0 pi-			PHSP;
+Enddecay
+
+Decay anti-Lambda0
+1.00	anti-p- pi+			PHSP;  
+Enddecay
+
+Decay Lambda0
+1.00	p+ pi-				PHSP;
+Enddecay
+
+End

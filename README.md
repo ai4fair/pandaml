@@ -36,14 +36,14 @@ To run simulation one needs to run either `runall.sh` (local) or `runsif.sh` (si
 
 ```bash
 # run on local machine
-./runall 100 box DBGEN
+./runall.sh 100 box DBGEN
 ```
 
 Similary if one have singularity container for PandaRoot, then just run `runsif.sh`.
 
 ```bash
 # run on container
-./runsif 100 box DBGEN
+./runsif.sh 100 box DBGEN
 ```
 
 
