@@ -63,9 +63,9 @@ flag="WithoutIdeal"     # With/Without IdealTrackFinder to Fill fParticles CSV
 _target=/lustre/panda/ninderw/simFiles/$prefix
 
 # create the directory structure
-mkdir -p $_target/root/$prefix
-mkdir -p $_target/log/$prefix
-mkdir -p $_target/cvs/$prefix
+mkdir -p $_target/root/
+mkdir -p $_target/log/
+mkdir -p $_target/cvs/
 
 # make temp directory for the intermediate files
 tmpdir=/tmp/pandaSim/$prefix
