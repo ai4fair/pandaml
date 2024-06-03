@@ -17,13 +17,14 @@
 # $2: Prefix/Name for the output files
 # $3: MC generator to use (SBoxGEN, DBoxGEN [default], ftf, pythia8, <file>.dec)
 # $4: Beam momentum in GeV (default: 1.642 GeV)
+# $5: Random seed for the simulation (default: 42)
 
 # ---------------------------------------------------------------
 #                       Create Directories
 # ---------------------------------------------------------------
 
 # target directory for the output files
-_target=/home/n_idw/simFiles
+_target=/lustre/panda/ninderw/simFiles/$prefix
 
 # create the directory structure
 mkdir -p $_target"/root"
@@ -31,7 +32,7 @@ mkdir -p $_target"/log"
 mkdir -p $_target"/cvs"
 
 # make temp directory for the intermediate files
-tmpdir="/tmp/"$USER
+tmpdir=/tmp/pandaSim
 mkdir -p $tmpdir
 
 # ---------------------------------------------------------------
@@ -62,8 +63,13 @@ if test "$4" != ""; then
   pBeam=$4
 fi
 
+# Random seed
+seed=42
+if test "$5" != ""; then
+  seed=$5
+fi
+
 flag="WithoutIdeal"     # With/Without IdealTrackFinder to Fill fParticles CSV
-seed=42                 # Random Seed
 
 # Output path
 outprefix=$tmpdir"/"$prefix
@@ -87,23 +93,23 @@ echo "Seed        : $seed"
 echo ""
 # Generates events and propagates them to a detector simulation
 echo "Started Simulation..."
-root -l -b -q sim_complete.C\($nevt,\"$outprefix\",\"$gen\",$pBeam,$seed\) > $outprefix"_sim.log" 2>&1
+root -l -b -q ../simulationChainMacros/sim_complete.C\($nevt,\"$outprefix\",\"$gen\",$pBeam,$seed\)
 
 # Takes the generated particle tracks and simulates the detector response
 echo "Started Digitization..."
-root -l -b -q digi_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_digi.log" 2>&1
+root -l -b -q ../simulationChainMacros/digi_complete.C\($nevt,\"$outprefix\"\)
 
 # Applies an correction to the longitudinal parameters of the hits in the skewed straw tubes
 echo "Started Skewed Correction..."
-root -l -b -q skew_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_skew.log" 2>&1
+root -l -b -q ../simulationChainMacros/skew_complete.C\($nevt,\"$outprefix\"\)
 
 # Reconstructs tracks from the hits in the straw tubes using MC truth (ideal track reconstruction)
 echo "Started Ideal Reconstruction..."
-root -l -b -q recoideal_complete.C\($nevt,\"$outprefix\"\) > $outprefix"_reco.log" 2>&1
+root -l -b -q ../simulationChainMacros/recoideal_complete.C\($nevt,\"$outprefix\"\)
 
 # Transfers the hit and track information into CVS files that are readable for the ML pipeline
 echo "Started CSV Generator..."
-root -l -b -q data_complete.C\($nevt,\"$outprefix\",\"$tmpdir\",\"$flag\"\) > $outprefix"_data.log" 2>&1
+root -l -b -q ../simulationChainMacros/data_complete.C\($nevt,\"$outprefix\",\"$tmpdir\",\"$flag\"\)
 
 echo "Finished All Tasks"
 
@@ -116,7 +122,6 @@ echo ""
 echo "Moving Files from '$tmpdir' to '$_target'"
 
 mv $tmpdir"/"*.root $_target"/root"
-mv $tmpdir"/"*.log $_target"/log"
 mv $tmpdir"/"*.csv $_target"/cvs"
 
 #*** Tidy Up ***
