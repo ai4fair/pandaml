@@ -27,9 +27,9 @@
 _target=/lustre/panda/ninderw/simFiles/$prefix
 
 # create the directory structure
-mkdir -p $_target"/root"
-mkdir -p $_target"/log"
-mkdir -p $_target"/cvs"
+mkdir -p $_target/root/$prefix
+mkdir -p $_target/log/$prefix
+mkdir -p $_target/cvs/$prefix
 
 # make temp directory for the intermediate files
 tmpdir=/tmp/pandaSim
@@ -72,7 +72,7 @@ fi
 flag="WithoutIdeal"     # With/Without IdealTrackFinder to Fill fParticles CSV
 
 # Output path
-outprefix=$tmpdir"/"$prefix
+outprefix=$tmpdir/$prefix
 
 # ---------------------------------------------------------------
 #                              Print Flags
@@ -121,8 +121,8 @@ echo ""
 
 echo "Moving Files from '$tmpdir' to '$_target'"
 
-mv $tmpdir"/"*.root $_target"/root"
-mv $tmpdir"/"*.csv $_target"/cvs"
+mv $outprefix/*.root $_target/root/$prefix
+mv $outprefix/*.csv $_target/cvs/$prefix
 
 #*** Tidy Up ***
 rm -rf $tmpdir
