@@ -68,7 +68,7 @@ mkdir -p $_target/log/$prefix
 mkdir -p $_target/cvs/$prefix
 
 # make temp directory for the intermediate files
-tmpdir=/tmp/pandaSim
+tmpdir=/tmp/pandaSim/$prefix
 mkdir -p $tmpdir
 
 # Output path
