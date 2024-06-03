@@ -12,4 +12,4 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --get-user-env
 
-./runSimChain_virgo.sh 1000 %x_%a DBoxGEN 1.642 %a
+./runSimChain_virgo.sh 10 %x_%a DBoxGEN 1.642 %a

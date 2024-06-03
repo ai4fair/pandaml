@@ -121,8 +121,8 @@ echo ""
 
 echo "Moving Files from '$tmpdir' to '$_target'"
 
-mv $outprefix/*.root $_target/root/$prefix
-mv $outprefix/*.csv $_target/cvs/$prefix
+mv $tmpdir/*.root $_target/root/$prefix
+mv $tmpdir/*.csv $_target/cvs/$prefix
 
 #*** Tidy Up ***
 rm -rf $tmpdir
