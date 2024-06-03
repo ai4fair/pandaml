@@ -30,28 +30,31 @@ if test "$1" != ""; then
 fi
 
 # Prefix for output files
-prefix="test" # default
-if test "$2" != ""; then
-  prefix=$2
-fi
+# prefix="test" # default
+# if test "$2" != ""; then
+#   prefix=$2
+# fi
+
+prefix=${SLURM_JOB_NAME}_${SLURM_ARRAY_TASK_ID}
 
 # MC generator: SBoxGEN, DBoxGEN, ftf, pythia8, <file>.dec (EvtGEN)
 gen=DBoxGEN # default
-if test "$3" != ""; then
-  gen=$3
+if test "$2" != ""; then
+  gen=$2
 fi
 
 # Beam momentum => llbar: 1.642 GeV, xibarxi1820: 4.6 GeV, J/Psi: 6.231552 GeV
 pBeam=1.642
-if test "$4" != ""; then
-  pBeam=$4
+if test "$3" != ""; then
+  pBeam=$3
 fi
 
 # Random seed
-seed=42
-if test "$5" != ""; then
-  seed=$5
-fi
+# seed=42
+# if test "$5" != ""; then
+#   seed=$5
+# fi
+seed=$SLURM_ARRAY_TASK_ID
 
 flag="WithoutIdeal"     # With/Without IdealTrackFinder to Fill fParticles CSV
 
