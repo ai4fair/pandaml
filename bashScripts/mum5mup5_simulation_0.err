@@ -1,0 +1,72 @@
+Warning in <TInterpreter::ReadRootmapFile>: class  PndProcess found in libProcessTask.so  is already in libEmcMC.so 
+Warning in <TInterpreter::ReadRootmapFile>: class  PndProcessTask found in libProcessTask.so  is already in libEmcMC.so 
+input_line_79:2:62: error: expected expression
+ sim_complete(10,"/tmp/pandaSim/%x_%a/%x_%a","DBoxGEN",1.642,%a) /* '.x' tries to invoke a function with the same name as the macro */
+                                                             ^
+input_line_79:2:63: error: use of undeclared identifier 'a'
+ sim_complete(10,"/tmp/pandaSim/%x_%a/%x_%a","DBoxGEN",1.642,%a) /* '.x' tries to invoke a function with the same name as the macro */
+                                                              ^
+Warning in <TInterpreter::ReadRootmapFile>: class  PndProcess found in libProcessTask.so  is already in libEmcMC.so 
+Warning in <TInterpreter::ReadRootmapFile>: class  PndProcessTask found in libProcessTask.so  is already in libEmcMC.so 
+Warning in <TGeoManager>: Changing system of units to ROOT units (cm, s, GeV).
+Error in <TFile::TFile>: file /tmp/pandaSim/%x_%a/%x_%a_sim.root does not exist
+
+ *** Break *** segmentation violation
+
+
+
+===========================================================
+There was a crash.
+This is the entire stack trace of all threads:
+===========================================================
+#0  0x0000153eefef42d7 in __GI___waitpid (pid=634977, stat_loc=stat_loc
+entry=0x7ffeb15ec708, options=options
+entry=0) at ../sysdeps/unix/sysv/linux/waitpid.c:30
+#1  0x0000153eefe7270f in do_system (line=<optimized out>) at ../sysdeps/posix/system.c:149
+#2  0x0000153ef061f263 in TUnixSystem::Exec (shellcmd=<optimized out>, this=0x559f2f1b77c0) at /home/uhlig/containers/home/debian10/software/fairsoft/apr21p2/build/Source/root/core/unix/src/TUnixSystem.cxx:2117
+#3  TUnixSystem::StackTrace (this=0x559f2f1b77c0) at /home/uhlig/containers/home/debian10/software/fairsoft/apr21p2/build/Source/root/core/unix/src/TUnixSystem.cxx:2408
+#4  0x0000153ef0621435 in TUnixSystem::DispatchSignals (this=0x559f2f1b77c0, sig=kSigSegmentationViolation) at /home/uhlig/containers/home/debian10/software/fairsoft/apr21p2/build/Source/root/core/unix/src/TUnixSystem.cxx:3646
+#5  <signal handler called>
+#6  FairFileSource::FairFileSource (this=0x559f3449f6e0, RootFileName=..., Title=<optimized out>) at /cvmfs/fairsoft.gsi.de/debian10/fairsoft/apr21p2/include/root/TObject.h:187
+#7  0x0000153edbcf4b5e in PndMasterRunAna::Setup (this=0x559f3525cd10, outprefix=...) at /u/ninderw/PandaRootSource/tools/MasterTasks/PndMasterRunAna.cxx:80
+#8  0x0000153eeb71d72b in ?? ()
+#9  0x0000559f35e3b7b8 in ?? ()
+#10 0x00007ffe00000000 in ?? ()
+#11 0x00007ffe0000002b in ?? ()
+#12 0x0000559f35e23ed0 in ?? ()
+#13 0x00007ffe00000000 in ?? ()
+#14 0x00007ffe00000028 in ?? ()
+#15 0x0000559f35e3bd00 in ?? ()
+#16 0x00007ffe00000000 in ?? ()
+#17 0x0000000000000000 in ?? ()
+===========================================================
+
+
+The lines below might hint at the cause of the crash.
+You may get help by asking at the ROOT forum https://root.cern.ch/forum
+Only if you are really convinced it is a bug in ROOT then please submit a
+report at https://root.cern.ch/bugs Please post the ENTIRE stack trace
+from above as an attachment in addition to anything else
+that might help us fixing this issue.
+===========================================================
+#6  FairFileSource::FairFileSource (this=0x559f3449f6e0, RootFileName=..., Title=<optimized out>) at /cvmfs/fairsoft.gsi.de/debian10/fairsoft/apr21p2/include/root/TObject.h:187
+#7  0x0000153edbcf4b5e in PndMasterRunAna::Setup (this=0x559f3525cd10, outprefix=...) at /u/ninderw/PandaRootSource/tools/MasterTasks/PndMasterRunAna.cxx:80
+#8  0x0000153eeb71d72b in ?? ()
+#9  0x0000559f35e3b7b8 in ?? ()
+#10 0x00007ffe00000000 in ?? ()
+#11 0x00007ffe0000002b in ?? ()
+#12 0x0000559f35e23ed0 in ?? ()
+#13 0x00007ffe00000000 in ?? ()
+#14 0x00007ffe00000028 in ?? ()
+#15 0x0000559f35e3bd00 in ?? ()
+#16 0x00007ffe00000000 in ?? ()
+#17 0x0000000000000000 in ?? ()
+===========================================================
+
+
+Warning in <TInterpreter::ReadRootmapFile>: class  PndProcess found in libProcessTask.so  is already in libEmcMC.so 
+Warning in <TInterpreter::ReadRootmapFile>: class  PndProcessTask found in libProcessTask.so  is already in libEmcMC.so 
+Warning in <TGeoManager>: Changing system of units to ROOT units (cm, s, GeV).
+Error in <TFile::TFile>: file /tmp/pandaSim/%x_%a/%x_%a_sim.root does not exist
+
+ *** Break *** segmentation violation

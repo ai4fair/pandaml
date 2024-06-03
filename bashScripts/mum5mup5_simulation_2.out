@@ -1,0 +1,39 @@
+Start Singularity container /cvmfs/vae.gsi.de/vae23/containers/vae23-user_container_20240418T1037.sif
+
+Temp Dir.   : /tmp/pandaSim/%x_%a
+Target Dir. : /lustre/panda/ninderw/simFiles/%x_%a
+Events      : 10
+Prefix      : /tmp/pandaSim/%x_%a/%x_%a
+Decay       : DBoxGEN
+pBeam       : 1.642
+Seed        : %a
+
+Started Simulation...
+
+Processing ../simulationChainMacros/sim_complete.C(10,"/tmp/pandaSim/%x_%a/%x_%a","DBoxGEN",1.642,%a)...
+[INFO] PndSensorNameContFact::PndSensorNameContFact()
+[INFO] PndSensorNameContFact::setAllContainers(): Added PndSensorNamePar, Match between GeoManager path and SensorId with context: TestDefaultContext
+Started Digitization...
+
+Processing ../simulationChainMacros/digi_complete.C(10,"/tmp/pandaSim/%x_%a/%x_%a")...
+[INFO] PndSensorNameContFact::PndSensorNameContFact()
+[INFO] PndSensorNameContFact::setAllContainers(): Added PndSensorNamePar, Match between GeoManager path and SensorId with context: TestDefaultContext
+
+[INFO] ========== Input Parameters ==========
+[INFO] nEvents: 10
+[INFO] prefix: /tmp/pandaSim/%x_%a/%x_%a
+
+[INFO] Setting up the run...
+PndFileNameCreator::fFileName /tmp/pandaSim/%x_%a/%x_%a 25
+Started Skewed Correction...
+
+Processing ../simulationChainMacros/skew_complete.C(10,"/tmp/pandaSim/%x_%a/%x_%a")...
+[INFO] PndSensorNameContFact::PndSensorNameContFact()
+[INFO] PndSensorNameContFact::setAllContainers(): Added PndSensorNamePar, Match between GeoManager path and SensorId with context: TestDefaultContext
+
+[INFO] ========== Input Parameters ==========
+[INFO] nEvents: 10
+[INFO] prefix: /tmp/pandaSim/%x_%a/%x_%a
+
+[INFO] Setting up the run...
+PndFileNameCreator::fFileName /tmp/pandaSim/%x_%a/%x_%a 25
