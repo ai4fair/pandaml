@@ -20,22 +20,6 @@
 # $5: Random seed for the simulation (default: 42)
 
 # ---------------------------------------------------------------
-#                       Create Directories
-# ---------------------------------------------------------------
-
-# target directory for the output files
-_target=/lustre/panda/ninderw/simFiles/$prefix
-
-# create the directory structure
-mkdir -p $_target/root/$prefix
-mkdir -p $_target/log/$prefix
-mkdir -p $_target/cvs/$prefix
-
-# make temp directory for the intermediate files
-tmpdir=/tmp/pandaSim
-mkdir -p $tmpdir
-
-# ---------------------------------------------------------------
 #                       User & Default Inputs
 # ---------------------------------------------------------------
 
@@ -70,6 +54,22 @@ if test "$5" != ""; then
 fi
 
 flag="WithoutIdeal"     # With/Without IdealTrackFinder to Fill fParticles CSV
+
+# ---------------------------------------------------------------
+#                       Create Directories
+# ---------------------------------------------------------------
+
+# target directory for the output files
+_target=/lustre/panda/ninderw/simFiles/$prefix
+
+# create the directory structure
+mkdir -p $_target/root/$prefix
+mkdir -p $_target/log/$prefix
+mkdir -p $_target/cvs/$prefix
+
+# make temp directory for the intermediate files
+tmpdir=/tmp/pandaSim
+mkdir -p $tmpdir
 
 # Output path
 outprefix=$tmpdir/$prefix
