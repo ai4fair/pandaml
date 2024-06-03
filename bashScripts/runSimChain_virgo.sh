@@ -124,8 +124,8 @@ echo ""
 
 echo "Moving Files from '$tmpdir' to '$_target'"
 
-mv ${outprefix}*.root $_target/$prefix/root
-mv ${tmpdir}/*.csv $_target/$prefix/cvs
+mv ${outprefix}*.root $_target/root
+mv ${tmpdir}"/"*.csv $_target/cvs
 mv ${SLURM_JOB_NAME}_${SLURM_ARRAY_TASK_ID}.out $_target/log/
 mv ${SLURM_JOB_NAME}_${SLURM_ARRAY_TASK_ID}.err $_target/log/
 
