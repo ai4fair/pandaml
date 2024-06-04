@@ -13,8 +13,12 @@
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=1
 
-export NUM_GEN_EVENTS=1
-export GENERATOR_NAME=DBoxGEN
-export BEAM_MOMENTUM=1.642
+# Output directory for the simulation, cvs and log files
+export OUTPUT_DIR=/lustre/panda/ninderw/simFiles
+
+export CVS_GEN_FLAG="WithoutIdeal" 	# With/Without IdealTrackFinder to Fill fParticles CSV
+export NUM_GEN_EVENTS=1				# Number of events to be generated
+export GENERATOR_NAME=DBoxGEN		# Specify the MC generator that should be used to generate the events
+export BEAM_MOMENTUM=1.642			# Beam momentum in GeV/c
 
 ./runSimChain_virgo.sh
