@@ -1,4 +1,4 @@
-# PANDA Tracking Stuides
+# PANDA Tracking Stuides <!-- omit in toc -->
 
 This repository contains the code for the following tasks:
 
@@ -6,6 +6,16 @@ This repository contains the code for the following tasks:
 2. **Reconstruct particle tracks** from these hits using ideal track reconstruction.
 3. **Export the hit (and ideal track) information** into .csv files so that they can be processed by a machine learning algorithm.
 4. **Visualize** the different steps of the simulation chain in combination with the detector geometries.
+
+## Table of Contents <!-- omit in toc -->
+
+- [Dependencies](#dependencies)
+- [Setup](#setup)
+  - [1. Download the Repository Using Git](#1-download-the-repository-using-git)
+  - [2. Add Modules to PandaRoot](#2-add-modules-to-pandaroot)
+  - [3. Create \& Activate the Conda Environment](#3-create--activate-the-conda-environment)
+  - [4. Set Bash Environment Variables](#4-set-bash-environment-variables)
+
 
 ## Dependencies
 
@@ -115,9 +125,3 @@ export VIS_PATH=<output/path/to/your/plots/and/images>
 ```
 
 Path to the directory where the plots and images created in the visualization step are saved.
-
-## Usage
-
-A user guide for the PandaRoot simulation chain can be found in the [simulationChainMacros/simulationChainGuide.md](simulationChainMacros/simulationChainGuide.md).
-
-A user guide for the visualization macros and notebooks can be found in [visualization/visualizationGuide.md](visualization/visualizationGuide.md).

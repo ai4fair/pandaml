@@ -1,3 +1,20 @@
 #!/bin/bash
 
-sbatch --partition=main --array=0-1 --job-name=test --output=%x_%a.out --error=%x_%a.err --time=00:05:00 --mail-type=ALL --mail-user=n_inde01@uni-muenster.de --nodes=1 --cpus-per-task=1 --get-user-env ./runSimChain_virgo.sh 1 DBoxGEN 1.642
+#SBATCH --job-name=test
+#SBATCH --output=%x_%a.out
+#SBATCH --error=%x_%a.err
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=n_inde01@uni-muenster.de
+
+#SBATCH --get-user-env
+#SBATCH --partition=debug
+#SBATCH --time=00:10:00
+#SBATCH --array=0-1
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=1
+
+export NUM_GEN_EVENTS=1
+export GENERATOR_NAME=DBoxGEN
+export BEAM_MOMENTUM=1.642
+
+./runSimChain_virgo.sh
