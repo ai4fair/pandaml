@@ -7,7 +7,7 @@
 #SBATCH --mail-user=n_inde01@uni-muenster.de
 
 #SBATCH --get-user-env
-#SBATCH --partition=debug
+#SBATCH --partition=main
 #SBATCH --time=00:10:00
 #SBATCH --array=0-1
 #SBATCH --nodes=1
