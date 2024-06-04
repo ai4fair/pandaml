@@ -17,20 +17,21 @@
 # ---------------------------------------------------------------
 
 # Make a temporary directory for the files during the simulation steps
-tmpDir=/tmp/$SLURM_JOB_NAME/$SLURM_ARRAY_TASK_ID
-mkdir -p $tmpDir/root
-mkdir -p $tmpDir/cvs
+tmpRootDir=/tmp/$SLURM_JOB_NAME/$SLURM_ARRAY_TASK_ID/root
+tmpCvsDir=/tmp/$SLURM_JOB_NAME/$SLURM_ARRAY_TASK_ID/cvs
+mkdir -p $tmpRootDir
+mkdir -p $tmpCvsDir
 
 # Prefix for the in- and output root files
-prefix=$tmpDir/root/${SLURM_JOB_NAME}_${SLURM_ARRAY_TASK_ID}
+prefix=$tmpRootDir/${SLURM_JOB_NAME}_${SLURM_ARRAY_TASK_ID}
 
 # ---------------------------------------------------------------
 #                              Print Flags
 # ---------------------------------------------------------------
 
 echo ""
-echo "Temp Directory (root)	: $tmpDir/root"
-echo "Temp Directory (cvs)	: $tmpDir/cvs"
+echo "Temp Directory (root)	: $tmpRootDir"
+echo "Temp Directory (cvs)	: $tmpCvsDir"
 echo "Output Directory		: $OUTPUT_DIR"
 echo "Number of Events		: $NUM_GEN_EVENTS"
 echo "Prefix     			: $prefix"
@@ -61,7 +62,7 @@ root -l -b -q ../simulationChainMacros/recoideal_complete.C\($NUM_GEN_EVENTS,\"$
 
 # Transfers the hit and track information into CVS files that are readable for the ML pipeline
 echo "Started CSV Generator..."
-root -l -b -q ../simulationChainMacros/data_complete.C\($NUM_GEN_EVENTS,\"$prefix\",\"$tmpDir/cvs\",\"$CVS_GEN_FLAG\"\)
+root -l -b -q ../simulationChainMacros/data_complete.C\($NUM_GEN_EVENTS,\"$prefix\",\"$tmpCvsDir\",\"$CVS_GEN_FLAG\"\)
 
 echo "Finished All Simulation Tasks"
 echo ""
@@ -71,8 +72,11 @@ echo ""
 # ---------------------------------------------------------------
 
 # Move the root and csv files out of the temporary directory
-echo "Moving Files from $tmpDir to $OUTPUT_DIR"
-mv $tmpDir $OUTPUT_DIR/
+taksOutputDir=$OUTPUT_DIR/$SLURM_JOB_NAME/$SLURM_ARRAY_TASK_ID
+mkdir -p $taksOutputDir
+echo "Moving Files from $tmpRootDir and $tmpCvsDir to $taskOutputDir"
+mv $tmpRootDir $taskOutputDir
+mv $tmpCvsDir $taskOutputDir
 echo "Done"
 echo " "
 
