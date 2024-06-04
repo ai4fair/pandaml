@@ -72,8 +72,8 @@ echo ""
 # ---------------------------------------------------------------
 
 # Move the root and csv files out of the temporary directory
-taksOutputDir=$OUTPUT_DIR/$SLURM_JOB_NAME/$SLURM_ARRAY_TASK_ID
-mkdir -p $taksOutputDir
+taskOutputDir=$OUTPUT_DIR/$SLURM_JOB_NAME/$SLURM_ARRAY_TASK_ID
+mkdir -p $taskOutputDir
 echo "Moving Files from $tmpRootDir and $tmpCvsDir to $taskOutputDir"
 mv $tmpRootDir $taskOutputDir
 mv $tmpCvsDir $taskOutputDir
