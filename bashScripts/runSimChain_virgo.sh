@@ -31,7 +31,7 @@ prefix=$tmpDir/root/${SLURM_JOB_NAME}_${SLURM_ARRAY_TASK_ID}
 echo ""
 echo "Temp Directory (root)	: $tmpDir/root"
 echo "Temp Directory (cvs)	: $tmpDir/cvs"
-echo "Output Directory		: $outDir"
+echo "Output Directory		: $OUTPUT_DIR"
 echo "Number of Events		: $NUM_GEN_EVENTS"
 echo "Prefix     			: $prefix"
 echo "MC Generator 			: $GENERATOR_NAME"
@@ -70,14 +70,24 @@ echo ""
 #                Move Files to the Target Directory
 # ---------------------------------------------------------------
 
-echo "Moving Files from '$tmpDir' to '$outDir'"
+# Move the root and csv files out of the temporary directory
+echo "Moving Files from $tmpDir to $OUTPUT_DIR"
+mv $tmpDir $OUTPUT_DIR/
+echo "Done"
+echo " "
 
-mv ${prefix}*.root $outDir/root
-mv $tmpDir/cvs/* $outDir/cvs
-mv ${SLURM_JOB_NAME}_${SLURM_ARRAY_TASK_ID}.out $outDir/log/
-mv ${SLURM_JOB_NAME}_${SLURM_ARRAY_TASK_ID}.err $outDir/log/
+# Move the log files out of the bash script directory
+logDir=$OUTPUT_DIR/$SLURM_JOB_NAME/$SLURM_ARRAY_TASK_ID/log
+mkdir -p $logDir
+echo "Moving Log Files from $pwd to $logDir"
+mv ${SLURM_JOB_NAME}_${SLURM_ARRAY_TASK_ID}.out $logDir
+mv ${SLURM_JOB_NAME}_${SLURM_ARRAY_TASK_ID}.err $logDir
+echo "Done"
+echo " "
 
-#*** Tidy Up ***
+# Tidy Up
+echo "Tidying Up..."
 rm -rf $tmpDir
-
+echo "Done"
+echo " "
 echo "Everything is done!"
