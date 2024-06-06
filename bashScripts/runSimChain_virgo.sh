@@ -74,7 +74,7 @@ echo ""
 # Move the root and csv files out of the temporary directory
 taskOutputDir=$OUTPUT_DIR/$SLURM_JOB_NAME/$SLURM_ARRAY_TASK_ID
 mkdir -p $taskOutputDir
-echo "Moving Files from $tmpRootDir and $tmpCvsDir to $taskOutputDir"
+echo "Moving files from $tmpRootDir and $tmpCvsDir to $taskOutputDir"
 mv $tmpRootDir $taskOutputDir
 mv $tmpCvsDir $taskOutputDir
 echo "Done"
@@ -83,11 +83,14 @@ echo " "
 # Move the log files out of the bash script directory
 logDir=$OUTPUT_DIR/$SLURM_JOB_NAME/$SLURM_ARRAY_TASK_ID/log
 mkdir -p $logDir
-echo "Moving Log Files from $pwd to $logDir"
+echo "Moving log files from $pwd to $logDir"
 mv ${SLURM_JOB_NAME}_${SLURM_ARRAY_TASK_ID}.out $logDir
 mv ${SLURM_JOB_NAME}_${SLURM_ARRAY_TASK_ID}.err $logDir
 echo "Done"
 echo " "
+
+echo "Moving the gphysi.dat file containing the GEANT4 parameters to $OUTPUT_DIR/$SLURM_JOB_NAME"
+mv gphysi.dat $OUTPUT_DIR/$SLURM_JOB_NAME
 
 # Tidy Up
 echo "Tidying Up..."
