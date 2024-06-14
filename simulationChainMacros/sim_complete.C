@@ -60,6 +60,13 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
 	if (inputGen.Contains("dec")) 
 	{
 		LOG(INFO) << "Using the EvtGen generator...";
+		std::ifstream decayFile(inputGen.Data());
+		if (!decayFile) 
+		{
+			LOG(ERROR) << "File " << inputGen.Data() << " not found!";
+			return 1;
+		}
+		LOG(INFO) << "Input generator: " << inputGen.Data();
 		fRun->SetInput(inputGen);
 	}
 		
@@ -160,6 +167,9 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
 	// -----   Geometry   -----------------------------------------------------
 	LOG(INFO) << "Creating the geometry...";
 	fRun->CreateGeometry();
+
+	// -----   Event generator   ----------------------------------------------
+  	fRun->SetGenerator();
 
 	// -----   Add tasks   ----------------------------------------------------
 	LOG(INFO) << "Adding simulation tasks...";
