@@ -6,12 +6,17 @@
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=n_inde01@uni-muenster.de
 
-#SBATCH --get-user-env
-#SBATCH --partition=main
+#SBATCH --partition=debug
 #SBATCH --time=00:10:00
 #SBATCH --array=0-1
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=1
+
+# Activate the PandaRoot environment
+source /lustre/panda/ninderw/config.sh -p
+
+echo $LD_LIBRARY_PATH
+echo $ROOT_INCLUDE_PATH
 
 # Output directory for the simulation, cvs and log files
 export OUTPUT_DIR=/lustre/panda/ninderw/simFiles
