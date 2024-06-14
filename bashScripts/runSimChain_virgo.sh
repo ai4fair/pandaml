@@ -9,7 +9,7 @@
 # sim_complete.C		Event generation & propagation in the dectactor simulation
 # digi_complete.C		Creation of realistic detector responses to the particle propagations
 # skew_complete.C		Correction of the longitudinal parameters of the hits in the skewed straw tubes (currently not used)
-# recoideal_complete.C 	Ideal reconstruction of tracks using the MC truth
+# recoideal_complete.C 		Ideal reconstruction of tracks using the MC truth
 # data_complete.C		Transfer of hit and track information into CSV files for the ML pipeline
 
 # ---------------------------------------------------------------
@@ -34,10 +34,10 @@ echo "Temp Directory (root)	: $tmpRootDir"
 echo "Temp Directory (cvs)	: $tmpCvsDir"
 echo "Output Directory		: $OUTPUT_DIR"
 echo "Number of Events		: $NUM_GEN_EVENTS"
-echo "Prefix     			: $prefix"
-echo "MC Generator 			: $GENERATOR_NAME"
+echo "Prefix     		: $prefix"
+echo "MC Generator 		: $GENERATOR_NAME"
 echo "Beam Momentum       	: $BEAM_MOMENTUM"
-echo "Seed					: $SLURM_ARRAY_TASK_ID"
+echo "Seed			: $SLURM_ARRAY_TASK_ID"
 echo ""
 
 # ---------------------------------------------------------------
@@ -49,20 +49,20 @@ echo "Started Simulation..."
 root -l -b -q ../simulationChainMacros/sim_complete.C\($NUM_GEN_EVENTS,\"$prefix\",\"$GENERATOR_NAME\",$BEAM_MOMENTUM,$SLURM_ARRAY_TASK_ID\)
 
 # Takes the generated particle tracks and simulates the detector response
-echo "Started Digitization..."
-root -l -b -q ../simulationChainMacros/digi_complete.C\($NUM_GEN_EVENTS,\"$prefix\"\)
+#echo "Started Digitization..."
+#root -l -b -q ../simulationChainMacros/digi_complete.C\($NUM_GEN_EVENTS,\"$prefix\"\)
 
 # Applies an correction to the longitudinal parameters of the hits in the skewed straw tubes
-echo "Started Skewed Correction..."
-root -l -b -q ../simulationChainMacros/skew_complete.C\($NUM_GEN_EVENTS,\"$prefix\"\)
+#echo "Started Skewed Correction..."
+#root -l -b -q ../simulationChainMacros/skew_complete.C\($NUM_GEN_EVENTS,\"$prefix\"\)
 
 # Reconstructs tracks from the hits in the straw tubes using MC truth (ideal track reconstruction)
-echo "Started Ideal Reconstruction..."
-root -l -b -q ../simulationChainMacros/recoideal_complete.C\($NUM_GEN_EVENTS,\"$prefix\"\)
+#echo "Started Ideal Reconstruction..."
+#root -l -b -q ../simulationChainMacros/recoideal_complete.C\($NUM_GEN_EVENTS,\"$prefix\"\)
 
 # Transfers the hit and track information into CVS files that are readable for the ML pipeline
-echo "Started CSV Generator..."
-root -l -b -q ../simulationChainMacros/data_complete.C\($NUM_GEN_EVENTS,\"$prefix\",\"$tmpCvsDir\",\"$CVS_GEN_FLAG\"\)
+#echo "Started CSV Generator..."
+#root -l -b -q ../simulationChainMacros/data_complete.C\($NUM_GEN_EVENTS,\"$prefix\",\"$tmpCvsDir\",\"$CVS_GEN_FLAG\"\)
 
 echo "Finished All Simulation Tasks"
 echo ""
