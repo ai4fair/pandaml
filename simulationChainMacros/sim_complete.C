@@ -7,9 +7,10 @@
 
 // FairRoot includes
 #include <FairBoxGenerator.h>
+#include <FairLogger.h>
 
 // PandaRoot includes
-#include <PndMasterRunSim.h>
+// #include <PndMasterRunSim.h>
 #include <PndEvtGenDirect.h>
 #include <PndEmcGeoPar.h>
 
@@ -17,12 +18,12 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
 {
 	// Print the input parameters
 	std::cout << std::endl;
-	LOG(INFO) << "========== Input Parameters ==========";
-	LOG(INFO) << "nEvents: " 	<< nEvents;
-	LOG(INFO) << "prefix: " 	<< prefix.Data();
-	LOG(INFO) << "inputGen: " 	<< inputGen.Data();
-	LOG(INFO) << "pBeam: " 		<< pBeam;
-	LOG(INFO) << "seed: " 		<< seed;
+	LOG(info) << "========== Input Parameters ==========";
+	LOG(info) << "nEvents: " 	<< nEvents;
+	LOG(info) << "prefix: " 	<< prefix.Data();
+	LOG(info) << "inputGen: " 	<< inputGen.Data();
+	LOG(info) << "pBeam: " 		<< pBeam;
+	LOG(info) << "seed: " 		<< seed;
 	std::cout << std::endl;
 	
 	//-------------------------------------------------------------------------//
@@ -59,13 +60,13 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
 	// EvtGen Generator
 	if (inputGen.Contains("dec")) 
 	{
-		LOG(INFO) << "Using the EvtGen generator...";
+		LOG(info) << "Using the EvtGen generator...";
 		fRun->SetInput(inputGen);
 	}
 		
 	if (inputGen.Contains("EvtGenFWP")) 
 	{    
-		LOG(INFO) << "Using EvtGen generator with llbar_fwp.dec...";
+		LOG(info) << "Using EvtGen generator with llbar_fwp.dec...";
 		
 		inputGen = "llbar_fwp.dec";
 		PndEvtGenDirect* evtGenDirect = new PndEvtGenDirect("pbarpSystem", inputGen.Data(), pBeam);
@@ -75,7 +76,7 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
 	
 	if (inputGen.Contains("EvtGenBKG")) 
 	{
-		LOG(INFO) << "Using EvtGen generator with llbar_bkg.dec ...";
+		LOG(info) << "Using EvtGen generator with llbar_bkg.dec ...";
 		
 		inputGen = "llbar_bkg.dec";
 		PndEvtGenDirect* evtGenDirect = new PndEvtGenDirect("pbarpSystem", inputGen.Data(), pBeam);
@@ -86,7 +87,7 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
 	// Single Box Generator
 	if (inputGen.Contains("SBoxGEN")) 
 	{
-		LOG(INFO) << " Using a single BoxGenerator...";
+		LOG(info) << " Using a single BoxGenerator...";
 		
 		FairBoxGenerator* boxGen = new FairBoxGenerator(13, 5);    // 13 = muon; 5 = multiplicity
 		boxGen->SetName("boxGen5mum");							   // Name of the generator for the log file
@@ -100,12 +101,12 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
 	// Double Box Generator
 	if (inputGen.Contains("DBoxGEN")) 
 	{
-		LOG(INFO) << "Using Double BoxGenerator...";
+		LOG(info) << "Using Double BoxGenerator...";
 		
 		// 1st BoxGenerator
 		FairBoxGenerator* boxGen1 = new FairBoxGenerator(13, 5);    // 13=muon; 3122=Lambda; multiplicity
-		boxGen1->SetName("boxGen for 5 mu-");						// Name of the generator for the log file
-		boxGen1->SetPRange(0.1, 1.5);                               // GeV/c (1.0 to 3.0), 100 MeV to 1.5 GeV
+		boxGen1->SetName("boxGen for 5 mu-");				// Name of the generator for the log file
+		boxGen1->SetPRange(0.1, 1.5);                               // Momentum Range: 100 MeV to 1.5 GeV
 		boxGen1->SetPhiRange(0., 360.);                             // Azimuth angle range [degree]
 		boxGen1->SetThetaRange(22., 140.);                          // Polar angle in lab system range [degree], STT
 		//boxGen1->SetThetaRange(3., 150.);                         // Polar angle in lab system range [degree], CTS
@@ -115,7 +116,7 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
 		// 2nd BoxGenerator
 		FairBoxGenerator* boxGen2 = new FairBoxGenerator(-13, 5);	// -13=antimuon; -3122=anti-Lambda; multiplicity
 		boxGen2->SetName("boxGen for 5 mu+");						// Name of the generator for the log file
-		boxGen2->SetPRange(0.1, 1.5);                            	// GeV/c (1.0 to 3.0), 100 MeV to 1.5 GeV
+		boxGen2->SetPRange(0.1, 1.5);                          		// Momentum range: 100 MeV to 1.5 GeV
 		boxGen2->SetPhiRange(0., 360.);                          	// Azimuth angle range [degree]
 		boxGen2->SetThetaRange(22., 140.);                       	// Polar angle in lab system range [degree], STT
 		//boxGen2->SetThetaRange(3., 150.);                      	// Polar angle in lab system range [degree], CTS
@@ -129,19 +130,19 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
 	
 	if (inputGen.Contains("dpm")) 
 	{
-		LOG(INFO) << "Using the DPM generator...";
+		LOG(info) << "Using the DPM generator...";
 		fRun->SetInput(inputGen);
 	}
 	
 	if (inputGen.Contains("ftf")) 
 	{
-		LOG(INFO) << "Using the FTF generator...";
+		LOG(info) << "Using the FTF generator...";
 		fRun->SetInput(inputGen);
 	}
 	
 	if (inputGen.Contains("pythia8")) 
 	{
-		LOG(INFO) << "Using the Pythia8 generator...";
+		LOG(info) << "Using the Pythia8 generator...";
 		fRun->SetInput(inputGen);
 	}    
 	
@@ -154,19 +155,19 @@ int sim_complete(Int_t nEvents=10, TString prefix="", TString inputGen="", Doubl
 	//fRun->SetUserDecay(decayMode);        // Force FairRoot for a certain decay chains (whatever that means)
 	
 	// -----  Initialization   ------------------------------------------------
-	LOG(INFO) << "Setting up the run...";
+	LOG(info) << "Setting up the run...";
 	fRun->Setup(prefix);
 
 	// -----   Geometry   -----------------------------------------------------
-	LOG(INFO) << "Creating the geometry...";
+	LOG(info) << "Creating the geometry...";
 	fRun->CreateGeometry();
 
 	// -----   Add tasks   ----------------------------------------------------
-	LOG(INFO) << "Adding simulation tasks...";
+	LOG(info) << "Adding simulation tasks...";
 	fRun->AddSimTasks();
 	
 	// -----   Intialise and run   --------------------------------------------
-	LOG(INFO) << "Initialising and running the simulation...";
+	LOG(info) << "Initialising and running the simulation...";
 
 	fRun->Init(); // There still seem to be some issues with initializing some EMC functions when the container is loaded
 	fRun->Run(nEvents); 

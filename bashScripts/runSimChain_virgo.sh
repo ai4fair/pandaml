@@ -49,20 +49,20 @@ echo "Started Simulation..."
 root -l -b -q ../simulationChainMacros/sim_complete.C\($NUM_GEN_EVENTS,\"$prefix\",\"$GENERATOR_NAME\",$BEAM_MOMENTUM,$SLURM_ARRAY_TASK_ID\)
 
 # Takes the generated particle tracks and simulates the detector response
-#echo "Started Digitization..."
-#root -l -b -q ../simulationChainMacros/digi_complete.C\($NUM_GEN_EVENTS,\"$prefix\"\)
+echo "Started Digitization..."
+root -l -b -q ../simulationChainMacros/digi_complete.C\($NUM_GEN_EVENTS,\"$prefix\"\)
 
 # Applies an correction to the longitudinal parameters of the hits in the skewed straw tubes
-#echo "Started Skewed Correction..."
-#root -l -b -q ../simulationChainMacros/skew_complete.C\($NUM_GEN_EVENTS,\"$prefix\"\)
+echo "Started Skewed Correction..."
+root -l -b -q ../simulationChainMacros/skew_complete.C\($NUM_GEN_EVENTS,\"$prefix\"\)
 
 # Reconstructs tracks from the hits in the straw tubes using MC truth (ideal track reconstruction)
-#echo "Started Ideal Reconstruction..."
-#root -l -b -q ../simulationChainMacros/recoideal_complete.C\($NUM_GEN_EVENTS,\"$prefix\"\)
+echo "Started Ideal Reconstruction..."
+root -l -b -q ../simulationChainMacros/recoideal_complete.C\($NUM_GEN_EVENTS,\"$prefix\"\)
 
 # Transfers the hit and track information into CVS files that are readable for the ML pipeline
-#echo "Started CSV Generator..."
-#root -l -b -q ../simulationChainMacros/data_complete.C\($NUM_GEN_EVENTS,\"$prefix\",\"$tmpCvsDir\",\"$CVS_GEN_FLAG\"\)
+echo "Started CSV Generator..."
+root -l -b -q ../simulationChainMacros/data_complete.C\($NUM_GEN_EVENTS,\"$prefix\",\"$tmpCvsDir\",\"$CVS_GEN_FLAG\"\)
 
 echo "Finished All Simulation Tasks"
 echo ""
@@ -89,8 +89,10 @@ mv ${SLURM_JOB_NAME}_${SLURM_ARRAY_TASK_ID}.err $logDir
 echo "Done"
 echo " "
 
-echo "Moving the gphysi.dat file containing the GEANT4 parameters to $OUTPUT_DIR/$SLURM_JOB_NAME"
-mv gphysi.dat $OUTPUT_DIR/$SLURM_JOB_NAME
+if [ -e "gphysi.dat" ]; then
+	echo "Moving the gphysi.dat file containing the GEANT4 parameters to $OUTPUT_DIR/$SLURM_JOB_NAME"
+	mv gphysi.dat $OUTPUT_DIR/$SLURM_JOB_NAME
+fi
 
 # Tidy Up
 echo "Tidying Up..."
