@@ -20,22 +20,6 @@
 # $5: Random seed for the simulation (default: 42)
 
 # ---------------------------------------------------------------
-#                       Create Directories
-# ---------------------------------------------------------------
-
-# target directory for the output files
-_target=/home/n_idw/simFiles
-
-# create the directory structure
-mkdir -p $_target"/root"
-mkdir -p $_target"/log"
-mkdir -p $_target"/cvs"
-
-# make temp directory for the intermediate files
-tmpdir="/tmp/"$USER
-mkdir -p $tmpdir
-
-# ---------------------------------------------------------------
 #                       User & Default Inputs
 # ---------------------------------------------------------------
 
@@ -70,6 +54,22 @@ if test "$5" != ""; then
 fi
 
 flag="WithoutIdeal"     # With/Without IdealTrackFinder to Fill fParticles CSV
+
+# ---------------------------------------------------------------
+#                       Create Directories
+# ---------------------------------------------------------------
+
+# target directory for the output files
+_target=/home/n_idw/simFiles/$prefix
+
+# create the directory structure
+mkdir -p $_target"/root"
+mkdir -p $_target"/log"
+mkdir -p $_target"/cvs"
+
+# make temp directory for the intermediate files
+tmpdir="/tmp/"$USER
+mkdir -p $tmpdir
 
 # Output path
 outprefix=$tmpdir"/"$prefix
